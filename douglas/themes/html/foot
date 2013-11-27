@@ -1,0 +1,9 @@
+<p>
+  $(blog_rights)
+</p>
+<p>
+  <a href="http://github.com/willkg/douglas/">Made with Douglas</a>
+  $(douglas_name)::$(douglas_version)
+</p>
+</body>
+</html>

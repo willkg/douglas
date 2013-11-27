@@ -3,7 +3,7 @@
 
    This document file was automatically generated.  If you want to edit
    the documentation, DON'T do it here--do it in the docstring of the
-   appropriate plugin.  Plugins are located in ``Pyblosxom/plugins/``.
+   appropriate plugin.  Plugins are located in ``Douglas/plugins/``.
 
 =======================================================
  yeararchives - Builds year-based archives listing.... 
@@ -21,9 +21,9 @@ either your head or foot template.
 Install
 =======
 
-This plugin comes with Pyblosxom.  To install, do the following:
+This plugin comes with Douglas.  To install, do the following:
 
-1. Add ``Pyblosxom.plugins.yeararchives`` to the ``load_plugins`` list
+1. Add ``Douglas.plugins.yeararchives`` to the ``load_plugins`` list
    in your ``config.py`` file.
 
 2. Add ``$(archivelinks)`` to your head and/or foot templates.
@@ -70,7 +70,7 @@ The vars available with typical example values are::
 .. Note::
 
    The ``archive_template`` variable value is formatted using Python
-   string formatting rules--not Pyblosxom template rules!
+   string formatting rules--not Douglas template rules!
 
 
 License

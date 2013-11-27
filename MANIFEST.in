@@ -8,8 +8,8 @@ include UPGRADE
 include setup.py
 
 recursive-include bin *
-recursive-include Pyblosxom *
-recursive-include Pyblosxom/data *
-recursive-include Pyblosxom/flavours *
-recursive-include Pyblosxom/tests *
+recursive-include douglas *
+recursive-include douglas/data *
+recursive-include douglas/themes *
+recursive-include douglas/tests *
 recursive-include docs *

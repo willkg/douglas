@@ -1,21 +1,12 @@
 #!/usr/bin/env python
 
-#######################################################################
-# This file is part of Pyblosxom.
-#
-# Copyright (C) 2003-2011 by the Pyblosxom team.  See AUTHORS.
-#
-# Pyblosxom is distributed under the MIT license.  See the file
-# LICENSE for distribution details.
-#######################################################################
-
 import os
 import re
 from setuptools import setup, find_packages
 
 
 READMEFILE = "README.rst"
-VERSIONFILE = os.path.join("Pyblosxom", "_version.py")
+VERSIONFILE = os.path.join("douglas", "__init__.py")
 VSRE = r"^__version__ = ['\"]([^'\"]*)['\"]"
 
 
@@ -30,23 +21,22 @@ def get_version():
 
 
 setup(
-    name="pyblosxom",
+    name="douglas",
     version=get_version(),
-    description="Pyblosxom is a file-based weblog engine.",
+    description="Douglas is a file-based blog system.",
     long_description=open(READMEFILE).read(),
     license='MIT',
-    author="Will Kahn-Greene, et al",
+    author="Will Kahn-Greene",
     author_email="willkg@bluesock.org",
-    keywords="blog pyblosxom cgi weblog wsgi",
-    url="https://github.com/willkg/pyblosxom/",
+    keywords="blog",
+    url="https://github.com/willkg/douglas/",
     packages=find_packages(),
-    scripts=["bin/pyblosxom-cmd"],
+    scripts=["bin/douglas-cmd"],
     zip_safe=False,
-    test_suite="Pyblosxom.tests.testrunner.test_suite",
     include_package_data=True,
     install_requires=[],
     classifiers=[
-        "Development Status :: 5 - Production/Stable",
+        "Development Status :: 2 - Pre-Alpha",
         "Environment :: Web Environment",
         "Intended Audience :: Developers",
         "License :: OSI Approved :: MIT License",

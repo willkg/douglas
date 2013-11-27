@@ -1,31 +1,28 @@
-.. Pyblosxom documentation master file, created by sphinx-quickstart on
+.. Douglas documentation master file, created by sphinx-quickstart on
    Mon Feb 16 00:26:34 2009.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
 =======================================
- Welcome to Pyblosxom's documentation!
+ Welcome to Douglas's documentation!
 =======================================
 
 .. _part-one:
 
-Part 1: Pyblosxom user manual
+Part 1: Douglas user manual
 =============================
 
-Documentation for installing, configuring and tweaking Pyblosxom for your
+Documentation for installing, configuring and tweaking Douglas for your
 purposes.
 
 .. toctree::
    :maxdepth: 2
 
    introduction
-   about_pyblosxom
+   about_douglas
    license
    whatsnew
-   whatsnewolder
-   install
-   upgrade
-   pyblosxom_cmd
+   douglas_cmd
    deploy_cgi
    deploy_paste
    deploy_apache_mod_wsgi
@@ -33,7 +30,7 @@ purposes.
    deploy_staticrendering
    config_variables
    writing_entries
-   flavours_and_templates
+   themes_and_templates
    syndication
    renderers
    comments
@@ -47,7 +44,7 @@ purposes.
 Part 2: Core plugin documentation
 =================================
 
-Documentation for plugins that come with Pyblosxom.
+Documentation for plugins that come with Douglas.
 
 .. toctree::
    :titlesonly:
@@ -59,7 +56,7 @@ Documentation for plugins that come with Pyblosxom.
 Part 3: Developer documentation
 ===============================
 
-Documentation anyone interested in hacking on Pyblosxom, writing
+Documentation anyone interested in hacking on Douglas, writing
 plugins, or things of that ilk.
 
 .. toctree::

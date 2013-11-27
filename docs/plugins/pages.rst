@@ -3,7 +3,7 @@
 
    This document file was automatically generated.  If you want to edit
    the documentation, DON'T do it here--do it in the docstring of the
-   appropriate plugin.  Plugins are located in ``Pyblosxom/plugins/``.
+   appropriate plugin.  Plugins are located in ``Douglas/plugins/``.
 
 ================================================
  pages - Allows you to include non-blog-entr... 
@@ -17,20 +17,20 @@ to add other content to your blog that's not a blog entry.  For
 example, an "about this blog" page or a page covering a list of your
 development projects.
 
-This plugin allows you to have pages served by Pyblosxom that aren't
+This plugin allows you to have pages served by Douglas that aren't
 blog entries.
 
 Additionally, this plugin allows you to have a non-blog-entry front
-page.  This makes it easier to use Pyblosxom to run your entire
+page.  This makes it easier to use Douglas to run your entire
 website.
 
 
 Install
 =======
 
-This plugin comes with Pyblosxom.  To install, do the following:
+This plugin comes with Douglas.  To install, do the following:
 
-1. add ``Pyblosxom.plugins.pages`` to the ``load_plugins`` list in
+1. add ``Douglas.plugins.pages`` to the ``load_plugins`` list in
    your ``config.py`` file.
 
 2. configure the plugin using the configuration variables below

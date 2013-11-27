@@ -1,14 +1,14 @@
 .. _deploy-cgi-chapter:
 
 ============================
-Deploying Pyblosxom with CGI
+Deploying Douglas with CGI
 ============================
 
 Summary
 =======
 
-You can run Pyblosxom as a CGI script with many web servers.  This
-document covers setting Pyblosxom up as a CGI script.
+You can run Douglas as a CGI script with many web servers.  This
+document covers setting Douglas up as a CGI script.
 
 
 Dependencies
@@ -21,11 +21,11 @@ helps to know how to run CGI scripts on that server, too.
 Deployment
 ==========
 
-1. Copy the ``pyblosxom.cgi`` file from the blog directory (the
-   directory which you created with ``pyblosxom-cmd create ./blog/``)
+1. Copy the ``douglas.cgi`` file from the blog directory (the
+   directory which you created with ``douglas-cmd create ./blog/``)
    into your CGI directory.
 
-2. Edit the ``pyblosxom.cgi`` file.
+2. Edit the ``douglas.cgi`` file.
 
    The top of the file looks something like this
 
@@ -54,16 +54,16 @@ Deployment
    make sure the path being appended is the directory that your
    ``config.py`` file is in.
 
-4. Make sure the ``pyblosxom.cgi`` file has the correct permissions
+4. Make sure the ``douglas.cgi`` file has the correct permissions
    and ownership for running a CGI script in this directory for the
    server that you're using.
 
 5. Make sure your blog directory has the correct permissions for being
    read by the process executing your CGI script.
 
-6. Run your ``pyblosxom.cgi`` script by doing::
+6. Run your ``douglas.cgi`` script by doing::
 
-       % ./pyblosxom.cgi test
+       % ./douglas.cgi test
 
    If that doesn't work, double-check to make sure you've completed
    the above steps, then check the trouble-shooting section below,
@@ -73,7 +73,7 @@ Deployment
 
 If that does work, then try to run the CGI script from your
 web browser.  The url is dependent on where you put the
-``pyblosxom.cgi`` script and how CGI works on your web server.
+``douglas.cgi`` script and how CGI works on your web server.
 
 
 Trouble-shooting
@@ -83,23 +83,23 @@ We're going to try to break this down a bit into categories. Bear with
 us and keep trying things. 
 
 If you have problems and have gone through this section to no avail,
-ask a question on the pyblosxom-users mailing list or ask us on IRC.
+ask a question on the douglas-users mailing list or ask us on IRC.
 Details for both of these are on the `website`_.
 
-.. _website: http://pyblosxom.github.com/
+.. _website: http://douglas.github.com/
 
 
-Running ./pyblosxom.cgi doesn't work
+Running ./douglas.cgi doesn't work
 ------------------------------------
 
 First, you should check to see if you have the minimum requirements
-for Pyblosxom on your system.  They're listed in the
+for Douglas on your system.  They're listed in the
 :ref:`Requirements section of the Install chapter <requirements>`.  If
 not, then please install them.
 
 If Python is installed on your system, make sure the first line in
-``pyblosxom.cgi`` points to the correct Python interpreter.  By
-default, ``pyblosxom.cgi`` uses ``env`` to execute the Python
+``douglas.cgi`` points to the correct Python interpreter.  By
+default, ``douglas.cgi`` uses ``env`` to execute the Python
 interpreter.  In some rare systems, ``/usr/bin/env`` doesn't exist or
 the system may have odd environment settings.  In those cases, you may
 edit the first line to point to the Python interpreter directly.  For
@@ -107,13 +107,13 @@ example::
 
     #!/usr/bin/python
 
-Then try running ``./pyblosxom.cgi`` again.
+Then try running ``./douglas.cgi`` again.
 
 If Python is installed on your system and the first line of
-``pyblosxom.cgi`` is correct, check for permissions issues.
-``pyblosxom.cgi`` is a script, so it needs execute permission in order
+``douglas.cgi`` is correct, check for permissions issues.
+``douglas.cgi`` is a script, so it needs execute permission in order
 to function.  If those aren't set, then fix that and try running
-``./pyblosxom.cgi`` again.
+``./douglas.cgi`` again.
 
 Check the error logs for your web server.
 
@@ -127,25 +127,25 @@ you're using the wrong URL.  Here are some questions to ask yourself:
 * Are you using an ``.htaccess`` file?
 * Does your server allow you to run CGI scripts?
 * Do other CGI scripts in this directory work?
-* Does the URL you're trying to use to access Pyblosxom look like
+* Does the URL you're trying to use to access Douglas look like
   other URLs that work on your system?
 
 
 I see a HTTP 500 error when I try to bring up my blog
 -----------------------------------------------------
 
-At this point, running ``./pyblosxom.cgi`` at the command prompt
+At this point, running ``./douglas.cgi`` at the command prompt
 should work fine.  If you haven't done that and you're busy
 trouble-shooting, go back and review the deployment instructions.
 
-If the problem is with Pyblosxom and not your web server, then you
+If the problem is with Douglas and not your web server, then you
 should see a pretty traceback that will help you figure out what the
 specific problem is.
 
 If the traceback and information doesn't make any sense to you, ask a
-question on the pyblosxom-users mailing list or ask us on IRC.
+question on the douglas-users mailing list or ask us on IRC.
 Details for both of these are on the `website
-<http://pyblosxom.github.com/>`_.
+<http://douglas.github.com/>`_.
 
 If you don't see a traceback, then you either have a configuration
 problem with your web server or a configuration problem with Python.
@@ -155,12 +155,12 @@ For Apache, look for the ``error.log`` file in a place like
 where your web server's error logs are, ask your system administrator.
 
 Does the account your web server runs as have execute access to your
-``pyblosxom.cgi`` script?  If your web server does not have the
-permissions to read and execute your ``pyblosxom.cgi`` script, then
+``douglas.cgi`` script?  If your web server does not have the
+permissions to read and execute your ``douglas.cgi`` script, then
 your blog will not work.
 
 Do you have plugins loaded?  If you do, comment out the
-``load_plugins`` setting in your ``config.py`` file so that Pyblosxom
+``load_plugins`` setting in your ``config.py`` file so that Douglas
 isn't loading any plugins.
 
 For example::
@@ -186,12 +186,12 @@ file to ``debug``.  For example::
     py["renderer"] = "debug"
 
 That will show a lot more detail about your configuration, what the
-web server passes Pyblosxom in environment variables, and other data
+web server passes Douglas in environment variables, and other data
 about your blog that might help you figure out what your problem is.
 
-If that doesn't help, ask a question on the pyblosxom-users mailing
+If that doesn't help, ask a question on the douglas-users mailing
 list or ask us on IRC.  Details for both of these are on the `website
-<http://pyblosxom.github.com/>`_.
+<http://douglas.github.com/>`_.
 
 
 UGH! My blog looks UGLY!
@@ -210,7 +210,7 @@ UGH! My blog looks UGLY!
 I hate writing in HTML!
 -----------------------
 
-That's ok.  Pyblosxom supports formatters and entry parsers which
+That's ok.  Douglas supports formatters and entry parsers which
 allow you to use a variety of markups for writing blog entries.  See
 the documentation on Writing Entries for more information.
 
@@ -234,24 +234,24 @@ that will make it nicer.  However, they're not necessary and they're
 advanced and we consider these things to be very much a "you're on
 your own" kind of issue.
 
-If you ever have problems with Pyblosxom and you ask us questions on
-the pyblosxom-users or pyblosxom-devel mailing lists, make sure you
+If you ever have problems with Douglas and you ask us questions on
+the douglas-users or douglas-devel mailing lists, make sure you
 explicitly state what things you've done from this chapter.  It'll go
 a long way in helping us to help you.
 
 
-Renaming the pyblosxom.cgi script
+Renaming the douglas.cgi script
 =================================
 
-In the default installation, the Pyblosxom script is named
-``pyblosxom.cgi``.
+In the default installation, the Douglas script is named
+``douglas.cgi``.
 
 For a typical user on an Apache installation with user folders turned
-on, Pyblosxom URLs could look like this::
+on, Douglas URLs could look like this::
 
-    http://example.com/~joe/cgi-bin/pyblosxom.cgi
-    http://example.com/~joe/cgi-bin/pyblosxom.cgi/an_entry.html
-    http://example.com/~joe/cgi-bin/pyblosxom.cgi/dev/another_entry.html 
+    http://example.com/~joe/cgi-bin/douglas.cgi
+    http://example.com/~joe/cgi-bin/douglas.cgi/an_entry.html
+    http://example.com/~joe/cgi-bin/douglas.cgi/dev/another_entry.html 
 
 
 That gets pretty long and it's not very good looking.  For example,
@@ -260,20 +260,20 @@ challenging.  It would be nice if we could shorten and simplify it.
 
 So, we have some options:
 
-* Change the name of the ``pyblosxom.cgi`` script.
+* Change the name of the ``douglas.cgi`` script.
 
 * And if that's not good enough for you, use the Apache mod_rewrite
-  module to get URLs internally redirected to the ``pyblosxom.cgi``
+  module to get URLs internally redirected to the ``douglas.cgi``
   script.
 
 Both methods are described here in more detail.
 
 
-Change the name of the pyblosxom.cgi script
+Change the name of the douglas.cgi script
 -------------------------------------------
 
-There's no reason that ``pyblosxom.cgi`` has to be named
-``pyblosxom.cgi``.  Let's try changing it ``blog``.  Now our example
+There's no reason that ``douglas.cgi`` has to be named
+``douglas.cgi``.  Let's try changing it ``blog``.  Now our example
 URLs look like this::
 
     http://example.com/~joe/cgi-bin/blog
@@ -302,7 +302,7 @@ might be able to do something like this::
 
     # if the user doesn't specify a file, then instead of doing the
     # regular directory listing, we look at "blog" (which is our
-    # pyblosxom.cgi script renamed)
+    # douglas.cgi script renamed)
     DirectoryIndex blog 
 
     # this tells Apache that even though "blog" doesn't end in .cgi,
@@ -326,8 +326,8 @@ do URL rewriting based on all sorts of things.  See the Apache manual
 for more details.
 
 In our case, we want all incoming URLs pointing to ``blog`` to get
-rewritten to ``cgi-bin/pyblosxom.cgi`` so they can be handled by
-Pyblosxom.  Then all our URLs will look like this::
+rewritten to ``cgi-bin/douglas.cgi`` so they can be handled by
+Douglas.  Then all our URLs will look like this::
 
     http://example.com/~joe/blog
     http://example.com/~joe/blog/an_entry.html
@@ -339,7 +339,7 @@ that) in our ``public_html`` directory (or wherever it is that
 ``/~joe/`` points to).  In that file we have the following code::
 
     RewriteEngine on
-    RewriteRule   ^blog?(.*)$   /~joe/cgi-bin/pyblosxom.cgi$1   [last]
+    RewriteRule   ^blog?(.*)$   /~joe/cgi-bin/douglas.cgi$1   [last]
 
 
 The first line turns on the Apache mod_rewrite engine so that it will

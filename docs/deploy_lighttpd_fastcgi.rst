@@ -1,13 +1,13 @@
 .. _deploy-lighttpd-mod-fastcgi:
 
 ==============================================
- Deploying Pyblosxom with Lighttpd and fastcgi
+ Deploying Douglas with Lighttpd and fastcgi
 ==============================================
 
 Summary
 =======
 
-This walks through install Pyblosxom as a FastCGI application on 
+This walks through install Douglas as a FastCGI application on 
 a Lighttpd web server with mod_fcgi installed.
 
 If you find any issues, please let us know.
@@ -33,13 +33,13 @@ Deployment
    ``config.py`` setup and other bits of **Setting up a blog** in
    ``install_cgi``.
 
-3. Create a ``pyblosxom.wsgi`` script that looks something like this:
+3. Create a ``douglas.wsgi`` script that looks something like this:
 
    .. code-block:: python
       :linenos:
 
       #!/usr/bin/env python
-      # This is the pyblosxom.wsgi script that powers the _______
+      # This is the douglas.wsgi script that powers the _______
       # blog.
 	  
       import sys
@@ -51,14 +51,14 @@ Deployment
       # call add_to_path with the directory that your config.py lives in.
       add_to_path("/home/joe/blog")
 
-      # if you have Pyblosxom installed in a directory and NOT as a
+      # if you have Douglas installed in a directory and NOT as a
       # Python library, then call add_to_path with the directory that
-      # Pyblosxom lives in.  For example, if I untar'd
-      # pyblosxom-1.5.tar.gz into /home/joe/, then add like this:
-      # add_to_path("/home/joe/pyblosxom-1.5/")
+      # Douglas lives in.  For example, if I untar'd
+      # douglas-1.5.tar.gz into /home/joe/, then add like this:
+      # add_to_path("/home/joe/douglas-1.5/")
 
-      import Pyblosxom.pyblosxom
-      application = Pyblosxom.pyblosxom.PyblosxomWSGIApp()
+      import Douglas.douglas
+      application = Douglas.douglas.DouglasWSGIApp()
 
       from flup.server.fcgi import WSGIServer
       WSGIServer(application).run()
@@ -67,8 +67,8 @@ Deployment
 
    ::
 
-      chown :www-data pyblosxom.wsgi
-      chmod g+x pyblosxom.wsgi
+      chown :www-data douglas.wsgi
+      chmod g+x douglas.wsgi
 
    This way you change group ownership to the group that lighty belongs
    to and give all group members execution permission.
@@ -92,7 +92,7 @@ Deployment
                 "port" => 3033,
                 "check-local" => "disable",
                 "max-procs" => 1,
-                "bin-path" => "/path/to/pyblosxom.wsgi"
+                "bin-path" => "/path/to/douglas.wsgi"
            )
           )
          )
@@ -112,7 +112,7 @@ Deployment
 
    Checkout what ``check-local`` and ``max-procs`` mean in `Lighttpd docs`_.
 
-   Change ``/path/to/pyblosxom.wsgi`` to be the absolute path to the
+   Change ``/path/to/douglas.wsgi`` to be the absolute path to the
    .wsgi file set up in step 3.
 
 5. Now you can enable and disable this part of configuration with 
@@ -125,7 +125,7 @@ Deployment
 
 .. Note::
 
-   Any time you make changes to Pyblosxom (update, add plugins, change
+   Any time you make changes to Douglas (update, add plugins, change
    configuration), you'll have to force-reload configuration of Lighttpd.
 
 .. _`Lighttpd docs`: http://redmine.lighttpd.net/projects/lighttpd/wiki/Docs:ConfigurationOptions#mod_fastcgi-fastcgi

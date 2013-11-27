@@ -1,7 +1,7 @@
+docs/_build
 build
 dist
-*.pyc
-pyblosxom.egg-info
-docs/_build
-*~
+douglas.egg-info
 .gitignore
+*~
+*.pyc

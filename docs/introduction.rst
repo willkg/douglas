@@ -2,12 +2,12 @@
 Introduction
 ============
 
-This is the manual for Pyblosxom.  
+This is the manual for Douglas.  
 
 This manual will always be free.  It's licensed under the MIT License
-along with the rest of Pyblosxom.  The manual is version controlled along 
-with the rest of Pyblosxom in the Git repository at
-https://github.com/willkg/pyblosxom/ .
+along with the rest of Douglas.  The manual is version controlled along 
+with the rest of Douglas in the Git repository at
+https://github.com/willkg/douglas/ .
 
 This manual is a work in progress.  In many cases, missing information
 is denoted with a *FIXME* in the text.

@@ -5,7 +5,7 @@ Comments
 Summary
 =======
 
-Pyblosxom does not come with comments functionality built-in.  There are 
+Douglas does not come with comments functionality built-in.  There are 
 several ways you can add comments functionality to your blog.  This chapter
 talks about those.
 
@@ -35,7 +35,7 @@ If this is interesting to you, `sign up for a Disqus account`_.
 Writing your own comments plugin
 ================================
 
-Pyblosxom allows for plugins allowing you to write a plugin to add comments
+Douglas allows for plugins allowing you to write a plugin to add comments
 to your website.  This isn't for the feint of heart--there are a lot of bits
 to think about.
 
@@ -51,14 +51,14 @@ Cons:
 Comments plugin
 ===============
 
-Pyblosxom comes with a comments plugin that has a series of features, but
+Douglas comes with a comments plugin that has a series of features, but
 also has some issues and isn't trivial to set up.
 
 Pros:
 
 * it's entirely in your control
 * you can extend and modify it to meet your needs
-* a lot of Pyblosxom users use it
+* a lot of Douglas users use it
 
 Cons:
 

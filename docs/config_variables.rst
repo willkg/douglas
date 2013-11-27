@@ -1,9 +1,9 @@
 =====================
-Configuring Pyblosxom
+Configuring Douglas
 =====================
 
-You configure a Pyblosxom blog by setting configuration variables in a
-Python file called ``config.py``.  Each Pyblosxom blog has its own
+You configure a Douglas blog by setting configuration variables in a
+Python file called ``config.py``.  Each Douglas blog has its own
 ``config.py`` file.
 
 This chapter documents the ``config.py`` variables.  Some of these are
@@ -11,7 +11,7 @@ required, others are optional.
 
 .. Note::
 
-   Pyblosxom comes with a sample config file.  This file does **not**
+   Douglas comes with a sample config file.  This file does **not**
    have everything listed below in it.  If you want to use a variable
    that's not listed in your config file---just add it.
 
@@ -21,12 +21,12 @@ Config variables and syntax
 
 Each configuration variable is set with a line like::
 
-    py["blog_title"] = "Another pyblosxom blog"
+    py["blog_title"] = "Another douglas blog"
 
 where:
 
 * *blog_title* is the name of the configuration variable
-* *"Another pyblosxom blog"* is the value
+* *"Another douglas blog"* is the value
 
 Most configuration values are strings and must be enclosed in quotes,
 but some are lists, numbers or other types of values.
@@ -69,7 +69,7 @@ uses Python code conventions.
 Plugin variables
 ================
 
-If you install any Pyblosxom plugins those plugins may ask you to set
+If you install any Douglas plugins those plugins may ask you to set
 additional variables in your ``config.py`` file.  Those variables will
 be documented in the documentation that comes with the plugin or at
 the top of the plugin's source code file.  Additional plugin variables
@@ -100,24 +100,24 @@ Codebase configuration
 
    (optional) string
 
-   If you have installed Pyblosxom on your web server using your
+   If you have installed Douglas on your web server using your
    distribution's package manager or Python setuptools then you don't
    need to set the codebase variable.
 
-   If you cannot install Pyblosxom on your web server then you can
-   save the Pyblosxom source code to a location on your server and use
+   If you cannot install Douglas on your web server then you can
+   save the Douglas source code to a location on your server and use
    the codebase setting instead. The codebase setting tells the Python
-   interpreter where to find the Pyblosxom codebase. This should be
-   the full path to where the Pyblosxom directory is on your
+   interpreter where to find the Douglas codebase. This should be
+   the full path to where the Douglas directory is on your
    system. It should be the path to the directory that holds the
-   "Pyblosxom" directory (note the case--uppercase P lowercase b!).
+   "Douglas" directory (note the case--uppercase P lowercase b!).
 
-   For example, if you untarred Pyblosxom into
-   ``/home/joe/pyblosxom-1.5/``, then the Pyblosxom (uppercase P and
-   lowercase b) directory should be in ``/home/joe/pyblosxom-1.5/``
+   For example, if you untarred Douglas into
+   ``/home/joe/douglas-1.5/``, then the Douglas (uppercase P and
+   lowercase b) directory should be in ``/home/joe/douglas-1.5/``
    and you would set your codebase variable like this::
 
-      py["codebase"] = "/home/joe/pyblosxom-1.5/"
+      py["codebase"] = "/home/joe/douglas-1.5/"
 
 
 Blog configuration
@@ -150,11 +150,11 @@ Blog configuration
       py["blog_description"] = "Critiques of restaurants in the Boston area"
 
 
-   Or if your blog covered development on Pyblosxom, your
+   Or if your blog covered development on Douglas, your
    ``blog_description`` might go like this::
 
       py["blog_description"] = (
-          "Ruminations on the development of Pyblosxom and "
+          "Ruminations on the development of Douglas and "
           "related things that I discovered while working on "
           "the project")
 
@@ -264,7 +264,7 @@ Blog configuration
 
    (optional) string; defaults to ``"C"``
 
-   Pyblosxom uses the locale config variable to adjust the values for
+   Douglas uses the locale config variable to adjust the values for
    month names and dates.
 
    In general, you don't need to set this unless you know you're not
@@ -315,7 +315,7 @@ Blog configuration
    (optional) integer; defaults to 0
 
    The depth setting determines how many levels deep in the directory
-   (category) tree that Pyblosxom will display when doing indexes.
+   (category) tree that Douglas will display when doing indexes.
 
    * 0 - infinite depth (aka grab everything) DEFAULT
    * 1 - datadir only
@@ -330,9 +330,9 @@ Blog configuration
    (optional) list of strings; defaults to ``[]``
 
    The ``ignore_directories`` variable allows you to specify which
-   directories in your datadir should be ignored by Pyblosxom.
+   directories in your datadir should be ignored by Douglas.
 
-   This defaults to an empty list (i.e. Pyblosxom will not ignore any
+   This defaults to an empty list (i.e. Douglas will not ignore any
    directories).
 
    For example, if you use CVS to manage the entries in your datadir,
@@ -358,9 +358,9 @@ Blog configuration
 
    (optional) string
 
-   This is the full path to where your Pyblosxom flavours are kept.
+   This is the full path to where your Douglas flavours are kept.
 
-   If you do not set the ``flavourdir``, then Pyblosxom will look for
+   If you do not set the ``flavourdir``, then Douglas will look for
    your flavours and templates in the datadir alongside your entries.
 
    .. Note::
@@ -403,7 +403,7 @@ Blog configuration
       py["default_flavour"] = "joy"
 
 
-   Doing this will cause Pyblosxom to use the "joy" flavour whenever
+   Doing this will cause Douglas to use the "joy" flavour whenever
    URIs are requested that don't specify the flavour.
 
    For example, the following will all use the "joy" flavour::
@@ -477,15 +477,15 @@ Blog configuration
    url into their browser, then they would see the main index page for
    your blog.
 
-   For example, if Joe Smith put his ``pyblosxom.cgi`` script into a
+   For example, if Joe Smith put his ``douglas.cgi`` script into a
    cgi-bin directory and he was using Apache, his base_url might look
    like this::
 
-      py["base_url"] = "http://example.com/~joe/cgi-bin/pyblosxom.cgi"
+      py["base_url"] = "http://example.com/~joe/cgi-bin/douglas.cgi"
 
-   However, it's common that this can be determined by Pyblosxom by
+   However, it's common that this can be determined by Douglas by
    looking at the HTTP environment variables--so if you're not doing
-   any url re-writing, it's possible that Pyblosxom can correctly
+   any url re-writing, it's possible that Douglas can correctly
    determine the url and you won't have to set the base_url variable
    at all.
 
@@ -509,7 +509,7 @@ Blog configuration
 
    (optional) string; defaults to "plain"
 
-   The default entry parser that Pyblosxom will use to parse this
+   The default entry parser that Douglas will use to parse this
    blog's entry files.  See :ref:`Entry parsers`.
 
 
@@ -520,28 +520,28 @@ Logging configuration
 
    (optional) string
 
-   This specifies the file that Pyblosxom will log messages to.
+   This specifies the file that Douglas will log messages to.
 
    If this is set to "NONE", then log messages will be silently
    ignored.
 
-   If Pyblosxom cannot open the file for writing, then log messages
+   If Douglas cannot open the file for writing, then log messages
    will be sent to sys.stderr.
 
-   For example, if you wanted Pyblosxom to log messages to
-   ``/home/joe/blog/logs/pyblosxom.log``, then you would set
+   For example, if you wanted Douglas to log messages to
+   ``/home/joe/blog/logs/douglas.log``, then you would set
    ``log_file`` to::
 
-      py["log_file"] = "/home/joe/blog/logs/pyblosxom.log"
+      py["log_file"] = "/home/joe/blog/logs/douglas.log"
 
    If you were on Windows, then you might set it to::
 
-      py["log_file"] = "c:/blog/logs/pyblosxom.log"
+      py["log_file"] = "c:/blog/logs/douglas.log"
 
    .. Note::
 
-      The web server that is executing Pyblosxom must be able to write
-      to the directory containing your ``pyblosxom.log`` file.
+      The web server that is executing Douglas must be able to write
+      to the directory containing your ``douglas.log`` file.
 
 
 .. py:data:: log_level
@@ -593,13 +593,13 @@ Logging configuration
    Each plugin can log messages on its own channel.  Therefore channel
    name == plugin name.
 
-   Pyblosxom logs its messages to a channel named "root".
+   Douglas logs its messages to a channel named "root".
 
    .. Warning::
 
       A warning about omitting root:
 
-      If you use ``log_filter`` and don't include "root", then Pyblosxom
+      If you use ``log_filter`` and don't include "root", then Douglas
       messages will be silently ignored!
 
    For example, if you wanted to filter log messages to "root" and
@@ -621,11 +621,11 @@ behavior for loading plugins: ``plugin_dirs`` and ``load_plugins``.
 
    (optional) list of strings; defaults to an empty list
 
-   The ``plugin_dirs`` variable tells Pyblosxom which directories to
+   The ``plugin_dirs`` variable tells Douglas which directories to
    look in for plugin files to load. You can list as many plugin
    directories as you want.
 
-   For example, if you stored your Pyblosxom plugins in
+   For example, if you stored your Douglas plugins in
    ``/home/joe/blog/plugins/``, then you would set ``plugin_dirs``
    like this::
 
@@ -646,7 +646,7 @@ behavior for loading plugins: ``plugin_dirs`` and ``load_plugins``.
              "/home/joe/blog/phils_plugins"
              ]
 
-      You can't just specify ``~/blog/`` and expect Pyblosxom to find
+      You can't just specify ``~/blog/`` and expect Douglas to find
       the plugins in the directory tree::
                               
          # This won't work!
@@ -665,10 +665,10 @@ behavior for loading plugins: ``plugin_dirs`` and ``load_plugins``.
 
    (optional) list of strings
 
-   If there is no ``load_plugins`` setting in ``config.py`` Pyblosxom
+   If there is no ``load_plugins`` setting in ``config.py`` Douglas
    loads all plugins it finds in the directories specified by
    ``plugins_dir`` in alphanumeric order by filename.  Specifying
-   ``load_plugins`` causes Pyblosxom to load only the plugins you name
+   ``load_plugins`` causes Douglas to load only the plugins you name
    and in in the order you name them.
 
    The value of ``load_plugins`` should be a list of strings where
@@ -693,10 +693,10 @@ behavior for loading plugins: ``plugin_dirs`` and ``load_plugins``.
                +- plugin_b.py
                +- plugin_c.py
 
-   then Pyblosxom would load all three plugins in alphabetical order
+   then Douglas would load all three plugins in alphabetical order
    by filename: ``plugin_a``, then ``plugin_b``, then ``plugin_c``.
 
-   If you wanted Pyblosxom to only load ``plugin_a`` and ``plugin_c``,
+   If you wanted Douglas to only load ``plugin_a`` and ``plugin_c``,
    then you would set ``load_plugins`` to::
 
       py["load_plugins"] = ["plugin_a", "plugin_c"]
@@ -711,7 +711,7 @@ behavior for loading plugins: ``plugin_dirs`` and ``load_plugins``.
 
    .. Note::
 
-      Pyblosxom loads plugins in the order specified by
+      Douglas loads plugins in the order specified by
       ``load_plugins``.  This order also affects the order that
       callbacks are registered and later executed.  For example, if
       ``plugin_a`` and ``plugin_b`` both implement the ``handle``
@@ -729,15 +729,15 @@ Caching Configuration
 =====================
 
 Enabling caching by setting the ``cacheDriver`` and ``cacheConfig``
-variables in ``config.py`` speeds up rendering of your Pyblosxom
+variables in ``config.py`` speeds up rendering of your Douglas
 pages.
 
 .. py:data:: cacheDriver
 
    (optional) string; defaults to ""
 
-   Pyblosxom has multiple cache mechanisms. Look at the source files
-   in ``Pyblosxom/cache`` to see what mechanisms are available, then
+   Douglas has multiple cache mechanisms. Look at the source files
+   in ``Douglas/cache`` to see what mechanisms are available, then
    set ``cacheDriver`` to the cache mechanism that you want. For
    example::
 
@@ -748,7 +748,7 @@ pages.
 
    (optional) string; defaults to ""
 
-   Read the top of the source code file in ``Pyblosxom/cache`` for your
+   Read the top of the source code file in ``Douglas/cache`` for your
    selected cache driver (e.g. ``entrypickle.py``) to see how to set the
    ``cacheConfig`` variable for it.  For example::
 
@@ -764,6 +764,6 @@ pages.
 Static Rendering Configuration
 ==============================
 
-If you are using static rendering to deploy your Pyblosxom blog you
+If you are using static rendering to deploy your Douglas blog you
 need to set some additional configuration variables in your
 ``config.py`` file, see :ref:`static-rendering`.

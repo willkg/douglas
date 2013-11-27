@@ -3,7 +3,7 @@
 
    This document file was automatically generated.  If you want to edit
    the documentation, DON'T do it here--do it in the docstring of the
-   appropriate plugin.  Plugins are located in ``Pyblosxom/plugins/``.
+   appropriate plugin.  Plugins are located in ``Douglas/plugins/``.
 
 ===================================================
  readmore - Breaks blog entries into summary an... 
@@ -19,9 +19,9 @@ easier to show just the summary in indexes.
 Install
 =======
 
-This plugin comes with Pyblosxom.  To install, do the following:
+This plugin comes with Douglas.  To install, do the following:
 
-1. Add ``Pyblosxom.plugins.readmore`` to the ``load_plugins`` list in
+1. Add ``Douglas.plugins.readmore`` to the ``load_plugins`` list in
    your ``config.py`` file.
 
    .. Note::
@@ -69,7 +69,7 @@ Configuration
    .. Note::
 
       This template is formatted using Python string formatting---not
-      Pyblosxom template formatting!
+      Douglas template formatting!
 
 
 Usage

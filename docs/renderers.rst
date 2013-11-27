@@ -4,7 +4,7 @@
 Renderers
 =========
 
-Pyblosxom supports multiple renderers and comes with two by default:
+Douglas supports multiple renderers and comes with two by default:
 debug and blosxom.
 
 
@@ -19,7 +19,7 @@ this::
 .. Note::
 
     If you don't specify the ``renderer`` configuration variable, 
-    Pyblosxom uses the blosxom renderer.
+    Douglas uses the blosxom renderer.
 
 The blosxom renderer is named as such because it operates similarly to
 blosxom.  Read the chapter on :ref:`flavours and templates
@@ -30,11 +30,11 @@ debug renderer
 ==============
 
 The debug renderer outputs your blog in a form that makes it easy to 
-see the data generated when handling a Pyblosxom request.  This is 
+see the data generated when handling a Douglas request.  This is 
 useful for debugging plugins, working on blosxom flavours and
 templates, and probably other things as well.
 
-To set Pyblosxom to use the debug renderer, do this in your
+To set Douglas to use the debug renderer, do this in your
 ``config.py`` file::
 
     py["renderer"] = "debug"

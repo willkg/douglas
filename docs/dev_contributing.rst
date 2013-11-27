@@ -11,7 +11,7 @@ PyBlosxom.
 How to clone the project
 ========================
 
-`PyBlosxom is on GitHub <https://github.com/pyblosxom/pyblosxom>`_.
+`PyBlosxom is on GitHub <https://github.com/douglas/douglas>`_.
 
 
 If you have a GitHub account [Recommended]
@@ -20,7 +20,7 @@ If you have a GitHub account [Recommended]
 This is the ideal way to contribute because GitHub makes things simple
 and convenient .
 
-Go to the project page (https://github.com/pyblosxom/pyblosxom) and click on
+Go to the project page (https://github.com/douglas/douglas) and click on
 "Fork" at the top right on the screen. GitHub will create a copy of the 
 PyBlosxom repository in your account for you to work on.
 
@@ -37,7 +37,7 @@ If you don't have a GitHub account
 
 Clone the project using git::
 
-    git clone https://github.com/pyblosxom/pyblosxom.git
+    git clone https://github.com/douglas/douglas.git
 
 Set ``user.name`` and ``user.email`` git configuration::
 
@@ -54,7 +54,7 @@ where ``NAME_OF_PATCH_FILE`` is a nice name that's short and
 descriptive of what the patch holds and master should be replaced with your 
 branch name
 
-Then attach that ``.patch`` file and send it to pyblosxom-devel
+Then attach that ``.patch`` file and send it to douglas-devel
 mailing list.
 
 
@@ -71,7 +71,7 @@ Please add tests for changes you make. In general, it's best to write
 a test, verify that it fails, then fix the code which should make the
 test pass.
 
-Tests go in ``Pyblosxom/tests/``.
+Tests go in ``Douglas/tests/``.
 
 
 Documentation

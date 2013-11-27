@@ -1,13 +1,13 @@
 .. _deploy-apache-mod-wsgi:
 
 ==============================================
- Deploying Pyblosxom with Apache and mod_wsgi
+ Deploying Douglas with Apache and mod_wsgi
 ==============================================
 
 Summary
 =======
 
-This walks through install Pyblosxom as an WSGI application on an
+This walks through install Douglas as an WSGI application on an
 Apache web server with mod_wsgi installed.
 
 If you find any issues, please let us know.
@@ -32,12 +32,12 @@ Deployment
    ``config.py`` setup and other bits of **Setting up a blog** in
    ``install_cgi``.
 
-3. Create a ``pyblosxom.wsgi`` script that looks something like this:
+3. Create a ``douglas.wsgi`` script that looks something like this:
 
    .. code-block:: python
       :linenos:
 
-      # This is the pyblosxom.wsgi script that powers the _______
+      # This is the douglas.wsgi script that powers the _______
       # blog.
 
       import sys
@@ -49,14 +49,14 @@ Deployment
       # call add_to_path with the directory that your config.py lives in.
       add_to_path("/home/joe/blog")
 
-      # if you have Pyblosxom installed in a directory and NOT as a
+      # if you have Douglas installed in a directory and NOT as a
       # Python library, then call add_to_path with the directory that
-      # Pyblosxom lives in.  For example, if I untar'd
-      # pyblosxom-1.5.tar.gz into /home/joe/, then add like this:
-      # add_to_path("/home/joe/pyblosxom-1.5/")
+      # Douglas lives in.  For example, if I untar'd
+      # douglas-1.5.tar.gz into /home/joe/, then add like this:
+      # add_to_path("/home/joe/douglas-1.5/")
 
-      import Pyblosxom.pyblosxom
-      application = Pyblosxom.pyblosxom.PyblosxomWSGIApp()
+      import Douglas.douglas
+      application = Douglas.douglas.DouglasWSGIApp()
 
 4. In the Apache conf file, add:
 
@@ -81,5 +81,5 @@ Deployment
 
 .. Note::
 
-   Any time you make changes to Pyblosxom (update, add plugins, change
+   Any time you make changes to Douglas (update, add plugins, change
    configuration), you'll have to restart Apache.

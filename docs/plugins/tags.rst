@@ -3,7 +3,7 @@
 
    This document file was automatically generated.  If you want to edit
    the documentation, DON'T do it here--do it in the docstring of the
-   appropriate plugin.  Plugins are located in ``Pyblosxom/plugins/``.
+   appropriate plugin.  Plugins are located in ``Douglas/plugins/``.
 
 =======================
  tags - Tags plugin... 
@@ -12,7 +12,7 @@
 Summary
 =======
 
-This is a tags plugin.  It uses Pyblosxom's command line abilities to
+This is a tags plugin.  It uses Douglas's command line abilities to
 split generation of tags index data from display of tags index data.
 
 It creates a ``$(tagslist)`` variable for head and foot templates
@@ -27,9 +27,9 @@ It creates a ``$(tagcloud)`` variable for the tag cloud.
 Install
 =======
 
-This plugin comes with Pyblosxom.  To install, do the following:
+This plugin comes with Douglas.  To install, do the following:
 
-1. Add ``Pyblosxom.plugins.tags`` to the ``load_plugins`` list in your
+1. Add ``Douglas.plugins.tags`` to the ``load_plugins`` list in your
    ``config.py`` file.
 
 2. Configure as documented below.
@@ -188,11 +188,11 @@ Creating the tags index file
 
 Run::
 
-    pyblosxom-cmd buildtags
+    douglas-cmd buildtags
 
 from the directory your ``config.py`` is in or::
 
-    pyblosxom-cmd buildtags --config=/path/to/config/file
+    douglas-cmd buildtags --config=/path/to/config/file
 
 from anywhere.
 
@@ -227,11 +227,11 @@ works or not.
 
 To run the command do::
 
-    pyblosxom-cmd categorytotags
+    douglas-cmd categorytotags
 
 from the directory your ``config.py`` is in or::
 
-    pyblosxom-cmd categorytotags --config=/path/to/config/file
+    douglas-cmd categorytotags --config=/path/to/config/file
 
 from anywhere.
 

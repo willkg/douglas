@@ -17,7 +17,7 @@ shouldn't feel that you have to implement each one of them in your
 blog---you can most assuredly get away with implementing RSS 2.0 or
 Atom and be just fine.
 
-The syndication flavours that come with Pyblosxom should be fine for
+The syndication flavours that come with Douglas should be fine for
 most blogs.  When pointing people to your syndication feed, just use
 one of the syndication flavours.
 
@@ -29,21 +29,21 @@ Examples:
 
 
 
-Feed formats that come with Pyblosxom
+Feed formats that come with Douglas
 =====================================
 
-Pyblosxom comes with a few default flavours, three of which are feed
+Douglas comes with a few default flavours, three of which are feed
 formats.
 
 
 RSS 0.9.1
 ---------
 
-Pyblosxom comes with an rss flavour that produces RSS 0.9.1 output.
+Douglas comes with an rss flavour that produces RSS 0.9.1 output.
 Here's a sample of what it produces::
 
    <?xml version="1.0" encoding="utf-8"?>
-   <!-- name="generator" content="pyblosxom/1.2 3/25/2005" -->
+   <!-- name="generator" content="douglas/1.2 3/25/2005" -->
    <!DOCTYPE rss PUBLIC "-//Netscape Communications//DTD RSS 0.91//EN"
    "http://my.netscape.com/publish/formats/rss-0.91.dtd">
 
@@ -81,7 +81,7 @@ your ``config.py`` file.
  
    Unless you have some reason to use RSS 0.9.1 as your syndication
    format, you should look at using RSS 2.0 or Atom both of which
-   also come with Pyblosxom.
+   also come with Douglas.
 
 
 For more information, look at the `RSS 0.9.1 spec`_.
@@ -93,7 +93,7 @@ For more information, look at the `RSS 0.9.1 spec`_.
 RSS 2.0
 -------
 
-Pyblosxom 1.3 comes with an RSS 2.0 flavour called "rss20".  If it's
+Douglas 1.3 comes with an RSS 2.0 flavour called "rss20".  If it's
 missing features that you want (for example, some folks are doing
 podcasting with their blog), then override the individual templates
 you need to adjust.
@@ -107,7 +107,7 @@ For more information on RSS 2.0, see the `RSS 2.0 spec`_.
 Atom
 ----
 
-Starting with 1.3, Pyblosxom comes with an Atom flavour called "atom".
+Starting with 1.3, Douglas comes with an Atom flavour called "atom".
 If it's missing features that you want, then override the individual
 templates you need to adjust.
 
@@ -125,4 +125,4 @@ feed is valid and fixing bugs in your feed content.
 
 .. _FeedValidator: http://feedvalidator.org/
 
-Additionally, feel free to ask on the pyblosxom-users mailing list.
+Additionally, feel free to ask on the douglas-users mailing list.

@@ -1,14 +1,5 @@
 #!/usr/bin/python
 
-#######################################################################
-# This file is part of Pyblosxom.
-#
-# Copyright (c) 2011 Will Kahn-Greene
-#
-# Pyblosxom is distributed under the MIT license.  See the file
-# LICENSE for distribution details.
-#######################################################################
-
 """
 This script generates documentation for plugins from the plugin docstrings.
 """
@@ -19,12 +10,12 @@ import sys
 
 
 # skip these because they're not plugins
-SKIP = ("akismet.py", "__init__.py")
+SKIP = ("__init__.py",)
 
 
 HELP = """extract_docs_from_plugins
 
-This goes through the plugins in ../Pyblosxom/plugins/, extracts the
+This goes through the plugins in ../douglas/plugins/, extracts the
 docstrings, and generates docs files for each one.  It puts them all in
 a plugins/ directory here.
 
@@ -36,7 +27,7 @@ TEMPLATE = """
 
    This document file was automatically generated.  If you want to edit
    the documentation, DON'T do it here--do it in the docstring of the
-   appropriate plugin.  Plugins are located in ``Pyblosxom/plugins/``.
+   appropriate plugin.  Plugins are located in ``douglas/plugins/``.
 
 %(line)s
 %(title)s
@@ -131,7 +122,7 @@ def main(args):
 
     outputdir = "./plugins/"
 
-    plugindir = "../Pyblosxom/plugins/"
+    plugindir = "../douglas/plugins/"
 
     print "plugindir: %s" % plugindir
     if not os.path.exists(plugindir):

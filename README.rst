@@ -1,15 +1,18 @@
-=================
- About Pyblosxom
-=================
+=============
+About Douglas
+=============
 
 What is this?
 =============
 
-This is the WILLCAGE EXTREME FURY version of Pyblosxom. This is
-tweaked for my blog.
+Douglas is a file-based blog system written in Python with the following features:
 
-See `pyblosxom official site <http://pyblosxom.github.io>`_ for
-the official pyblosxom.
+* static renderer
+* WSGI application
+* plugin system for easy adjustment of transforms
+* Jinja renderer
+
+Douglas is based on `Pyblosxom <http://pyblosxom.github.io>`_.
 
 
 Requirements
@@ -19,48 +22,48 @@ Requirements
 * possibly other requirements depending on what plugins you install
 
 
-Pyblosxom quickstart for static rendering
-=========================================
+Quickstart for static rendering
+===============================
 
 1. Create a virtual environment
 2. Activate the virtual environment
-3. Install Pyblosxom into your virtual environment::
+3. Install Douglas into your virtual environment::
 
-       pip install https://github.com/willkg/pyblosxom/archive/master.zip#egg=pyblosxom
+       pip install https://github.com/willkg/douglas.zip#egg=douglas
 
 4. Create a new blog structure::
 
-       pyblosxom-cmd create <blog-dir>
+       douglas-cmd create <blog-dir>
 
-   For example: ``pyblosxom-cmd create mynewblog``
+   For example: ``douglas-cmd create mynewblog``
 
 5. Edit the ``mynewblog/config.py`` file. There should be instructions
    on what should get changed and how to change it.
 
 6. From ``mynewblog``, render the site::
 
-       pyblosxom-cmd staticrender
+       douglas-cmd staticrender
 
-7. Copy the files from the compiled/ dir to where they're available for
-   serving by your web server.
+7. Copy the files from the ``compiled/`` dir to where they're available
+   for serving by your web server.
 
 
 Where to go from here
 =====================
 
-Each file in ``mynewblog/entries/`` is a blog entry. They are text files.
-You can edit them with your favorite text editor.
+Each file in ``mynewblog/entries/`` is a blog entry. They are text
+files.  You can edit them with your favorite text editor.
 
-The blog is rendered using templates in the ``mynewblog/flavours/``
-directory. A flavour consists of at least content_type, head, story and
-foot templates. You can have date_head and date_foot as well.
+The blog is rendered using templates in the``mynewblog/themes/``
+directory.  A flavour consists of at least content_type, head, story
+and foot templates.  You can have date_head and date_foot as well.
 
 The following plugins are used by default:
 
 **draft_folder**
 
     Creates a draft folder that you can view on the web-site, but doesn't
-    show up in the archive links. This makes it easier for other people
+    show up in the archive links.  This makes it easier for other people
     to review entries before they're live.
 
     The draft dir is ``mynewblog/drafts/``.
@@ -75,12 +78,12 @@ The following plugins are used by default:
     file.
 
 
-Overview of Pyblosxom
+Overview of Douglas
 =====================
 
 Entries, categories, storage:
 
-* Pyblosxom stores everything as files on the file system---there is
+* Douglas stores everything as files on the file system---there is
   no database.
 * Each blog entry is a file.
 * Blog entry files are stored in a directory hierarchy in your *datadir*.
@@ -89,24 +92,20 @@ Entries, categories, storage:
 
 Themes:
 
-* Themes in Pyblosxom are called *flavours*.
-* A flavour consists of a set of *templates*.
-* Flavours are stored in a directory called the *flavourdir*.
-* Pyblosxom comes with several flavours: html, rss20, and atom.
-* The `website <http://pyblosxom.github.com/>`_ maintains a flavour
-  registry for flavours contributed by people like you.
-* There's more information on flavours and templates in
-  the Flavours and Templates chapter of the manual
-  (``docs/flavours_and_templates.rst`` if you're looking at the source).
+* A theme consists of a set of Jinja *templates*. It's an output
+  format.
+* Themes are stored in a directory called the *themedir*.
+* Douglas comes with two themes: html, rss.
+* There's more information on themes and templates in
+  the Themes and Templates chapter of the manual
+  (``docs/themes_and_templates.rst`` if you're looking at the source).
 
 Plugins:
 
-* Pyblosxom has a plugin system.
+* Douglas has a plugin system.
 * Plugins are written in Python.
 * Plugins are loaded using the ``plugin_dirs`` and ``load_plugins``
   configuration variables.
-* The `website <http://pyblosxom.github.com/>`_ maintains a plugin
-  registry for plugins submitted by people like you.
 * For more information on using plugins, see Plugins in the manual
   (``docs/plugins.rst`` if you're looking at the source).
 * For more information on writing plugins see Writing Plugins

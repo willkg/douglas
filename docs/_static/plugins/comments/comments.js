@@ -1,7 +1,7 @@
-/* AJAX comment support for pyblosxom.
+/* AJAX comment support for douglas.
  *
- * Ryan Barrett <pyblosxom@ryanb.org>
- * http://snarfed.org/space/pyblosxom+ajax+comments
+ * Ryan Barrett <douglas@ryanb.org>
+ * http://snarfed.org/space/douglas+ajax+comments
  */
 var xml_http_request;
 

@@ -5,20 +5,20 @@
 Testing
 =======
 
-In the pyblosxom git repository, there are two big things that have
+In the douglas git repository, there are two big things that have
 test suites:
 
-1. the Pyblosxom core code
+1. the Douglas core code
 2. the plugins that are in plugins/
 
 These have two separate testing infrastructures, but both are based on
 unittest which comes with Python.
 
 
-Pyblosxom core code testing
+Douglas core code testing
 ===========================
 
-These tests are located in ``Pyblosxom/tests/`` and test the Pyblosxom
+These tests are located in ``Douglas/tests/`` and test the Douglas
 core functionality and all core plugins.
 
 Tests are executed by::
@@ -28,26 +28,26 @@ Tests are executed by::
 This uses the ``test_suite`` parameter to setup which is in both
 distribute and setuptools.
 
-The ``test_suite`` is ``Pyblosxom.tests.testrunner.test_suite`` which
-is a function that goes through all the files in ``Pyblosxom/tests/``
+The ``test_suite`` is ``Douglas.tests.testrunner.test_suite`` which
+is a function that goes through all the files in ``Douglas/tests/``
 and loads tests in files where the filename starts with ``test_`` and
 ends in ``.py``.
 
-The ``Pyblosxom.tests`` package defines helper functions, classes, and
+The ``Douglas.tests`` package defines helper functions, classes, and
 other things to make testing easier.
 
 Writing tests is pretty easy:
 
-1. create a file in ``Pyblosxom/tests/`` with a filename that starts
+1. create a file in ``Douglas/tests/`` with a filename that starts
    with ``test_`` and ends with ``.py``.
 
-2. import ``UnitTestBase`` from ``Pyblosxom.tests``
+2. import ``UnitTestBase`` from ``Douglas.tests``
 
 3. create a subclass of ``UnitTestBase``
 
 4. write some tests using pretty standard unittest stuff
 
-See ``Pyblosxom/tests/`` for examples testing the core as well as core
+See ``Douglas/tests/`` for examples testing the core as well as core
 plugins.
 
 
@@ -61,7 +61,7 @@ it will help you learn the code base.  If you're at all interested,
 let us know!
 
 Adding tests for the code we're writing helps us a TON in the quality
-department.  Pyblosxom 1.5 is ten times as good as previous versions
+department.  Douglas 1.5 is ten times as good as previous versions
 because we've got a better testing infrastructure and we're testing
 plugin functionality.
 

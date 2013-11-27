@@ -3,7 +3,7 @@
 
    This document file was automatically generated.  If you want to edit
    the documentation, DON'T do it here--do it in the docstring of the
-   appropriate plugin.  Plugins are located in ``Pyblosxom/plugins/``.
+   appropriate plugin.  Plugins are located in ``Douglas/plugins/``.
 
 ===================================================
  paginate - Allows navigation by page for index... 
@@ -14,7 +14,7 @@ Summary
 
 Plugin for paging long index pages.
 
-Pyblosxom uses the num_entries configuration variable to prevent more
+Douglas uses the num_entries configuration variable to prevent more
 than ``num_entries`` being rendered by cutting the list down to
 ``num_entries`` entries.  So if your ``num_entries`` is set to 20, you
 will only see the first 20 entries rendered.
@@ -25,9 +25,9 @@ The paginate overrides this functionality and allows for paging.
 Install
 =======
 
-This plugin comes with Pyblosxom.  To install, do the following:
+This plugin comes with Douglas.  To install, do the following:
 
-1. Add ``Pyblosxom.plugins.paginate`` to your ``load_plugins`` list
+1. Add ``Douglas.plugins.paginate`` to your ``load_plugins`` list
    variable in your ``config.py`` file.
 
    Make sure it's the first plugin in the ``load_plugins`` list so

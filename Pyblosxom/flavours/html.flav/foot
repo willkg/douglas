@@ -1,9 +1,0 @@
-<p>
-  $(blog_rights)
-</p>
-<p>
-  <a href="http://github.com/willkg/pyblosxom/">Made with Pyblosxom WILLCAGE FURY EDITION</a>
-  $(pyblosxom_name)::$(pyblosxom_version)
-</p>
-</body>
-</html>

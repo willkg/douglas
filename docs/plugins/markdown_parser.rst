@@ -3,7 +3,7 @@
 
    This document file was automatically generated.  If you want to edit
    the documentation, DON'T do it here--do it in the docstring of the
-   appropriate plugin.  Plugins are located in ``Pyblosxom/plugins/``.
+   appropriate plugin.  Plugins are located in ``Douglas/plugins/``.
 
 ============================================
  markdown_parser - Markdown entry parser... 
@@ -12,7 +12,7 @@
 Summary
 =======
 
-A Markdown entry formatter for Pyblosxom.
+A Markdown entry formatter for Douglas.
 
 
 Install
@@ -21,7 +21,7 @@ Install
 Requires python-markdown to be installed.  See
 http://www.freewisdom.org/projects/python-markdown/ for details.
 
-1. Add ``Pyblosxom.plugins.markdown_parser`` to the ``load_plugins``
+1. Add ``Douglas.plugins.markdown_parser`` to the ``load_plugins``
    list in your ``config.py`` file
 
 

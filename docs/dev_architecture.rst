@@ -2,20 +2,20 @@
    :linenothreshold: 5
 
 ======================
-Pyblosxom Architecture
+Douglas Architecture
 ======================
 
 Summary
 =======
 
-Pyblosxom uses the file system for data storage allowing you to use
+Douglas uses the file system for data storage allowing you to use
 the text-based tools that you use for other parts of your workflow for
 your blog.
 
-Pyblosxom has a plugin system allowing users to augment and extend
-Pyblosxom's behavior to meet their specific needs.
+Douglas has a plugin system allowing users to augment and extend
+Douglas's behavior to meet their specific needs.
 
-This chapter covers Pyblosxom's architecture.
+This chapter covers Douglas's architecture.
 
 The code is fairly well documented and you should always consider the
 code to be the authority when the code and this manual are in
@@ -25,37 +25,37 @@ disagreement.
 Parts
 =====
 
-Pyblosxom is composed of several parts:
+Douglas is composed of several parts:
 
-1. ``pyblosxom.cgi`` - This is the CGI script that is executed by your
+1. ``douglas.cgi`` - This is the CGI script that is executed by your
    web server, pulls in configuration variables from ``config.py`` and
-   then instantiates Pyblosxom objects to handle the request.
+   then instantiates Douglas objects to handle the request.
 
-2. ``PyblosxomWSGIApp`` - This is the WSGI application for Pyblosxom.
+2. ``DouglasWSGIApp`` - This is the WSGI application for Douglas.
 
-3. ``Pyblosxom`` package - This is the Python package that holds the
-   Pyblosxom objects and utility functions that handle the request.
+3. ``Douglas`` package - This is the Python package that holds the
+   Douglas objects and utility functions that handle the request.
 
    1. the ``entries`` package - Handles the abstraction allowing
-      Pyblosxom to use entries other than those solely found on the
+      Douglas to use entries other than those solely found on the
       file system.
 
-   2. the ``renderers`` package - Pyblosxom can handle different
+   2. the ``renderers`` package - Douglas can handle different
       renderers.  The renderer gets a list of entries to be rendered
       and can render them using whatever means it so desires: blosxom
       templates, htmltmpl templates, Cheetah templates, hard-coded RSS
       2.0 markup, ...
 
-      Pyblosxom comes with two renderers: blosxom and debug.
+      Douglas comes with two renderers: blosxom and debug.
 
-   3. the ``cache`` package - Pyblosxom allows for entry-level
+   3. the ``cache`` package - Douglas allows for entry-level
       caching.  This helps in cases where your entries are stored in a
       format that requires a lot of processing to convert to HTML.
 
 
-Pyblosxom's behavior and output is then augmented by:
+Douglas's behavior and output is then augmented by:
 
-1. plugins - Plugins allow you to augment Pyblosxom's default
+1. plugins - Plugins allow you to augment Douglas's default
    behavior.  These you can get from the plugin registry or write
    yourself.
 
@@ -66,65 +66,65 @@ Pyblosxom's behavior and output is then augmented by:
 
 .. _lifecycle-of-the-blosxom-renderer:
 
-Lifecycle of a Pyblosxom request
+Lifecycle of a Douglas request
 ================================
 
-This is the life cycle of a single Pyblosxom CGI request. It involves
+This is the life cycle of a single Douglas CGI request. It involves
 the following "entities":
 
 
-* ``pyblosxom.cgi`` - A script found in the ``web/`` directory.  This
-  is the CGI script that handles Pyblosxom requests.
+* ``douglas.cgi`` - A script found in the ``web/`` directory.  This
+  is the CGI script that handles Douglas requests.
 
 * ``config.py`` - The configuration file that defines the behavior and
   properties of your blog.
 
-* ``Pyblosxom.pyblosxom`` - The pyblosxom module holds the default
-  Pyblosxom behavior functions. It also defines the Request class and
-  the Pyblosxom class.
+* ``Douglas.douglas`` - The douglas module holds the default
+  Douglas behavior functions. It also defines the Request class and
+  the Douglas class.
 
-* ``Pyblosxom.pyblosxom.Request`` - The Request object holds the state
-  of the Pyblosxom request at any given time throughout the lifecycle
+* ``Douglas.douglas.Request`` - The Request object holds the state
+  of the Douglas request at any given time throughout the lifecycle
   of the request.  The Request object is passed to most callbacks in
   the args dict as ``request``.
 
-* ``Pyblosxom.pyblosxom.Pyblosxom`` - The Pyblosxom object holds a
+* ``Douglas.douglas.Douglas`` - The Douglas object holds a
   list of registered plugins, what callbacks they're registered to,
   and the methods that handle the the actual request.
 
 
-The Pyblosxom request lifecycle starts with the web server executing
-``pyblosxom.cgi``.
+The Douglas request lifecycle starts with the web server executing
+``douglas.cgi``.
 
-1. ``pyblosxom.cgi`` loads ``config.py``
+1. ``douglas.cgi`` loads ``config.py``
 
-2. ``pyblosxom.cgi`` instantiates a Request object
+2. ``douglas.cgi`` instantiates a Request object
 
-3. ``pyblosxom.cgi`` instantiates a ``Pyblosxom.pyblosxom.Pyblosxom``
+3. ``douglas.cgi`` instantiates a ``Douglas.douglas.Douglas``
    object passing it the Request object
 
-4. ``pyblosxom.cgi`` calls ``run()`` on the Pyblosxom object
+4. ``douglas.cgi`` calls ``run()`` on the Douglas object
 
-   1. Pyblosxom instance, run method: calls ``initialize``
+   1. Douglas instance, run method: calls ``initialize``
 
-        1. Pyblosxom instance, ``initialize`` method: calls the entry
+        1. Douglas instance, ``initialize`` method: calls the entry
            parser callback to get a map of all the entry types
-           Pyblosxom can handle
+           Douglas can handle
 
-   2. Pyblosxom instance, ``run`` method: calls the start callback to
+   2. Douglas instance, ``run`` method: calls the start callback to
       allow plugins to do any initialization they need to do
 
-   3. Pyblosxom instance, ``run`` method: calls the handle callback
+   3. Douglas instance, ``run`` method: calls the handle callback
       allowing plugins to handle the request
 
       If a plugin handles the request, the plugin should return a
-      ``1`` signifying it has handled the request and Pyblosxom should
+      ``1`` signifying it has handled the request and Douglas should
       stop.  FINISHED.
 
       If no plugin handles the request, then we continue using the
       ``blosxom_handler``.
 
-   4. Pyblosxom instance, ``run`` method: calls the end callback to
+   4. Douglas instance, ``run`` method: calls the end callback to
       allow plugins to do any cleanup they need to do.
 
 FIXME - add lifecycle for long-running processes through WSGI---it's
@@ -135,18 +135,18 @@ Lifecycle of the blosxom_handler
 ================================
 
 This describes what the ``blosxom_handler`` does.  This is the default
-handler for Pyblosxom.  It's called by the Pyblosxom instance in the
+handler for Douglas.  It's called by the Douglas instance in the
 run method if none of the plugins have handled the request already.
 
 1. Calls the ``renderer`` callback to get a renderer instance.
 
    If none of the plugins return a ``Renderer`` instance, then
-   Pyblosxom checks to see if the ``renderer`` property is set in
+   Douglas checks to see if the ``renderer`` property is set in
    ``config.py``.
 
-   If there ``renderer`` is specified, Pyblosxom instantiates that.
+   If there ``renderer`` is specified, Douglas instantiates that.
 
-   If there ``renderer`` is not specified, Pyblosxom uses the
+   If there ``renderer`` is not specified, Douglas uses the
    ``blosxom`` renderer in the ``renderer`` package.
 
 2. Calls the ``pathinfo`` callback which allows all plugins to help
@@ -199,7 +199,7 @@ that specific piece.
 About callbacks
 ===============
 
-Callbacks allow plugins to override behavior in Pyblosxom or provide
+Callbacks allow plugins to override behavior in Douglas or provide
 additional behavior.  The callback mechanism actually encompasses a
 series of different functions.  Callbacks can act as handlers, as
 notifiers, and also as modifiers.
@@ -208,16 +208,16 @@ notifiers, and also as modifiers.
 Types of callbacks
 ------------------
 
-In the case of handler callbacks, Pyblosxom will query each plugin
+In the case of handler callbacks, Douglas will query each plugin
 implementing the callback until one of the plugins returns that it has
 handled the callback.  At that point, execution of handling code
-stops.  If none of the plugins handle the callback, then Pyblosxom
+stops.  If none of the plugins handle the callback, then Douglas
 will run its default behavior code.
 
-In the case of notifier callbacks, Pyblosxom will notify each plugin
+In the case of notifier callbacks, Douglas will notify each plugin
 implementing the callback regardless of return values.
 
-In the case of modifier callbacks, Pyblosxom will query each plugin
+In the case of modifier callbacks, Douglas will query each plugin
 implementing the callback passing in some input.  It takes the output
 from the callback function and passes that in as input to the next
 callback function.  In this way, each plugin has a chance to modify
@@ -226,20 +226,20 @@ and transform the data.
 There's no reason you can't implement a handler-type callback and use
 it for notification purposes---that's fine.  You should know that in
 the case of handler callbacks and modifier callbacks, the return value
-that your plugin gives will affect Pyblosxom's execution.
+that your plugin gives will affect Douglas's execution.
 
 
 Callbacks that have blosxom equivalents
 ---------------------------------------
 
-There are a series of callbacks in Pyblosxom that have equivalents in
+There are a series of callbacks in Douglas that have equivalents in
 blosxom 2.0.  The names are sometimes different and in most cases the
-arguments the Pyblosxom versions take are different than the blosxom
-2.0 versions.  Even so, the Pyblosxom versions serve the same purpose
+arguments the Douglas versions take are different than the blosxom
+2.0 versions.  Even so, the Douglas versions serve the same purpose
 as the blosxom 2.0 versions.
 
 This isn't very interesting unless you're trying to implement the
-functionality of a blosxom 2.0 plugin in Python for Pyblosxom.
+functionality of a blosxom 2.0 plugin in Python for Douglas.
 
 The available blosxom renderer callbacks are:
 
@@ -305,7 +305,7 @@ cb_logrequest
 -------------
 
 The logrequest callback is used to notify plugins of the current
-Pyblosxom request for the purposes of logging.
+Douglas request for the purposes of logging.
 
 Functions that implement this callback will get an args dict
 containing:
@@ -448,7 +448,7 @@ containing:
 Functions that implement this callback must return the input args dict
 whether or not they adjust anything in it.  The callback chain will
 stop as soon as a callback modifies mtime.  If no plugin handles the
-callback, Pyblosxom will fall back to calling ``os.stat()``.
+callback, Douglas will fall back to calling ``os.stat()``.
 
 
 cb_pathinfo
@@ -494,7 +494,7 @@ cb_commandline
 --------------
 
 The commandline callback allows plugins to implement additional
-``pyblosxom-cmd`` commands.  This allows a plugin to expose
+``douglas-cmd`` commands.  This allows a plugin to expose
 maintenance and setup functionality to the user at the command line or
 through cron.
 
@@ -633,10 +633,10 @@ like:
 
 .. Note::
 
-   ``cb_start`` is different in Pyblosxom than in blosxom.
+   ``cb_start`` is different in Douglas than in blosxom.
 
    The ``cb_start`` callback is slightly different than in blosxom in
-   that ``cb_start`` is called for every Pyblosxom request regardless
+   that ``cb_start`` is called for every Douglas request regardless
    of whether it's handled by the default blosxom handler.  In
    general, it's better to delay allocating resources until you
    absolutely know you are going to use them.
@@ -674,9 +674,9 @@ Functions that implement this callback don't need to return anything.
 
 .. Note::
 
-   ``cb_end`` is different in Pyblosxom than in blosxom
+   ``cb_end`` is different in Douglas than in blosxom
 
-   The ``cb_end`` callback is called for every Pyblosxom request
+   The ``cb_end`` callback is called for every Douglas request
    regardless of whether it's handled by the default blosxom handler
    or not.  This is slightly different than blosxom.
 

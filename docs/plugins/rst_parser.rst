@@ -3,7 +3,7 @@
 
    This document file was automatically generated.  If you want to edit
    the documentation, DON'T do it here--do it in the docstring of the
-   appropriate plugin.  Plugins are located in ``Pyblosxom/plugins/``.
+   appropriate plugin.  Plugins are located in ``Douglas/plugins/``.
 
 =====================================================
  rst_parser - restructured text support for blog ... 
@@ -12,7 +12,7 @@
 Summary
 =======
 
-A reStructuredText entry formatter for pyblosxom.  reStructuredText is
+A reStructuredText entry formatter for douglas.  reStructuredText is
 part of the docutils project (http://docutils.sourceforge.net/).  To
 use, you need a *recent* version of docutils.  A development snapshot
 (http://docutils.sourceforge.net/#development-snapshots) will work
@@ -22,9 +22,9 @@ fine.
 Install
 =======
 
-This plugin comes with Pyblosxom.  To install, do the following:
+This plugin comes with Douglas.  To install, do the following:
 
-1. Add ``Pyblosxom.plugins.rst_parser`` to the ``load_plugins`` list
+1. Add ``Douglas.plugins.rst_parser`` to the ``load_plugins`` list
    in your ``config.py`` file.
 
 2. Install docutils.  Instructions are at

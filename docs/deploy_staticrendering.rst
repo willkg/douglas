@@ -1,22 +1,22 @@
 .. _static-rendering:
 
 ======================================
-Deploy Pyblosxom with Static Rendering
+Deploy Douglas with Static Rendering
 ======================================
 
 Summary
 =======
 
-Static rendering made its first appearance in Pyblosxom 1.0.  It fills
-the functionality gap for people who want to use Pyblosxom, but don't
+Static rendering made its first appearance in Douglas 1.0.  It fills
+the functionality gap for people who want to use Douglas, but don't
 have a web server with CGI installed, don't have CGI access, or can't
-run Pyblosxom for one of a myriad of other reasons.  Static rendering
-allows these people to run Pyblosxom on their local machine, write
+run Douglas for one of a myriad of other reasons.  Static rendering
+allows these people to run Douglas on their local machine, write
 blog entries, render their entire site into HTML, and then use ftp or
 some other file copy method to move the pages up to their static
 website.
 
-Pyblosxom's static rendering also allows for incremental building.  It
+Douglas's static rendering also allows for incremental building.  It
 can scan your entries, figure out what's changed, and render only the
 pages that need re-rendering.
 
@@ -24,7 +24,7 @@ pages that need re-rendering.
 Configuring static rendering
 ============================
 
-These are the instructions for configuring static rendering in Pyblosxom.
+These are the instructions for configuring static rendering in Douglas.
 
 1. Uncomment ``static_dir`` in your ``config.py`` file.
 
@@ -125,23 +125,23 @@ Render everything
 To render all pages in your blog, ``cd`` into the directory that
 contains your ``config.py`` file and run::
 
-   % pyblosxom-cmd staticrender
+   % douglas-cmd staticrender
 
 Or from any directory run::
 
-   % pyblosxom-cmd staticrender --config </path/to/blog_dir>
+   % douglas-cmd staticrender --config </path/to/blog_dir>
 
 where ``</path/to/blog_dir>`` is replaced by the path of the directory
 that contains your ``config.py`` file.  For example::
 
-   % pyblosxom-cmd staticrender --config /home/joe/blog/
+   % douglas-cmd staticrender --config /home/joe/blog/
 
 Or, if the location of your ``config.py`` file is in your
 ``PYTHONPATH`` (an environment variable) then you can run
-``pyblosxom-cmd staticrender`` from any directory without giving the
+``douglas-cmd staticrender`` from any directory without giving the
 ``--config`` option.
 
-Lots of output will appear as Pyblosxom figures out all the urls that
+Lots of output will appear as Douglas figures out all the urls that
 need to be rendered and then renders them.
 
 
@@ -199,8 +199,8 @@ Things to note
   instead specify the urls by hand in ``static_urls``.
 
 * If your website requires more files than just the ones that are
-  rendered by Pyblosxom (images, CSS, ...), then you need to copy
-  those files over separately---Pyblosxom won't do it for you.
+  rendered by Douglas (images, CSS, ...), then you need to copy
+  those files over separately---Douglas won't do it for you.
 
 
 Example setup
@@ -244,7 +244,7 @@ The script looks like this:
    OUTPUTDIR=/home/joe/public_html
  
    # incrementally render entire blog
-   pyblosxom-cmd staticrender --config ${BLOGDIR} --incremental
+   douglas-cmd staticrender --config ${BLOGDIR} --incremental
 
    # copy static files (images, css, ...)
    cp -ar ${BLOGDIR}/www/* ${OUTPUTDIR}

@@ -7,7 +7,7 @@ Writing Entries
 Categories
 ==========
 
-Writing entries in Pyblosxom is fairly straightforward.  Each entry is
+Writing entries in Douglas is fairly straightforward.  Each entry is
 a single text file located somewhere in the directory tree of your
 datadir.  The directory that the entry is in is the category the entry
 is "filed under".
@@ -40,7 +40,7 @@ front---you can add them as you need them.
 The format of an entry
 ======================
 
-Pyblosxom entries consist of three parts: the title, the metadata, and
+Douglas entries consist of three parts: the title, the metadata, and
 then the body of the entry.  The first line is the title of the entry.
 Then comes zero or more lines of metadata.  After the metadata comes
 the body of the entry.
@@ -203,7 +203,7 @@ You can see this in the following example of output::
 Entry parsers
 =============
 
-Pyblosxom supports one format for entry files by default.  This format
+Douglas supports one format for entry files by default.  This format
 is the same format that blosxom uses and is described in previous
 sections.
 
@@ -221,18 +221,18 @@ folks write a lot of material in a non-HTML markup format and would
 like to use that same format for blog entries.  These are all very
 valid reasons to want to use other markup formats.
 
-Pyblosxom allows you to install entry parser plugins which are
-Pyblosxom plugins that implement an entry parser.  These entry parser
+Douglas allows you to install entry parser plugins which are
+Douglas plugins that implement an entry parser.  These entry parser
 plugins allow you to use other markup formats.  Check the Plugin
 Registry on the `website`_ for other available entry parsers.
-Pyblosxom comes with a restructured text entry parser.
+Douglas comes with a restructured text entry parser.
 
 If you don't see your favorite markup format represented, try looking
 at the code for other entry parsers and implement it yourself.  If you
-need help, please ask on the pyblosxom-devel mailing list or on IRC.
+need help, please ask on the douglas-devel mailing list or on IRC.
 Details for both of these are on the `website`_.
 
-.. _website: http://pyblosxom.github.com/
+.. _website: http://douglas.github.com/
 
 Additionally, you're not locked into using a single markup across your
 blog.  You can use any markup for an entry that you have an entry
@@ -243,7 +243,7 @@ Beyond editors
 ==============
 
 There's no reason that all your entries have to come from editing blog
-entry text files in your datadir.  Check the Pyblosxom Registry for
+entry text files in your datadir.  Check the Douglas Registry for
 scripts and other utilities that generate entries from other input
 sources.
 
