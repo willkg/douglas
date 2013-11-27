@@ -32,7 +32,7 @@ class EntryBase:
     """
     def __init__(self, request):
         self._data = ""
-        self._metadata = dict(tools.STANDARD_FILTERS)
+        self._metadata = dict()
         self._id = ""
         self._mtime = BIGNUM
         self._request = request

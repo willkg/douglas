@@ -108,15 +108,6 @@ py["default_theme"] = "html"
 # For production, "warning" or "error' is recommended.
 #py["log_level"] = "warning"
 
-# This lets you specify which channels should be logged.
-# If specified, only messages from the listed channels are logged.
-# Each plugin logs to it's own channel, therefor channelname == pluginname.
-# Application level messages are logged to a channel named "root".
-# If you use log_filter and ommit the "root" channel here, app level messages 
-# are not logged! log_filter is mainly interesting to debug a specific plugin.
-#py["log_filter"] = ["root", "plugin1", "plugin2"]
-
-
 
 # Plugin configuration
 # ====================
@@ -186,7 +177,7 @@ py["static_themes"] = ["html"]
 # and plugin_info plugins.  If there are multiple themes you want
 # to capture, specify each:
 # ex: py["static_urls"] = ["/booklist.rss", "/booklist.html"]
-py["static_urls"] = ["/path/to/url1", "/path/to/url2"]
+# py["static_urls"] = ["/path/to/url1", "/path/to/url2"]
 
 py["static_index_themes"] = ["html", "rss"]
 

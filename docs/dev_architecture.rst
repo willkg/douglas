@@ -301,36 +301,6 @@ Example of a ``cb_prepare`` function in a plugin::
        data['entrycount'] = IF(num_entry > entries, num_entry, entries)
 
 
-cb_logrequest
--------------
-
-The logrequest callback is used to notify plugins of the current
-Douglas request for the purposes of logging.
-
-Functions that implement this callback will get an args dict
-containing:
-
-``filename``
-   a filename; typically a base filename
-
-``return_code``
-   an HTTP error code (e.g. 200, 404, 304, ...)
-
-``request``
-   a Request object
-
-
-Functions that implement this callback can return whatever they
-want---it doesn't affect the callback chain.
-
-``cb_logrequest`` is called after rendering and will contain all the
-modifications to the Request object made by the plugins.
-
-An example input args dict is like this::
-
-   {'filename': filename, 'return_code': '200', 'request': Request()}
-
-
 cb_filelist
 -----------
 

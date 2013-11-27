@@ -14,7 +14,7 @@ from optparse import OptionParser
 from douglas import __version__
 from douglas import plugin_utils
 from douglas.app import Douglas
-from douglas.tools import run_callback, pwrap, pwrap_error
+from douglas.tools import run_callback, pwrap, pwrap_error, setup_logging
 
 
 USAGE = "%prog [options] [command] [command-options]"
@@ -39,6 +39,7 @@ def build_douglas():
                                                              scriptname))
         return None
 
+    setup_logging(cfg)
     return Douglas(cfg, {})
 
 
@@ -462,6 +463,8 @@ def get_handlers():
 
 
 def main(argv):
+
+
     # FIXME - rewrite with argparse
     if "--silent" in argv:
         sys.stdout = open(os.devnull, "w")

@@ -1,17 +1,16 @@
-import sgmllib
-import re
+import locale
 import os
-import time
 import os.path
+import re
 import stat
 import sys
-import locale
-import urllib
-import inspect
 import textwrap
+import time
+import urllib
 
 # douglas imports
 from douglas import plugin_utils
+
 
 # Note: month names tend to differ with locale
 
@@ -23,88 +22,55 @@ num2month = None
 MONTHS    = None
 
 
-# regular expression for detection and substituion of variables.
-_VAR_REGEXP = re.compile(r"""
-    (?<!\\)   # if the $ is escaped, then this isn't a variable
-    \$        # variables start with a $
-    (
-        (?:\w|\-|::\w)+       # word char, - or :: followed by a word char
-        (?:
-            \(                # an open paren
-            .*?               # followed by non-greedy bunch of stuff
-            (?<!\\)\)         # with an end paren that's not escaped
-        )?    # 0 or 1 of these ( ... ) blocks
-    |
-        \(
-        (?:\w|\-|::\w)+       # word char, - or :: followed by a word char
-        (?:
-            \(                # an open paren
-            .*?               # followed by non-greedy bunch of stuff
-            (?<!\\)\)         # with an end paren that's not escaped
-        )?    # 0 or 1 of these ( ... ) blocks
-        \)
-    )
-    """, re.VERBOSE)
+def initialize():
+    """Initializes locale-ish things.
 
+    This should be called from ``douglas.app.Douglas.initialize`` after
+    locale has been set.
 
-# reference to the douglas config dict
-_config = {}
-
-
-def initialize(config):
-    """Initializes the tools module.
-
-    This gives the module a chance to use configuration from the
-    douglas config.py file.
-
-    This should be called from ``douglas.douglas.douglas.initialize``.
     """
-    global _config
-    _config = config
-
     # Month names tend to differ with locale
     global month2num
 
     try:
-        month2num = {'nil' : '00',
-                     locale.nl_langinfo(locale.ABMON_1) : '01',
-                     locale.nl_langinfo(locale.ABMON_2) : '02',
-                     locale.nl_langinfo(locale.ABMON_3) : '03',
-                     locale.nl_langinfo(locale.ABMON_4) : '04',
-                     locale.nl_langinfo(locale.ABMON_5) : '05',
-                     locale.nl_langinfo(locale.ABMON_6) : '06',
-                     locale.nl_langinfo(locale.ABMON_7) : '07',
-                     locale.nl_langinfo(locale.ABMON_8) : '08',
-                     locale.nl_langinfo(locale.ABMON_9) : '09',
-                     locale.nl_langinfo(locale.ABMON_10) : '10',
-                     locale.nl_langinfo(locale.ABMON_11) : '11',
-                     locale.nl_langinfo(locale.ABMON_12) : '12'}
+        month2num = {
+            'nil' : '00',
+            locale.nl_langinfo(locale.ABMON_1) : '01',
+            locale.nl_langinfo(locale.ABMON_2) : '02',
+            locale.nl_langinfo(locale.ABMON_3) : '03',
+            locale.nl_langinfo(locale.ABMON_4) : '04',
+            locale.nl_langinfo(locale.ABMON_5) : '05',
+            locale.nl_langinfo(locale.ABMON_6) : '06',
+            locale.nl_langinfo(locale.ABMON_7) : '07',
+            locale.nl_langinfo(locale.ABMON_8) : '08',
+            locale.nl_langinfo(locale.ABMON_9) : '09',
+            locale.nl_langinfo(locale.ABMON_10) : '10',
+            locale.nl_langinfo(locale.ABMON_11) : '11',
+            locale.nl_langinfo(locale.ABMON_12) : '12'
+        }
 
     except AttributeError:
         # Windows doesn't have nl_langinfo, so we use one that
         # only return English.
         # FIXME - need a better hack for this issue.
-        month2num = {'nil': '00',
-                     "Jan": '01',
-                     "Feb": '02',
-                     "Mar": '03',
-                     "Apr": '04',
-                     "May": '05',
-                     "Jun": '06',
-                     "Jul": '07',
-                     "Aug": '08',
-                     "Sep": '09',
-                     "Oct": '10',
-                     "Nov": '11',
-                     "Dec": '12'}
+        month2num = {
+            'nil': '00',
+            "Jan": '01',
+            "Feb": '02',
+            "Mar": '03',
+            "Apr": '04',
+            "May": '05',
+            "Jun": '06',
+            "Jul": '07',
+            "Aug": '08',
+            "Sep": '09',
+            "Oct": '10',
+            "Nov": '11',
+            "Dec": '12'
+        }
 
-    # This is not python 2.1 compatible (Nifty though)
-    # num2month = dict(zip(month2num.itervalues(), month2num))
     global num2month
-    num2month = {}
-    for month_abbr, month_num in month2num.items():
-        num2month[month_num] = month_abbr
-        num2month[int(month_num)] = month_abbr
+    num2month = dict(zip(month2num.itervalues(), month2num))
 
     # all the valid month possibilities
     global MONTHS
@@ -135,16 +101,6 @@ def pwrap_error(s):
         linesep = os.linesep + "  "
 
     sys.stderr.write(starter + linesep.join(textwrap.wrap(s, 72)) + "\n")
-
-
-def deprecated_function(func):
-    def _deprecated_function(*args, **kwargs):
-        return func(*args, **kwargs)
-
-    _deprecated_function.__doc__ = ("DEPRECATED.  Use %s instead." %
-                                    func.__name__)
-    _deprecated_function.__dict__.update(func.__dict__)
-    return _deprecated_function
 
 
 class ConfigSyntaxErrorException(Exception):
@@ -266,252 +222,6 @@ def urlencode_text(s):
         return s
 
     return urllib.quote(s)
-
-
-STANDARD_FILTERS = {"escape": lambda req, vd, s: escape_text(s),
-                    "urlencode": lambda req, vd, s: urlencode_text(s)}
-
-
-class Stripper(sgmllib.SGMLParser):
-    """
-    SGMLParser that removes HTML formatting code.
-    """
-    def __init__(self):
-        """
-        Initializes the instance.
-        """
-        self.data = []
-        sgmllib.SGMLParser.__init__(self)
-
-    def unknown_starttag(self, tag, attrs):
-        """
-        Implements unknown_starttag.  Appends a space to the buffer.
-        """
-        self.data.append(" ")
-
-    def unknown_endtag(self, tag):
-        """
-        Implements unknown_endtag.  Appends a space to the buffer.
-        """
-        self.data.append(" ")
-
-    def handle_data(self, data):
-        """
-        Implements handle_data.  Appends data to the buffer.
-        """
-        self.data.append(data)
-
-    def gettext(self):
-        """
-        Returns the buffer.
-        """
-        return "".join(self.data)
-
-
-def commasplit(s):
-    """
-    Splits a string that contains strings by comma.  This is
-    more involved than just an ``s.split(",")`` because this handles
-    commas in strings correctly.
-
-    Note: commasplit doesn't remove extranneous spaces.
-
-    >>> tools.commasplit(None)
-    []
-    >>> tools.commasplit("")
-    [""]
-    >>> tools.commasplit("a")
-    ["a"]
-    >>> tools.commasplit("a, b, c")
-    ["a", " b", " c"]
-    >>> tools.commasplit("'a', 'b, c'")
-    ["a", " 'b, c'"]
-    >>> tools.commasplit("'a', \"b, c\"")
-    ["a", " \"b, c\""]
-
-    :param s: the string to split
-
-    :returns: list of strings
-    """
-    if s is None:
-        return []
-
-    if not s:
-        return [""]
-
-    startstring = None
-    t = []
-    l = []
-
-    for c in s:
-        if c == startstring:
-            startstring = None
-            t.append(c)
-        elif c == "'" or c == '"':
-            startstring = c
-            t.append(c)
-        elif not startstring and c == ",":
-            l.append("".join(t))
-            t = []
-        else:
-            t.append(c)
-    if t:
-        l.append("".join(t))
-    return l
-
-
-class Replacer:
-    """
-    Class for replacing variables in a template
-
-    This class is a utility class used to provide a bound method to the
-    ``re.sub()`` function.  Originally from OPAGCGI.
-    """
-    def __init__(self, request, encoding, var_dict):
-        """
-        Its only duty is to populate itself with the replacement
-        dictionary passed.
-
-        :param request: the Request object
-        :param encoding: the encoding to use.  ``utf-8`` is good.
-        :param var_dict: the dict containing variable substitutions
-        """
-        self._request = request
-        self._encoding = encoding
-        self.var_dict = var_dict
-
-    def replace(self, matchobj):
-        """
-        This is passed a match object by ``re.sub()`` which represents
-        a template variable without the ``$``.  parse manipulates the
-        variable and returns the expansion of that variable using the
-        following rules:
-
-        1. if the variable ``v`` is an identifier, but not in the
-           variable dict, then we return the empty string, or
-
-        2. if the variable ``v`` is an identifier in the variable
-           dict, then we return ``var_dict[v]``, or
-
-        3. if the variable ``v`` is a function call where the function
-           is an identifier in the variable dict, then
-
-           - if ``v`` has no passed arguments and the function takes
-             no arguments we return ``var_dict[v]()`` (this is the old
-             behavior
-
-           - if ``v`` has no passed arguments and the function takes
-             two arguments we return ``var_dict[v](request, vd)``
-
-           - if ``v`` has passed arguments, we return
-             ``var_dict[v](request, vd, *args)`` after some mild
-             processing of the arguments
-
-        Also, for backwards compatability reasons, we convert things
-        like::
-
-            $id_escaped
-            $id_urlencoded
-            $(id_escaped)
-            $(id_urlencoded)
-
-        to::
-
-            $escape(id)
-            $urlencode(id)
-
-        :param matchobj: the regular expression match object
-
-        :returns: the substituted string
-        """
-        vd = self.var_dict
-        request = self._request
-        key = matchobj.group(1)
-
-        # if the variable is using $(foo) syntax, then we strip the
-        # outer parens here.
-        if key.startswith("(") and key.endswith(")"):
-            key = key[1:-1]
-
-        # do this for backwards-compatability reasons
-        if key.endswith("_escaped"):
-            key = "escape(%s)" % key[:-8]
-        elif key.endswith("_urlencoded"):
-            key = "urlencode(%s)" % key[:-11]
-
-        if key.find("(") != -1 and key.rfind(")") > key.find("("):
-            args = key[key.find("(")+1:key.rfind(")")]
-            key = key[:key.find("(")]
-        else:
-            args = None
-
-        if not vd.has_key(key):
-            return ""
-
-        r = vd[key]
-
-        # if the value turns out to be a function, then we call it
-        # with the args that we were passed.
-        if callable(r):
-            if args:
-                def fix(s, vd=vd):
-                    # if it's an int, return an int
-                    if s.isdigit():
-                        return int(s)
-                    # if it's a string, return a string
-                    if s.startswith("'") or s.startswith('"'):
-                        return s[1:-1]
-                    # otherwise it might be an identifier--check
-                    # the vardict and return the value if it's in
-                    # there
-                    if vd.has_key(s):
-                        return vd[s]
-                    if s.startswith("$") and vd.has_key(s[1:]):
-                        return vd[s[1:]]
-                    return s
-                args = [fix(arg.strip()) for arg in commasplit(args)]
-
-                # stick the request and var_dict in as the first and
-                # second arguments
-                args.insert(0, vd)
-                args.insert(0, request)
-
-                r = r(*args)
-
-            elif len(inspect.getargspec(r)[0]) == 2:
-                r = r(request, vd)
-
-            else:
-                # this case is here for handling the old behavior
-                # where functions took no arguments
-                r = r()
-
-        # convert non-strings to strings
-        if not isinstance(r, str):
-            if isinstance(r, unicode):
-                r = r.encode(self._encoding)
-            else:
-                r = str(r)
-
-        return r
-
-
-def parse(request, var_dict, template):
-    """
-    This method parses the ``template`` passed in using ``Replacer``
-    to expand template variables using values in the ``var_dict``.
-
-    Originally based on OPAGCGI, but mostly re-written.
-
-    :param request: the Request object
-    :param var_dict: the dict holding name/value pair variable replacements
-    :param template: the string template we're expanding variables in.
-
-    :returns: the template string with template variables expanded.
-    """
-    encoding = request.config.get("blog_encoding", "utf-8")
-    replacer = Replacer(request, encoding, var_dict)
-    return _VAR_REGEXP.sub(replacer.replace, template)
 
 
 def walk(request, root='.', recurse=0, pattern='', return_folders=0):
@@ -701,7 +411,7 @@ def importname(modulename, name):
     :returns: the module object or ``None`` if there were problems
               importing.
     """
-    logger = getLogger()
+    logger = logging.getLogger()
     if not modulename:
         m = name
     else:
@@ -830,21 +540,6 @@ def run_callback(chain, input,
     return output
 
 
-def addcr(text):
-    """Adds a cr if it needs one.
-
-    >>> addrc("foo")
-    foo\\n
-    >>> addcr("foo\\n")
-    foo\\n
-
-    :returns: string with \\n at the end
-    """
-    if not text.endswith("\n"):
-        return text + "\n"
-    return text
-
-
 def create_entry(datadir, category, filename, mtime, title, metadata, body):
     """
     Creates a new entry in the blog.
@@ -870,7 +565,10 @@ def create_entry(datadir, category, filename, mtime, title, metadata, body):
     metadatalines = ["#%s %s" % (key, metadata[key])
                      for key in metadata.keys()]
 
-    entry = addcr(title) + "\n".join(metadatalines) + body
+    if not title.endswith('\n'):
+        title = title + '\n'
+
+    entry = title + "\n".join(metadatalines) + body
 
     # create the category directories
     d = os.path.join(datadir, category)
@@ -967,7 +665,7 @@ def render_url(cdict, pathinfo, querystring=""):
 
     :returns: a douglas ``Response`` object.
     """
-    from douglas import douglas
+    from douglas.app import Douglas
 
     if querystring:
         request_uri = pathinfo + "?" + querystring
@@ -988,7 +686,7 @@ def render_url(cdict, pathinfo, querystring=""):
         "wsgi.input": None
     }
     data = {"STATIC": 1}
-    p = douglas(cdict, env, data)
+    p = Douglas(cdict, env, data)
     p.run(static=True)
     return p.get_response()
 
@@ -999,166 +697,21 @@ def render_url(cdict, pathinfo, querystring=""):
 
 import logging
 
-# A dict to keep track of created log handlers.  Used to prevent
-# multiple handlers from beeing added to the same logger.
-_loghandler_registry = {}
+LEVELS = {
+    'critical': logging.CRITICAL,
+    'error': logging.ERROR,
+    'warning': logging.WARNING,
+    'info': logging.INFO,
+    'debug': logging.DEBUG
+}
 
-class LogFilter(object):
-    """
-    Filters out messages from log-channels that are not listed in the
-    log_filter config variable.
-    """
-    def __init__(self, names=None):
-        """
-        Initializes the filter to the list provided by the names
-        argument (or ``[]`` if ``names`` is ``None``).
 
-        :param names: list of strings to filter out
-        """
-        if names == None:
-            names = []
-        self.names = names
+def setup_logging(cfg):
+    level = cfg.get('log_level', 'error')
+    level = LEVELS[level]
 
-    def filter(self, record):
-        if record.name in self.names:
-            return 1
-        return 0
-
-def get_logger(log_file=None):
-    """Creates and retuns a log channel.
-
-    If no log_file is given the system-wide logfile as defined in
-    config.py is used. If a log_file is given that's where the created
-    logger logs to.
-
-    :param log_file: the file to log to.  defaults to None which
-                     causes douglas to check for the ``log_file``
-                     config.py property and if that's blank, then the
-                     log_file is stderr
-
-    :returns: a log channel (logger instance) which you can call
-              ``error``, ``warning``, ``debug``, ``info``, ... on.
-    """
-    custom_log_file = False
-    if log_file == None:
-        log_file = _config.get('log_file', 'stderr')
-        f = sys._getframe(1)
-        filename = f.f_code.co_filename
-        module = f.f_globals["__name__"]
-        # by default use the root logger
-        log_name = ""
-        for path in _config.get('plugin_dirs', []):
-            if filename.startswith(path):
-                # if it's a plugin, use the module name as the log
-                # channels name
-                log_name = module
-                break
-        # default to log level WARNING if it's not defined in
-        # config.py
-        log_level = _config.get('log_level', 'warning')
+    if cfg.get('log_file') is None:
+        # If no log file is set up, set to logging.ERROR and stderr.
+        logging.basicConfig(level=level, stream=sys.stderr)
     else:
-        # handle custom log_file
-        custom_log_file = True
-        # figure out a name for the log channel
-        log_name = os.path.splitext(os.path.basename(log_file))[0]
-        # assume log_level debug (show everything)
-        log_level = "debug"
-
-    global _loghandler_registry
-
-    # get the logger for this channel
-    logger = logging.getLogger(log_name)
-    # don't propagate messages up the logger hierarchy
-    logger.propagate = 0
-
-    # setup the handler if it doesn't allready exist.  only add one
-    # handler per log channel.
-    key = "%s|%s" % (log_file, log_name)
-    if not key in _loghandler_registry:
-
-        # create the handler
-        if log_file == "stderr":
-            hdlr = logging.StreamHandler(sys.stderr)
-        else:
-            if log_file == "NONE": # user disabled logging
-                if os.name == 'nt': # windoze
-                    log_file = "NUL"
-                else: # assume *nix
-                    log_file = "/dev/null"
-            try:
-                hdlr = logging.FileHandler(log_file)
-            except IOError:
-                # couldn't open logfile, fallback to stderr
-                hdlr = logging.StreamHandler(sys.stderr)
-
-        # create and set the formatter
-        if log_name:
-            fmtr_s = '%(asctime)s [%(levelname)s] %(name)s: %(message)s'
-        else: # root logger
-            fmtr_s = '%(asctime)s [%(levelname)s]: %(message)s'
-
-        hdlr.setFormatter(logging.Formatter(fmtr_s))
-
-        logger.addHandler(hdlr)
-        int_level = getattr(logging, log_level.upper())
-        logger.setLevel(int_level)
-
-        if not custom_log_file:
-            # only log messages from plugins listed in log_filter.
-            # add 'root' to the log_filter list to still allow
-            # application level messages.
-            log_filter = _config.get('log_filter', None)
-            if log_filter:
-                lfilter = LogFilter(log_filter)
-                logger.addFilter(lfilter)
-
-        # remember that we've seen this handler
-        _loghandler_registry[key] = True
-
-    return logger
-
-getLogger = deprecated_function(get_logger)
-
-
-def log_exception(log_file=None):
-    """
-    Logs an exception to the given file.  Uses the system-wide
-    log_file as defined in config.py if none is given here.
-
-    :param log_file: the file to log to.  defaults to None which
-                     causes douglas to check for the ``log_file``
-                     config.py property and if that's blank, then the
-                     log_file is stderr
-    """
-    log = getLogger(log_file)
-    log.exception("Exception occured:")
-
-
-def log_caller(frame_num=1, log_file=None):
-    """
-    Logs some info about the calling function/method.  Useful for
-    debugging.
-
-    Usage:
-
-    >>> import tools
-    >>> tools.log_caller()     # logs frame 1
-    >>> tools.log_caller(2)
-    >>> tools.log_caller(3, log_file="/path/to/file")
-
-    :param frame_num: the index of the frame to log; defaults to 1
-
-    :param log_file: the file to log to.  defaults to None which
-                     causes douglas to check for the ``log_file``
-                     config.py property and if that's blank, then the
-                     log_file is stderr
-    """
-    f = sys._getframe(frame_num)
-    module = f.f_globals["__name__"]
-    filename = f.f_code.co_filename
-    line = f.f_lineno
-    subr = f.f_code.co_name
-
-    log = getLogger(log_file)
-    log.info("\n  module: %s\n  filename: %s\n  line: %s\n  subroutine: %s",
-             module, filename, line, subr)
+        logging.basicConfig(level=level, filename=cfg['log_file'], filemode='a')

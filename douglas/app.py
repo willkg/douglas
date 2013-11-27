@@ -1,16 +1,10 @@
-"""This is the main module for Douglas functionality.  Douglas's
-setup and default handlers are defined here.
-"""
-
-from __future__ import nested_scopes, generators
-
 # Python imports
+import cgi
 import os
-import time
+import os.path
 import locale
 import sys
-import os.path
-import cgi
+import time
 try:
     from cStringIO import StringIO
 except ImportError:
@@ -24,7 +18,7 @@ from douglas import plugin_utils
 from douglas.entries.fileentry import FileEntry
 
 
-class Douglas:
+class Douglas(object):
     """Main class for Douglas functionality.  It handles
     initialization, defines default behavior, and also pushes the
     request through all the steps until the output is rendered and
@@ -64,7 +58,7 @@ class Douglas:
                 pass
 
         # initialize the tools module
-        tools.initialize(config)
+        tools.initialize()
 
         data["douglas_version"] = __version__
         data['pi_bl'] = ''
@@ -110,7 +104,7 @@ class Douglas:
         """
         # log some useful stuff for debugging
         # this will only be logged if the log_level is "debug"
-        log = tools.getLogger()
+        log = tools.logging.getLogger()
         response = self.get_response()
         log.debug("status = %s" % response.status)
         log.debug("headers = %s" % response.headers)
@@ -420,6 +414,8 @@ class DouglasWSGIApp:
         if "codebase" in _config:
             sys.path.insert(0, _config["codebase"])
 
+        tools.setup_logging(self.config)
+
     def run_douglas(self, env, start_response):
         """
         Executes a single run of Douglas wrapped in the crash handler.
@@ -433,7 +429,6 @@ class DouglasWSGIApp:
 
             p = Douglas(dict(self.config), env)
             p.run()
-
             response = p.get_response()
 
         except Exception:
@@ -826,7 +821,7 @@ def blosxom_handler(request):
 
     if not rend:
         # get the renderer we want to use
-        rend = config.get("renderer", "blosxom")
+        rend = config.get("renderer", "jinjarenderer")
 
         # import the renderer
         rend = tools.importname("douglas.renderers", rend)
@@ -889,11 +884,6 @@ def blosxom_handler(request):
     if renderer and not renderer.rendered:
         if entry_list:
             renderer.set_content(entry_list)
-            # Log it as success
-            tools.run_callback("logrequest",
-                               {'filename':config.get('logfile',''),
-                                'return_code': '200',
-                                'request': request})
         else:
             renderer.add_header('Status', '404 Not Found')
             renderer.set_content(
@@ -901,11 +891,6 @@ def blosxom_handler(request):
                  'body': 'Somehow I cannot find the page you want. ' +
                  'Go Back to <a href="%s">%s</a>?'
                  % (config["base_url"], config["blog_title"])})
-            # Log it as failure
-            tools.run_callback("logrequest",
-                               {'filename':config.get('logfile',''),
-                                'return_code': '404',
-                                'request': request})
         renderer.render()
 
     elif not renderer:
@@ -1252,16 +1237,6 @@ def run_douglas():
     from config import py as cfg
     env = {}
 
-    # if there's no REQUEST_METHOD, then this is being run on the
-    # command line and we should execute the command_line_handler.
-    if not "REQUEST_METHOD" in os.environ:
-        from Douglas.commandline import command_line_handler
-
-        if len(sys.argv) <= 1:
-            sys.argv.append("test")
-
-        sys.exit(command_line_handler("douglas.cgi", sys.argv))
-
     # names taken from wsgi instead of inventing something new
     env['wsgi.input'] = sys.stdin
     env['wsgi.errors'] = sys.stderr
@@ -1279,28 +1254,6 @@ def run_douglas():
         else:
             env['wsgi.url_scheme'] = "http"
 
-    try:
-        # try running as a WSGI-CGI
-        from wsgiref.handlers import CGIHandler
-        CGIHandler().run(DouglasWSGIApp())
-
-    except ImportError:
-        # run as a regular CGI
-
-        if os.environ.get("HTTPS") in ("yes", "on", "1"):
-            env['wsgi.url_scheme'] = "https"
-
-        for mem in ["HTTP_HOST", "HTTP_USER_AGENT", "HTTP_REFERER",
-                    "PATH_INFO", "QUERY_STRING", "REMOTE_ADDR",
-                    "REQUEST_METHOD", "REQUEST_URI", "SCRIPT_NAME",
-                    "HTTP_IF_NONE_MATCH", "HTTP_IF_MODIFIED_SINCE",
-                    "HTTP_COOKIE", "CONTENT_LENGTH", "CONTENT_TYPE",
-                    "HTTP_ACCEPT", "HTTP_ACCEPT_ENCODING"]:
-            env[mem] = os.environ.get(mem, "")
-
-        p = Douglas(dict(cfg), env)
-
-        p.run()
-        response = p.get_response()
-        response.send_headers(sys.stdout)
-        response.send_body(sys.stdout)
+    # Run as a WSGI-CGI thing
+    from wsgiref.handlers import CGIHandler
+    CGIHandler().run(DouglasWSGIApp())

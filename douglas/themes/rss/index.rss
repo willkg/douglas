@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="{{ blog_encoding }}" ?>
+<rss version="2.0" 
+   xmlns:creativeCommons="http://backend.userland.com/creativeCommonsRssModule" 
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" 
+   xmlns:slash="http://purl.org/rss/1.0/modules/slash/">
+<channel>
+   <title>{{ blog_title }}</title>
+   <link>{{ base_url }}</link>
+   <description>{{ blog_description }}</description>
+   <language>{{ blog_language }}</language>
+   <copyright>{{ blog_rights }}</copyright>
+   <ttl>60</ttl>
+   <pubDate>{{ latest_rfc822date }}</pubDate>
+   <managingEditor>{{ blog_email }} ({{ blog_author}})</managingEditor>
+   <generator>Douglas https://github.com/willkg/douglas/ {{ douglas_version }}</generator>
+
+{% for entry in content %}
+<item>
+   <title>{{ entry.title }}</title>
+   <guid isPermaLink="false">{{ entry.file_path }}</guid>
+   <link>{{ base_url }}/{{ entry.file_path }}.{{ theme }}</link>
+   <description>
+{{ entry.body }}
+</description>
+   <category domain="{{ base_url }}">{{ entry.path }}</category>
+   <pubDate>{{ entry.rfc822date }}</pubDate>
+</item>
+{% endfor %}
+
+</channel>
+</rss>

@@ -44,13 +44,13 @@ class Renderer(RendererBase):
     This is the debug renderer.  This is very useful for debugging
     plugins and templates.
     """
-    def render(self, header=True):
+    def render(self, render_headers=True):
         """
         Renders a douglas request after we've gone through all the
         motions of converting data and getting entries to render.
 
-        :param header: either prints (True) or does not print (True)
-                       the http headers.
+        :arg render_headers: either prints (True) or does not print (True)
+            the http headers.
         """
         pyhttp = self._request.get_http()
         config = self._request.get_configuration()
@@ -60,7 +60,7 @@ class Renderer(RendererBase):
         hbar = "------------------------------------------------------\n"
 
 
-        if header:
+        if render_headers:
             self.add_header('Content-type', 'text/html')
             self.show_headers()
 

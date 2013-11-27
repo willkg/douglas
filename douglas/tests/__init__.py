@@ -6,7 +6,7 @@ data structures for useful testing plugins.
 """
 
 from douglas import app, tools, entries
-from douglas.renderers.blosxom import Renderer
+from douglas.renderers.jinjarenderer import Renderer
 import cgi
 import StringIO
 import os
@@ -189,12 +189,11 @@ class PluginTest(unittest.TestCase):
         self.datadir = tempfile.mkdtemp(prefix='douglas_test_datadir')
 
         plugin_file = os.path.dirname(plugin_module.__file__)
-        self.config_base = {'datadir': self.datadir,
-                            'plugin_dirs': [plugin_file],
-                            'base_url': 'http://bl.og/',
-                            }
-        self.config = self.config_base
-        tools.initialize(self.config)
+        self.config = {
+            'datadir': self.datadir,
+            'plugin_dirs': [plugin_file],
+            'base_url': 'http://bl.og/',
+        }
 
         # set up environment vars and http request
         self.environ = {'PATH_INFO': '/', 'REMOTE_ADDR': ''}

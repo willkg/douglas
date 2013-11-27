@@ -5,7 +5,6 @@ from nose.tools import eq_
 
 from douglas.entries.base import EntryBase, generate_entry
 from douglas.tests import req_, UnitTestBase
-from douglas.tools import STANDARD_FILTERS
 
 
 TIME1 = (2008, 7, 21, 12, 51, 47, 0, 203, 1)
@@ -32,7 +31,7 @@ class TestEntryBase(UnitTestBase):
 
     def test_metadata(self):
         e = EntryBase(req_())
-        eq_(e.get_metadata_keys(), STANDARD_FILTERS.keys())
+        eq_(e.get_metadata_keys(), [])
         eq_(e.get_metadata("foo"), None)
         eq_(e.get_metadata("foo", "bar"), "bar")
         e.set_metadata("foo", "bar")
@@ -68,7 +67,7 @@ class TestEntryBase(UnitTestBase):
             l.sort()
             return l
 
-        eq_(sortlist(e.keys()), sortlist(STANDARD_FILTERS.keys() + ["foo", "body"]))
+        eq_(sortlist(e.keys()), ["body", "foo"])
 
         eq_(e["foo"], "bar")
         eq_(e.get("foo"), "bar")

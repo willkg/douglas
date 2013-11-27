@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>{{ blog_title }} : {{ pi_bl }}</title>
+    <link rel="top" href="{{ base_url }}/" title="{{ blog_title }}">
+    <meta name="author" content="{{ blog_author }}">
+    <meta http-equiv="Content-Type" content="text/html; charset={{ blog_encoding }}">
+    <link rel="alternate" type="application/rss+xml" href="{{ base_url }}/index.rss">
+  </head>
+  <body>
+    <h1>{{ blog_title }}</h1>
+
+    <p>
+      [
+      <a href="{{ base_url }}/">Home</a>
+      |
+      <a href="{{ base_url }}/index.rss">RSS 2.0</a>
+      ]
+    </p>
+    <p>
+      {{ page_navigation }}
+    </p>
+
+    {% for entry in content %}
+      <h3><a name="{{ entry.fn }}">{{ entry.title }}</a></h3>
+      <div class="blosxomStory">
+        {{ entry.body|safe }}
+        <div class="links">
+          <p>
+            posted on: {{ entry.date }} |
+            tags: {{ entry.tags }}
+            category: <a href="{{ base_url }}/{{ entry.absolute_path }}">/{{ absolute_path }}</a> |
+            <a href="{{ base_url }}/{{ entry.file_path }}.{{ theme }}">permalink</a>
+          </p>
+        </div>
+      </div>
+    {% endfor %}
+
+    <p>
+      {{ blog_rights }}
+    </p>
+    <p>
+      Powered with <a href="http://github.com/willkg/douglas/">Douglas</a>
+      {{ douglas_name }}::{{ douglas_version }}
+    </p>
+  </body>
+</html>

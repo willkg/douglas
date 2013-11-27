@@ -57,8 +57,6 @@ class FileEntry(base.EntryBase):
         """
         return self._filename
 
-    getId = tools.deprecated_function(get_id)
-
     def get_data(self):
         """
         Returns the data for this file entry.  The data is the parsed
@@ -71,8 +69,6 @@ class FileEntry(base.EntryBase):
         if self._populated_data == 0:
             self._populatedata()
         return self._data
-
-    getData = tools.deprecated_function(get_data)
 
     def get_metadata(self, key, default=None):
         """
@@ -87,8 +83,6 @@ class FileEntry(base.EntryBase):
             self._populatedata()
 
         return self._metadata.get(key, default)
-
-    getMetadata = tools.deprecated_function(get_metadata)
 
     def _populatedata(self):
         """

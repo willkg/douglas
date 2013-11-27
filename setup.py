@@ -30,6 +30,7 @@ setup(
     author_email="willkg@bluesock.org",
     keywords="blog",
     url="https://github.com/willkg/douglas/",
+    requires=['Jinja2'],
     packages=find_packages(),
     scripts=["bin/douglas-cmd"],
     zip_safe=False,

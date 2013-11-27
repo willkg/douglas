@@ -88,7 +88,7 @@ class Testpathinfo(UnitTestBase):
             self.tearDown()
 
     def test_dates(self):
-        tools.initialize({})
+        tools.initialize()
 
         self._basic_test("/2002",
                          {"bl_type": "dir",
@@ -104,7 +104,8 @@ class Testpathinfo(UnitTestBase):
                           "theme": "html"})
 
     def test_categories_and_dates(self):
-        tools.initialize({})
+        tools.initialize()
+
         entries = self.build_file_set(["cata/entry1.txt",
                                        "cata/suba/entry1.txt",
                                        "catb/entry1.txt"])
@@ -136,7 +137,6 @@ class Testpathinfo(UnitTestBase):
             self.tearDown()
 
     def test_date_categories(self):
-        tools.initialize({})
         entries = self.build_file_set(["2007/entry1.txt",
                                        "2007/05/entry3.txt",
                                        "cata/entry2.txt"])
@@ -168,7 +168,6 @@ class Testpathinfo(UnitTestBase):
         # or the theme= querystring.
         root = self.get_temp_dir()
 
-        tools.initialize({})
         entries = self.build_file_set(["2007/entry1.txt", 
                                        "2007/05/entry3.txt", 
                                        "cata/entry2.txt"])
@@ -196,7 +195,6 @@ class Testpathinfo(UnitTestBase):
     def test_url(self):
         # url var tests
         # The url is the HTTP PATH_INFO env variable.
-        tools.initialize({})
         entries = self.build_file_set(["2007/entry1.txt", 
                                        "2007/05/entry3.txt", 
                                        "cata/entry2.txt"])
@@ -215,7 +213,6 @@ class Testpathinfo(UnitTestBase):
         # pi_bl var tests
         # pi_bl is the entry the user requested to see if the request indicated
         # a specific entry.  It's the empty string otherwise.
-        tools.initialize({})
         entries = self.build_file_set(["2007/entry1.txt", 
                                        "2007/05/entry3.txt", 
                                        "cata/entry2.txt"]) 

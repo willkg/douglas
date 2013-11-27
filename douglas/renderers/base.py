@@ -33,7 +33,6 @@ class RendererBase(object):
         self._out = stdoutput
         self._content = None
         self._content_mtime = None
-        self._needs_content_type = 1
         self.rendered = None
 
     def write(self, data):
@@ -77,7 +76,6 @@ class RendererBase(object):
         :param data: Piece of string you want printed
         """
         self._out.write(data)
-
 
     def add_header(self, *args):
         """
@@ -127,16 +125,6 @@ class RendererBase(object):
         """
         return self._content
 
-    def needs_content_type(self, flag):
-        """
-        Use the renderer to determine 'Content-Type: x/x' default is
-        to use the renderer for Content-Type, set flag to None to
-        indicate no Content-Type generation.
-
-        :param flag: True of false value
-        """
-        self._needs_content_type = flag
-
     def show_headers(self):
         """
         Updated the headers of the
@@ -148,14 +136,14 @@ class RendererBase(object):
         for k, v in self._header:
             response.add_header(k, v)
 
-    def render(self, header=True):
+    def render(self, render_headers=True):
         """
         Do final rendering.
 
-        :param header: whether (True) or not (False) to show the
-                       headers
+        :arg render_headers: whether (True) or not (False) to render the
+            headers
         """
-        if header:
+        if render_headers:
             if self._header:
                 self.show_headers()
             else:
