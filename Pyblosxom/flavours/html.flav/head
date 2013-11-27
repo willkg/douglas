@@ -1,6 +1,11 @@
+<!DOCTYPE html5>
 <html>
 <head>
   <title>$(blog_title) : $(pi_bl)</title>
+  <link rel="top" href="$(base_url)/" title="Will's Blog">
+  <meta name="author" content="$(blog_author)">
+  <meta http-equiv="Content-Type" content="text/html; charset=$(blog_encoding)">
+  <link rel="alternate" type="application/rss+xml" href="$(base_url)/index.rss">
 </head>
 <body>
 <h1>$(blog_title)</h1>
@@ -15,3 +20,6 @@
 ]
 </p>
 
+<p>
+  $(page_navigation)
+</p>

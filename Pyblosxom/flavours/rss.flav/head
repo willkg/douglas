@@ -1,10 +1,15 @@
-<?xml version="1.0" encoding="$(blog_encoding)"?>
-<!-- name="generator" content="$(pyblosxom_name)/$(pyblosxom_version)" -->
-<!DOCTYPE rss PUBLIC "-//Netscape Communications//DTD RSS 0.91//EN" "http://my.netscape.com/publish/formats/rss-0.91.dtd">
-
-<rss version="0.91">
+<?xml version="1.0" encoding="$(blog_encoding)" ?>
+<rss version="2.0" 
+   xmlns:creativeCommons="http://backend.userland.com/creativeCommonsRssModule" 
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" 
+   xmlns:slash="http://purl.org/rss/1.0/modules/slash/">
 <channel>
-<title>$(blog_title)</title>
-<link>$(base_url)</link>
-<description>$(blog_description)</description>
-<language>$(blog_language)</language>
+   <title>$(escape(blog_title))</title>
+   <link>$(base_url)</link>
+   <description>$(escape(blog_description))</description>
+   <language>$(escape(blog_language))</language>
+   <copyright>$(escape(blog_rights))</copyright>
+   <ttl>60</ttl>
+   <pubDate>$(latest_rfc822date)</pubDate>
+   <managingEditor>$(escape(blog_email)) ($(escape(blog_author)))</managingEditor>
+   <generator>Pyblosxom https://github.com/willkg/pyblosxom/ $(escape(pyblosxom_version))</generator>

@@ -2,76 +2,77 @@
  About Pyblosxom
 =================
 
-What is Pyblosxom
-=================
+What is this?
+=============
 
-Pyblosxom is a lightweight blog system.  It was originally a Python
-clone of `Blosxom`_ but has since evolved into a blog system of its
-own reminiscent of `Blosxom`_.
+This is the WILLCAGE EXTREME FURY version of Pyblosxom. This is
+tweaked for my blog.
 
-.. _Blosxom: http://www.blosxom.com/
-
-Pyblosxom focuses on three things:
-
-**simplicity**
-
-  Pyblosxom stores all data on the file system in plain text files.
-  This allows you to use any text editor to create, update and
-  manipulate entries.  You can also use existing text-manipulation
-  tools, version control, scripts, grep, ...  for managing your blog.
-
-  Pyblosxom can run as a CGI script, WSGI component or you can use it
-  to statically compile your website into HTML/XML files.
-
-  Your workflow is your workflow.
-
-**extensibility**
-
-  Pyblosxom has a plugin framework enabling you to augment and enhance
-  Pyblosxom's default behavior.  Plugins are written in Python.  We
-  maintain a list of plugins in the plugin registry on the website.
-
-  Plugins aren't hard to write.  We're happy to help you write
-  plugins.
-
-**community**
-
-  There are several hundred Pyblosxom users out there all of whom have
-  different needs.  Pyblosxom is used on a variety of operating
-  systems in a variety of environments.  We have the standard open
-  source project fare: mailing lists, IRC channel, wiki, ...
-
-Pyblosxom is built to let you use existing text-manipulation tools
-without having to build the whole ecology from scratch.
-
-Pyblosxom can be run as:
-
-* a "static renderer" and compile your blog
-* a CGI script
-* a WSGI application
-
-You can learn more about Pyblosxom on the `website`_.
-
-.. _website: http://pyblosxom.github.com/
+See `pyblosxom official site <http://pyblosxom.github.io>`_ for
+the official pyblosxom.
 
 
-Why you might not want to use Pyblosxom
-=======================================
+Requirements
+============
 
-Pyblosxom is a small open source project and while there is a
-community, it's pretty small.  Pyblosxom's features are great but make
-it a niche blog system.
+* Python 2.7
+* possibly other requirements depending on what plugins you install
 
-Pyblosxom is a *file-based* blog system.  Each blog entry is a
-separate file stored in a directory hierarchy on your file system.  By
-default, the hierarchy is a category tree meaning each blog entry
-belongs in a single category.  By default, mtimes are used as the blog
-entry timestamp.  There are plugins that change this behavior, but
-require extra configuration to use.
 
-There are a lot of other blog systems out there.  If it's apparent
-that Pyblosxom won't work for you, don't force it---use something
-else.
+Pyblosxom quickstart for static rendering
+=========================================
+
+1. Create a virtual environment
+2. Activate the virtual environment
+3. Install Pyblosxom into your virtual environment::
+
+       pip install https://github.com/willkg/pyblosxom/archive/master.zip#egg=pyblosxom
+
+4. Create a new blog structure::
+
+       pyblosxom-cmd create <blog-dir>
+
+   For example: ``pyblosxom-cmd create mynewblog``
+
+5. Edit the ``mynewblog/config.py`` file. There should be instructions
+   on what should get changed and how to change it.
+
+6. From ``mynewblog``, render the site::
+
+       pyblosxom-cmd staticrender
+
+7. Copy the files from the compiled/ dir to where they're available for
+   serving by your web server.
+
+
+Where to go from here
+=====================
+
+Each file in ``mynewblog/entries/`` is a blog entry. They are text files.
+You can edit them with your favorite text editor.
+
+The blog is rendered using templates in the ``mynewblog/flavours/``
+directory. A flavour consists of at least content_type, head, story and
+foot templates. You can have date_head and date_foot as well.
+
+The following plugins are used by default:
+
+**draft_folder**
+
+    Creates a draft folder that you can view on the web-site, but doesn't
+    show up in the archive links. This makes it easier for other people
+    to review entries before they're live.
+
+    The draft dir is ``mynewblog/drafts/``.
+
+    When you want to make an entry live, you move it from
+    ``mynewblog/drafts/`` to ``mynewblog/entries/``.
+
+**published_date**
+
+    Add ``#pyblished YYYY-MM-DD HH:MM`` to your file metadata and that's
+    the published date for the blog entry rather than the mtime of the
+    file.
 
 
 Overview of Pyblosxom
@@ -110,97 +111,3 @@ Plugins:
   (``docs/plugins.rst`` if you're looking at the source).
 * For more information on writing plugins see Writing Plugins
   (``docs/dev_writing_plugins.rst`` if you're looking at the source).
-
-
-.. _project-details-and-contact:
-
-Project details, contact information, and where to go for help
-==============================================================
-
-See the `website <http://pyblosxom.github.com/>`_ for details on
-the mailing lists, IRC, source code, issue tracker, and everything
-else.
-
-
-Requirements
-============
-
-* Python 2.5 or higher---does not work with Python 3 or higher
-* (optional) Sphinx for building documentation
-* (optional) other things depending on what plugins you install
-
-
-How to install Pyblosxom
-========================
-
-If you're installing for the first time, be sure to read Installing
-Pyblosxom in the manual (``INSTALL`` if you're looking at the source).
-
-If you're upgrading from a previous Pyblosxom version, read Upgrading
-Pyblosxom in the manual (``UPGRADE`` if you're looking at the source)
-as well as What's New in the manual (``WHATSNEW`` if you're looking at
-the source) which covers what's new in this version and what you'll
-need to change in your blog.
-
-
-How to find comprehensive documentation
-=======================================
-
-The source tarball comes with a ``docs/`` directory which contains the
-Pyblosxom manual for that version of Pyblosxom.
-
-The manual for the most current version and past versions of Pyblosxom
-can be found on the `website <http://pyblosxom.github.com/>`_.
-
-
-How to join the community
-=========================
-
-Pyblosxom is written for and by people like you.  If you're using
-Pyblosxom, please contribute something back whether it's reporting a
-bug, fixing something, adding a new flavour, blogging about Pyblosxom,
-telling your friends, writing a plugin, or hanging out with us on IRC.
-
-Details on where we hang out and such are on the `website
-<http://pyblosxom.github.com/>`_.
-
-
-How to report bugs, send in patches, fix problems
-=================================================
-
-If you have a problem with Pyblosxom, please report it!
-
-There are several different ways to report a bug, but all bugs should
-eventually make their way into our issue tracker.
-
-1. Let someone know on IRC: #pyblosxom on irc.freenode.net
-
-2. Send a mail to the pyblosxom-users or pyblosxom-devel mailing
-   lists.  Details are on the `website
-   <http://pyblosxom.github.com/>`_.
-
-3. Write up a bug report in the issue tracker.  Details are on the
-   `website <http://pyblosxom.github.com/>`_.
-
-If you're able to fix the bug, that helps a ton!  Please attach a
-patch file to the bug report or send the patch as an attachment to the
-pyblosxom-devel mailing list.
-
-When sending a patch, it helps a lot to know the details of the bug as
-well as how you fixed it and whether there are outstanding issues.
-
-
-How to run unit tests
-=====================
-
-Tests are written with the Python unittest module and don't require
-any additional test frameworks.
-
-To run the tests, do::
-
-    python setup.py test
-
-This will build Pyblosxom, then run the tests.
-
-If you would like to add tests to the test suite, please do and send
-us patches!

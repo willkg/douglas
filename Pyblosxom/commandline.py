@@ -12,6 +12,7 @@ This module holds commandline related stuff.  Installation
 verification, blog creation, commandline argument parsing, ...
 """
 
+import datetime
 import os
 import os.path
 import sys
@@ -24,8 +25,10 @@ from Pyblosxom.pyblosxom import Pyblosxom
 from Pyblosxom.tools import run_callback, pwrap, pwrap_error
 from Pyblosxom import plugin_utils
 
+
 USAGE = "%prog [options] [command] [command-options]"
 VERSION = "%prog " + __version__
+
 
 def build_pyblosxom():
     """Imports config.py and builds an empty Pyblosxom object.
@@ -46,6 +49,7 @@ def build_pyblosxom():
 
     return Pyblosxom(cfg, {})
 
+
 def build_parser(usage):
     parser = OptionParser(usage=usage, version=VERSION)
     parser.add_option("-q", "--quiet",
@@ -60,6 +64,7 @@ def build_parser(usage):
                       "the 'create' command need a config.py file.")
 
     return parser
+
 
 def generate_entries(command, argv):
     """
@@ -136,6 +141,7 @@ def generate_entries(command, argv):
     if verbose:
         print "Done!"
     return 0
+
 
 def test_installation(command, argv):
     """
@@ -272,6 +278,7 @@ def test_installation(command, argv):
     pwrap("")
     pwrap("Verification complete.  Correct any errors and warnings above.")
 
+
 def create_blog(command, argv):
     """
     Creates a blog in the specified directory.  Mostly this involves
@@ -355,23 +362,28 @@ def create_blog(command, argv):
     _copyfile(source, d, "config.py", fix=True)
     _copyfile(source, d, "blog.ini", fix=True)
     _copyfile(source, d, "pyblosxom.cgi", fix=True)
+    _copyfile(source, d, "README.txt", fix=True)
 
     datadir = os.path.join(d, "entries")
     firstpost = os.path.join(datadir, "firstpost.txt")
     if verbose:
         print "Creating file '%s'..." % firstpost
+    datestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M')
     fp = open(firstpost, "w")
     fp.write("""First post!
+#published {0}
+#tags firstpost
 <p>
   This is your first post!  If you can see this with a web-browser,
   then it's likely that everything's working nicely!
 </p>
-""")
+""".format(datestamp))
     fp.close()
 
     if verbose:
         print "Done!"
     return 0
+
 
 def render_url(command, argv):
     """Renders a single url.
@@ -399,6 +411,7 @@ def render_url(command, argv):
 
     return 0
 
+
 def run_static_renderer(command, argv):
     parser = build_parser("%prog staticrender [options]")
     parser.add_option("--incremental",
@@ -418,6 +431,7 @@ def run_static_renderer(command, argv):
 
     return p.run_static_renderer(options.incremental)
 
+
 DEFAULT_HANDLERS = (
     ("create", create_blog, "Creates directory structure for a new blog."),
     ("test", test_installation,
@@ -428,6 +442,7 @@ DEFAULT_HANDLERS = (
     ("generate", generate_entries, "Generates random entries--helps "
      "with blog setup.")
     )
+
 
 def get_handlers():
     try:
@@ -452,6 +467,7 @@ def get_handlers():
         handlers.append((k, v[0], v[1]))
 
     return handlers
+
 
 def command_line_handler(scriptname, argv):
     if "--silent" in argv:

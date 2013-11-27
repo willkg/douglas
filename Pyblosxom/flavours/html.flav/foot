@@ -1,5 +1,9 @@
 <p>
-  <a href="http://pyblosxom.github.com/"><img src="http://pyblosxom.github.com/images/pb_pyblosxom.gif" alt="Made with Pyblosxom" border="0" /></a>
+  $(blog_rights)
+</p>
+<p>
+  <a href="http://github.com/willkg/pyblosxom/">Made with Pyblosxom WILLCAGE FURY EDITION</a>
+  $(pyblosxom_name)::$(pyblosxom_version)
 </p>
 </body>
 </html>

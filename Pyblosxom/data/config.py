@@ -31,7 +31,7 @@ py = {}
 
 import os
 
-blogdir = "%(basedir)s"
+BLOGDIR = "%(basedir)s"
 
 # Blog configuration
 # ==================
@@ -55,7 +55,7 @@ py["blog_email"] = "email@example.com"
 # it in correctly could result in a feed that doesn't validate.
 py["blog_rights"] = "Copyright 2005 Joe Bobb"
 
-# What is this blog's primary language (for outgoing RSS feed)?
+# What is this blog's primary language? (For the RSS feed.)
 py["blog_language"] = "en"
 
 # Encoding for output.  This defaults to utf-8.
@@ -68,10 +68,10 @@ py["blog_encoding"] = "utf-8"
 #py["locale"] = "en_US.iso-8859-1"
 
 # Where are this blog's entries kept?
-py["datadir"] = os.path.join(blogdir, "entries")
+py["datadir"] = os.path.join(BLOGDIR, "entries")
 
 # Where are this blog's flavours kept?
-py["flavourdir"] = os.path.join(blogdir, "flavours")
+py["flavourdir"] = os.path.join(BLOGDIR, "flavours")
 
 # List of strings with directories that should be ignored (e.g. "CVS")
 # ex: py['ignore_directories'] = ["CVS", "temp"]
@@ -87,7 +87,7 @@ py["depth"] = 0
 # How many entries should I show on the home page and category pages?
 # If you put 0 here, then I will show all pages.
 # Note: this doesn't affect date-based archive pages.
-py["num_entries"] = 5
+py["num_entries"] = 10
 
 # What is the default flavour you want to use when the user doesn't
 # specify a flavour in the request?
@@ -101,7 +101,7 @@ py["default_flavour"] = "html"
 # Where should Pyblosxom write logged messages to?
 # If set to "NONE" log messages are silently ignored.
 # Falls back to sys.stderr if the file can't be opened for writing.
-#py["log_file"] = os.path.join(blogdir, "logs", "pyblosxom.log")
+#py["log_file"] = os.path.join(BLOGDIR, "logs", "pyblosxom.log")
 
 # At what level should we log to log_file?
 # One of: "critical", "error", "warning", "info", "debug"
@@ -127,7 +127,7 @@ py["default_flavour"] = "html"
 # want.
 # Example: py['plugin_dirs'] = ["/home/joe/blog/plugins",
 #                               "/var/lib/pyblosxom/plugins"]
-py["plugin_dirs"] = [os.path.join(blogdir, "plugins")]
+py["plugin_dirs"] = [os.path.join(BLOGDIR, "plugins")]
 
 # There are two ways for Pyblosxom to load plugins:
 # 
@@ -145,8 +145,15 @@ py["plugin_dirs"] = [os.path.join(blogdir, "plugins")]
 # 
 # If you specify an empty list, then this will load no plugins.
 # ex: py["load_plugins"] = ["pycalendar", "pyfortune", "pyarchives"]
-py["load_plugins"] = []
+py["load_plugins"] = [
+    "Pyblosxom.plugins.paginate",
+    "Pyblosxom.plugins.draft_folder",
 
+    "Pyblosxom.plugins.tags",
+    "Pyblosxom.plugins.yeararchives",
+
+    "Pyblosxom.plugins.published_date",
+]
 
 
 # ======================
@@ -169,27 +176,46 @@ py["load_plugins"] = []
 # documentation.
 # 
 # What directory do you want your static html pages to go into?
-#py["static_dir"] = "/path/to/static/dir"
+py["static_dir"] = os.path.join(BLOGDIR, "compiled_site")
 
 # What flavours should get generated?
-#py["static_flavours"] = ["html"]
+py["static_flavours"] = ["html"]
 
 # What other paths should we statically render?
 # This is for additional urls handled by other plugins like the booklist
 # and plugin_info plugins.  If there are multiple flavours you want
 # to capture, specify each:
 # ex: py["static_urls"] = ["/booklist.rss", "/booklist.html"]
-#py["static_urls"] = ["/path/to/url1", "/path/to/url2"]
+py["static_urls"] = ["/path/to/url1", "/path/to/url2"]
+
+py["static_index_flavours"] = ["html", "rss"]
+
 
 # Whether (True) or not (False) you want to generate date indexes with month
 # names?  (ex. /2004/Apr/01)  Defaults to True.
-#py["static_monthnames"] = True
+py["static_monthnames"] = False
 
 # Whether (True) or not (False) you want to generate date indexes
 # using month numbers?  (ex. /2004/04/01)  Defaults to False.
-#py["static_monthnumbers"] = False
+py["static_monthnumbers"] = False
 
 # Whether (True) or not (False) you want to generate year indexes?
 # (ex. /2004)  Defaults to True.
-#py["static_yearindexes"] = True
+py["static_yearindexes"] = True
 
+
+# Plugins
+# =======
+
+# tags
+py["tags_separator"] = "::"
+
+# draft_folder
+py["draftdir"] = os.path.join(BLOGDIR, 'drafts')
+
+# paginate
+# for the paginate plugin
+py['paginate_previous_text'] = "(more recent) &lt;&lt;"
+py['paginate_next_text'] = "&gt;&gt; (less recent)"
+py['paginate_count_from'] = 1
+py['paginate_linkstyle'] = 1
