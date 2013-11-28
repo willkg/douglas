@@ -54,9 +54,9 @@ Where to go from here
 Each file in ``mynewblog/entries/`` is a blog entry. They are text
 files.  You can edit them with your favorite text editor.
 
-The blog is rendered using templates in the``mynewblog/themes/``
-directory.  A flavour consists of at least content_type, head, story
-and foot templates.  You can have date_head and date_foot as well.
+The blog is rendered using Jinja2 templates in the
+``mynewblog/themes/`` directory.  A theme consists of at least a
+``content_type`` and a ``index.<themename>`` file.
 
 The following plugins are used by default:
 
