@@ -63,58 +63,60 @@ class CrashHandler:
         headers["Content-Type"] = "text/html"
         # FIXME - are there other userful headers?
 
-        output.write("<html>")
-        output.write("<title>HTTP 500: Oops!</title>")
-        output.write("<body>")
-        output.write("<h1>HTTP 500: Oops!</h1>")
-        output.write(
-            "<p>"
-            "A problem has occurred while Douglas was rendering "
-            "this page."
-            "</p>")
-
-        output.write(
-            "<p>"
-            "If this is your blog and you've just upgraded Douglas, "
-            "check the manual for changes you need to make to your "
-            "config.py, douglas.cgi, blog.ini, plugins, and theme "
-            "files.  This is usually covered in the Upgrade and What's New "
-            "chapters."
-            "</p>")
-
-        output.write(
-            "<p>"
-            "Here is some useful information to track down "
-            "the root cause of the problem:"
-            "</p>")
-
-        output.write("<div style=\"border: 1px solid black; padding: 10px;\">")
-
         try:
             import douglas
             version = douglas.__version__
         except:
             version = "unknown"
 
-        output.write("<p>Douglas version: {0}</p>".format(_e(version)))
-        output.write("<p>Python version: {0}".format(_e(sys.version)))
-
-        output.write("<p>Error traceback:</p>")
-        output.write("<pre>")
         tb = "".join(traceback.format_exception(exc_type, exc_value, exc_tb))
-        output.write(_e(tb))
-        output.write("</pre>")
 
-        output.write("<p>HTTP environment:</p>")
-        output.write("<pre>")
+        http_environ = ""
         for key, val in self.environ.items():
-            output.write("{0}: {1}\n".format(_e(repr(key)), _e(repr(val))))
-        output.write("</pre>")
+            http_environ += "{0}: {1}\n".format(_e(repr(key)), _e(repr(val)))
 
-        output.write("</div>")
+        output.write("""
+<html>
+<head>
+<title>HTTP 500: Oops!</title>
+</head>
+<body>
+<h1>HTTP 500: GAH!</h1>
+<p>
+A problem has occurred while Douglas was rendering
+this page.
+</p>
+<p>
+If this is your blog and you've just upgraded Douglas,
+check the documentation for changes you need to make to your
+config.py, douglas.cgi, blog.ini, plugins, and theme
+files.
+</p>
+<p>
+Here is some useful information to track down the root cause
+of the problem:
+</p>
+<div style="border: 1px solid black; padding: 10px;">
 
-        output.write("</body>")
-        output.write("</html>")
+<p>Douglas version: {version}</p>
+<p>Python version: {python_version}</p>
+<p>Error traceback:</p>
+<pre>
+{traceback}
+</pre>
+
+<p>HTTP environment:</p>
+<pre>
+{http_environ}
+</pre>
+</div>
+</body>
+</html>
+""".format(
+        version=_e(version),
+        python_version=_e(sys.version),
+        traceback=tb,
+        http_environ=http_environ))
 
         headers["Content-Length"] = str(output.len)
         return Response("500 Server Error", headers, output)
