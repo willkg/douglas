@@ -73,11 +73,14 @@ class Renderer(RendererBase):
 
             # Allow plugins to alter the context adding additional
             # bits
-            data['extensions'] = run_callback(
+            args = {'context': context}
+            args = run_callback(
                 "context_processor",
-                {'context': context},
+                args,
                 mappingfunc=lambda x,y:y,
                 defaultfunc=lambda x:x)
+
+            context = args['context']
 
             env = Environment(
                 autoescape=guess_autoescape,

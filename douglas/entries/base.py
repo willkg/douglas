@@ -8,32 +8,26 @@ This module also holds a generic generate_entry function which will generate
 a BaseEntry with data that you provide for it.
 """
 
-import time, locale
-from douglas import tools
+import locale
+import time
+from UserDict import DictMixin
+
 
 BIGNUM = 2000000000
-CONTENT_KEY = "body"
-DOESNOTEXIST = "THISKEYDOESNOTEXIST"
-DOESNOTEXIST2 = "THISKEYDOESNOTEXIST2"
 
-class EntryBase:
+
+class EntryBase(object, DictMixin):
     """
     EntryBase is the base class for all the Entry classes.  Each
     instance of an Entry class represents a single entry in the
     weblog, whether it came from a file, or a database, or even
     somewhere off the InterWeeb.
 
-    EntryBase derivatives are dict-like except for one key difference:
-    when doing ``__getitem__`` on a nonexistent key, it returns an
-    empty string.  For example:
-
-    >>> entry["some_nonexistent_key"]
-    ""
+    EntryBase derivatives are dict-like.
     """
     def __init__(self, request):
-        self._data = ""
         self._metadata = dict()
-        self._id = ""
+        self._id = ''
         self._mtime = BIGNUM
         self._request = request
 
@@ -57,76 +51,6 @@ class EntryBase:
         """
         return self._id
 
-    def get_data(self):
-        """
-        Returns the data string.  This method should be overridden to
-        provide from pulling the data from other places.
-
-        Override this.
-
-        :returns: the data as a string
-        """
-        return str(self._data)
-
-    def set_data(self, data):
-        """
-        Sets the data content for this entry.  If you are not creating
-        the entry, then you have no right to set the data of the
-        entry.  Doing so could be hazardous depending on what
-        EntryBase subclass you're dealing with.
-
-        Override this.
-
-        :param data: the data
-        """
-        self._data = data
-
-    def get_metadata(self, key, default=None):
-        """
-        Returns a given piece of metadata.
-
-        Override this.
-
-        :param key: the key being sought
-
-        :param default: the default to return if the key does not
-                        exist
-
-        :return: either the default (if the key did not exist) or the
-                 value of the key in the metadata dict
-        """
-        return self._metadata.get(key, default)
-
-    def set_metadata(self, key, value):
-        """
-        Sets a key/value pair in the metadata dict.
-
-        Override this.
-
-        :param key: the key string
-
-        :param value: the value string
-        """
-        self._metadata[key] = value
-
-    def get_metadata_keys(self):
-        """
-        Returns the list of keys for which we have values in our
-        stored metadata.
-
-        .. Note::
-
-            This list gets modified later downstream.  If you cache
-            your list of metadata keys, then this method should return
-            a copy of that list and not the list itself lest it get
-            adjusted.
-
-        Override this.
-
-        :returns: list of metadata keys
-        """
-        return self._metadata.keys()
-
     def set_time(self, timetuple):
         """
         This takes in a given time tuple and sets all the magic
@@ -138,21 +62,25 @@ class EntryBase:
                           mtime/atime portions of an os.stat.  This
                           time is expected to be local time, not UTC.
         """
-        self['timetuple'] = timetuple
         self._mtime = time.mktime(timetuple)
         gmtimetuple = time.gmtime(self._mtime)
-        self['mtime'] = self._mtime
-        self['ti'] = time.strftime('%H:%M', timetuple)
-        self['mo'] = time.strftime('%b', timetuple)
-        self['mo_num'] = time.strftime('%m', timetuple)
-        self['da'] = time.strftime('%d', timetuple)
-        self['dw'] = time.strftime('%A', timetuple)
-        self['yr'] = time.strftime('%Y', timetuple)
-        self['fulltime'] = time.strftime('%Y%m%d%H%M%S', timetuple)
-        self['date'] = time.strftime('%a, %d %b %Y', timetuple)
+
+        self._metadata.update({
+            'timetuple': timetuple,
+            'mtime': self._mtime,
+            'ti': time.strftime('%H:%M', timetuple),
+            'mo': time.strftime('%b', timetuple),
+            'mo_num': time.strftime('%m', timetuple),
+            'da': time.strftime('%d', timetuple),
+            'dw': time.strftime('%A', timetuple),
+            'yr': time.strftime('%Y', timetuple),
+            'fulltime': time.strftime('%Y%m%d%H%M%S', timetuple),
+            'date': time.strftime('%a, %d %b %Y', timetuple)
+        })
 
         # YYYY-MM-DDThh:mm:ssZ
-        self['w3cdate'] = time.strftime('%Y-%m-%dT%H:%M:%SZ', gmtimetuple)
+        self._metadata['w3cdate'] = time.strftime(
+            '%Y-%m-%dT%H:%M:%SZ', gmtimetuple)
 
         # Temporarily disable the set locale, so RFC-compliant date is
         # really RFC-compliant: directives %a and %b are locale
@@ -161,138 +89,33 @@ class EntryBase:
         loc = locale.getlocale(locale.LC_ALL)
         locale.setlocale(locale.LC_ALL, 'C')
 
-        self['rfc822date'] = time.strftime('%a, %d %b %Y %H:%M GMT', \
-                                           gmtimetuple)
+        self._metadata['rfc822date'] = time.strftime(
+            '%a, %d %b %Y %H:%M GMT', gmtimetuple)
 
         # set the locale back
         locale.setlocale(locale.LC_ALL, loc)
 
-    # everything below this point involves convenience functions
-    # that work with the above functions.
+    # Everything below this point implements the bits required for the
+    # DictMixin.
 
-    def __getitem__(self, key, default=None):
-        """
-        Retrieves an item from this dict based on the key given.  If
-        the item does not exist, then we return the default.
+    def __contains__(self, key):
+        return key in self.keys()
 
-        If the item is ``CONTENT_KEY``, it calls ``get_data``,
-        otherwise it calls ``get_metadata``.  Don't override this.
+    def __iter__(self):
+        for key in self.keys():
+            yield key
 
-        .. Warning::
+    def __delitem__(self, key):
+        return self._metadata.__delitem__(key)
 
-            There's no reason to override this--override ``get_data``
-            and ``get_metadata`` instead.
-
-        :param key: the key being sought
-
-        :param default: the default to return if the key does not
-                        exist
-
-        :returns: the value of ``get_metadata`` or ``get_data``
-        """
-        if key == CONTENT_KEY:
-            return self.get_data()
-
-        return self.get_metadata(key, default)
-
-    def get(self, key, default=None):
-        """
-        Retrieves an item from the internal dict based on the key
-        given.
-
-        All this does is turn aroun and call ``__getitem__``.
-
-        .. Warning::
-
-            There's no reason to override this--override ``get_data``
-            and ``get_metadata`` instead.
-
-        :param key: the key being sought
-
-        :param default: the default to return if the key does not
-                        exist
-
-        :returns: the value of ``get_metadata`` or ``get_data``
-                  (through ``__getitem__``)
-        """
-        return self.__getitem__(key, default)
+    def __getitem__(self, key):
+        return self._metadata.__getitem__(key)
 
     def __setitem__(self, key, value):
-        """
-        Sets the metadata[key] to the given value.
-
-        This uses ``set_data`` and ``set_metadata``.  Don't override
-        this.
-
-        :param key: the given key name
-
-        :param value: the given value
-        """
-        if key == CONTENT_KEY:
-            self.set_data(value)
-        else:
-            self.set_metadata(key, value)
-
-    def update(self, newdict):
-        """
-        Updates the contents in this entry with the contents in the
-        dict.  It does so by calling ``set_data`` and
-        ``set_metadata``.
-
-        .. Warning::
-
-            There's no reason to override this--override ``set_data``
-            and ``set_metadata`` instead.
-
-        :param newdict: the dict we're updating this one with
-        """
-        for mem in newdict.keys():
-            if mem == CONTENT_KEY:
-                self.set_data(newdict[mem])
-            else:
-                self.set_metadata(mem, newdict[mem])
-
-    def has_key(self, key):
-        """
-        Returns whether a given key is in the metadata dict.  If the
-        key is the ``CONTENT_KEY``, then we automatically return true.
-
-        .. Warning::
-
-            There's no reason to override this--override
-            ``get_metadata`` instead.
-
-        :param key: the key to check in the metadata dict for
-
-        :returns: whether (True) or not (False) the key exists
-        """
-        if key == CONTENT_KEY or key == CONTENT_KEY + "_escaped":
-            return True
-
-        value = self.get_metadata(key, DOESNOTEXIST)
-        if value == DOESNOTEXIST:
-            value = self.get_metadata(key, DOESNOTEXIST2)
-            if value == DOESNOTEXIST2:
-                return False
-
-        return True
+        return self._metadata.__setitem__(key, value)
 
     def keys(self):
-        """
-        Returns a list of the keys that can be accessed through
-        ``__getitem__``.
-
-        .. Warning::
-
-            There's no reason to override this--override
-            ``get_metadata_keys`` instead.
-
-        :returns: list of key names
-        """
-        keys = self.get_metadata_keys()
-        if CONTENT_KEY not in keys:
-            keys.append(CONTENT_KEY)
-        return keys
+        return self._metadata.keys()
 
 
 def generate_entry(request, properties, data, mtime=None):
@@ -312,7 +135,7 @@ def generate_entry(request, properties, data, mtime=None):
     entry = EntryBase(request)
 
     entry.update(properties)
-    entry.set_data(data)
+    entry['body'] = data
     if mtime:
         entry.set_time(mtime)
     else:

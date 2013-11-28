@@ -1,18 +1,10 @@
-"""
-This module contains FileEntry class which is used to retrieve entries
-from a file system.  Since pulling data from the file system and
-parsing it is expensive (especially when you have 100s of entries) we
-delay fetching data until it's demanded.
-
-The FileEntry calls EntryBase methods addToCache and getFromCache to
-handle caching.
-"""
-
-import time
 import os
 import re
+import time
+
 from douglas import tools
 from douglas.entries import base
+
 
 class FileEntry(base.EntryBase):
     """
@@ -21,14 +13,11 @@ class FileEntry(base.EntryBase):
     """
     def __init__(self, request, filename, root, datadir=""):
         """
-        :param request: the Request object
-
-        :param filename: the complete filename for the file in question
-                         including path
-
-        :param root: i have no clue what this is
-
-        :param datadir: the datadir
+        :arg request: the Request object
+        :arg filename: the complete filename for the file in question
+            including path
+        :arg root: i have no clue what this is
+        :arg datadir: the datadir
         """
         base.EntryBase.__init__(self, request)
         self._config = request.get_configuration()
@@ -42,8 +31,7 @@ class FileEntry(base.EntryBase):
         self._timetuple = tools.filestat(self._request, self._filename)
         self._mtime = time.mktime(self._timetuple)
         self._fulltime = time.strftime("%Y%m%d%H%M%S", self._timetuple)
-
-        self._populated_data = 0
+        self.__populated = 0
 
     def __repr__(self):
         return "<fileentry f'%s' r'%s'>" % (self._filename, self._root)
@@ -57,32 +45,25 @@ class FileEntry(base.EntryBase):
         """
         return self._filename
 
-    def get_data(self):
-        """
-        Returns the data for this file entry.  The data is the parsed
-        (via the entryparser) content of the entry.  We do this on-demand
-        by checking to see if we've gotten it and if we haven't then
-        we get it at that point.
-
-        :returns: the content for this entry
-        """
-        if self._populated_data == 0:
+    def keys(self):
+        if not self.__populated:
             self._populatedata()
-        return self._data
+        return super(FileEntry, self).keys()
 
-    def get_metadata(self, key, default=None):
-        """
-        This overrides the ``base.EntryBase`` ``get_metadata`` method.
-
-        .. Note::
-
-            We populate our metadata lazily--only when it's requested.
-            This delays parsing of the file as long as we can.
-        """
-        if self._populated_data == 0:
+    def __delitem__(self, key):
+        if not self.__populated:
             self._populatedata()
+        return super(FileEntry, self).__delitem__(key)
 
-        return self._metadata.get(key, default)
+    def __getitem__(self, key):
+        if not self.__populated:
+            self._populatedata()
+        return super(FileEntry, self).__getitem__(key)
+
+    def __setitem__(self, key, value):
+        if not self.__populated:
+            self._populatedata()
+        return super(FileEntry, self).__setitem__(key, value)
 
     def _populatedata(self):
         """
@@ -94,6 +75,7 @@ class FileEntry(base.EntryBase):
         """
         file_basename = os.path.basename(self._filename)
 
+        # FIXME - this code is crazy
         path = self._filename.replace(self._root, '')
         path = path.replace(os.path.basename(self._filename), '')
         path = path[:-1]
@@ -115,12 +97,14 @@ class FileEntry(base.EntryBase):
         tb_id = '%s/%s' % (absolute_path, filenamenoext)
         tb_id = re.sub(r'[^A-Za-z0-9]', '_', tb_id)
 
-        self['path'] = path
-        self['tb_id'] = tb_id
-        self['absolute_path'] = absolute_path
-        self['file_path'] = file_path
-        self['fn'] = filenamenoext
-        self['filename'] = self._filename
+        self._metadata.update({
+            'path': path,
+            'absolute_path': absolute_path,
+            'file_path': file_path,
+            'tb_id': tb_id,
+            'basename': filenamenoext,
+            'filename': self._filename
+        })
 
         self.set_time(self._timetuple)
 
@@ -129,9 +113,10 @@ class FileEntry(base.EntryBase):
         fileext = os.path.splitext(self._filename)
         if fileext:
             fileext = fileext[1][1:]
-
         eparser = data['extensions'][fileext]
         entrydict = eparser(self._filename, self._request)
 
-        self.update(entrydict)
-        self._populated_data = 1
+        # Update the _metadata directly skipping over this class'
+        # dict-like stuff. Otherwise we end up in a vicious loop!
+        self._metadata.update(entrydict)
+        self.__populated = 1

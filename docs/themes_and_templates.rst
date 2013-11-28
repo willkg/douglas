@@ -225,8 +225,13 @@ These template variables are only available in your story template.
 
    Example: ``First Post!``
 
+``body``
+   The text of the entry in HTML.
+
+   Example: ``<p>This is my first post!</p>``
+
 ``filename``
-   The absolute path of the file that the entry is stored in.
+   The absolute path of the blog entry file on the file system.
 
    Example: ``/home/subtle/blosxom/weblogs/tools/douglas/firstpost.txt``
 
@@ -235,9 +240,8 @@ These template variables are only available in your story template.
 
    Example: ``firstpost.txt``
 
-``fn``
-   The filename with no extension of the file that the entry is stored
-   in.
+``basename``
+   The filename without directory or file extension.
 
    Example: ``firstpost``
 
@@ -246,20 +250,15 @@ These template variables are only available in your story template.
 
    Example: ``weblogs/tools/douglas``
 
-``body``
-   The text of the entry.
+``path``
+   The category/path of the entry.
 
-   Example: ``<p>This is my first post!</p>``
+   Example: ``weblogs/tools/douglas``
 
 ``tb_id``
    The trackback id of the entry.
 
    Example: ``_firstpost``
-
-``path``
-   The category/path of the entry.
-
-   Example: ``weblogs/tools/douglas``
 
 ``yr``
    The four-digit year of the mtime of this entry.
