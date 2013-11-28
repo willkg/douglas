@@ -18,7 +18,6 @@ purposes.
 .. toctree::
    :maxdepth: 2
 
-   introduction
    about_douglas
    license
    whatsnew
@@ -36,7 +35,6 @@ purposes.
    comments
    plugins
    authors
-   glossary
 
 
 .. _part-two:

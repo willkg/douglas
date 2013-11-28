@@ -95,15 +95,10 @@ pages of entries. Then the urls would look like this::
 
 """
 
-__author__ = "Will Kahn-Greene"
-__email__ = "willg at bluesock dot org"
-__version__ = "2011-10-22"
-__url__ = "http://douglas.github.com/"
 __description__ = (
     "Allows navigation by page for indexes that have too many entries.")
 __category__ = "display"
 __license__ = "MIT"
-__registrytags__ = "1.5, core"
 
 
 import os

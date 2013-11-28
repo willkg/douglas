@@ -1,321 +1,64 @@
-.. _flavours-and-templates:
+.. _themes-and-templates:
 
-======================
-Flavours and Templates
-======================
+====================
+Themes and Templates
+====================
 
 Summary
 =======
 
-This chapter covers the blosxom renderer in Douglas.  There are other
-renderers (like the debug renderer) that operate differently.  See
-the chapter on :ref:`renderers <renderers>` for more details.
+This chapter covers writing a theme for Douglas.  The default renderer
+is `Jinja2 <http://jinja.pocoo.org/docs/>`_. You can set up other
+renderers using plugins.  See the chapter on:ref:`renderers <renderers>`
+for more details.
 
-If you want your blog rendered using a different template system---say
-Cheetah or htmltmpl---implement a renderer that renders the output.
-This new renderer can be implemented as a Douglas plugin.  See the
-chapter on writing plugins for more information.
 
-The rest of this chapter talks about the various things you can do with
-the blosxom renderer which comes with Douglas.
-
-
-
-Flavours and templates
-======================
-
-The blosxom renderer renders the output of a request with a
-:term:`flavour`.
-
-A :term:`flavour` is a group of templates for a specific output format
-or style.  For example, html, xhtml, atom, rss, rdf, etc.
-
-A flavour consists of at least the following templates:
-
-* **content_type** - holds the content type of the flavour
-* **head** - holds everything before all the entries
-* **story** - holds a single entry
-* **foot** - holds everything after all the entries
-* **date_head** - shows at the start of a date
-* **date_foot** - shows at the end of a date
-
-.. Note::
-
-   Many plugins require additional templates to render their output in
-   addition to the standard templates listed above.  See the
-   documentation for the plugin for more information.
-
-.. Note::
-
-    Refer to :ref:`lifecycle-of-the-blosxom-renderer` for detailed 
-    information on how Douglas's default renderer blosxom uses these
-    templates.
-
-More on flavours, how they're stored, and such later.
-
-A :term:`template` is one piece of a flavour that specifies a specific
-portion of the output.  For example, the head template of an html
-flavour would be in a file called ``head`` and might look like this::
-
-    <html>
-    <head>
-       <title>$(blog_title)</title>
-    </head>
-    <body>
-
-More on templates later.
-
-Douglas allows you to manage the flavours and templates for your
-blog in several different ways:
-
-1. in directories in the flavourdir, OR
-2. in directories in the datadir, OR
-3. in the datadir along with your entries.
-
-.. Note::
-
-   Douglas is backwards compatible with previous versions of
-   Douglas.  You can put your flavour files in your datadir.  You
-   can also put your flavour files in the categories of your datadir.
-   However you cannot have a flavourdir and put flavour files in your
-   datadir---Douglas will look at **EITHER** your datadir **OR**
-   your flavourdir for flavour files.
-
-
-Storing flavours in the flavourdir
-----------------------------------
-
-This is the easiest way to store your flavours separately from the
-entries in your blog.  This is the preferred way.
-
-If you specify the ``flavourdir`` directory in your ``config.py`` file,
-you can store each flavour in a directory in the flavourdir.
-
-For example, Joe has this in his ``config.py``::
-
-   py["flavourdir"] = "/home/joe/blog/flavours/"
-
-Joe's blog directory structure would look like this::
-
-   /home/joe/blog/
-             |- entries/             <-- datadir
-             |  |- work/             <-- work category of entries
-             |  |- home/             <-- home category of entries
-             |
-             |- flavours/
-                |- html.flav/        <-- html flavour
-                |  |- content_type
-                |  |- head
-                |  |- foot
-                |  |- story
-                |  |- ...
-                |
-                |- rss.flav/         <-- rss flavour
-                |  |- content_type
-                |  |- head
-                |  |- foot
-                |  |- story
-                |  |- ...
-
-The ``flavourdir`` specifies the directory in which Joe stores his
-flavours.
-
-.. Note::
-
-   Flavour directories must end in ``.flav``.
-
-.. Note::
-
-   Templates in the flavour directory don't need an extension.
-
-This structure also makes it easier to use flavour packs found in the
-flavour registry on the `Douglas website`_.
-
-.. _Douglas website: http://douglas.github.com/
-
-
-
-Storing flavours in flavour directories in the datadir
-------------------------------------------------------
-
-Flavours can be stored in directories in the directory specified by
-your datadir.  This works exactly the same as having a separate
-flavourdir except that the flavourdir is not a separate directory
-tree---it's the same tree as your datadir.
-
-For example, Joe stores his flavours alongside his entries and his
-blog directory tree looks like this::
-
-   /home/joe/blog/
-             |- entries/             <-- datadir
-                |- html.flav/        <-- html flavour
-                |  |- content_type
-                |  |- head
-                |  |- foot
-                |  |- story
-                |  |- ...
-                |
-                |- work/             <-- work category of entries
-                |  |- html.flav/     <-- html flavour for the work category
-                |  |- ...
-                |
-                |- home/             <-- home category of entries
-
-In this way your entries are intermixed with your flavour directories.
-
-
-Storing flavours in the datadir
--------------------------------
-
-Instead of storing flavour templates in separate flavour directories
-in either your datadir or your flavourdir, you can store the templates
-alongside your entries.
-
-This is not recommended---it's a pain in the ass to maintain and
-everything gets all mixed up.  It's supported since this is how
-Douglas used to work.
-
-The template files for a given flavour all have to have the flavour
-name as the extension of the file.  For example, if you were using an
-"html" flavour, the flavour itself would be composed of the following
-files:
-
-* ``content_type.html``
-* ``head.html``
-* ``story.html``
-* ``foot.html``
-* ``date_head.html``
-* ``date_foot.html``
-
-If you want to create an "atom" flavour, you would have the following
-files:
-
-* ``content_type.atom``
-* ``head.atom``
-* ``story.atom``
-* ``foot.atom``
-* ``date_head.atom``
-* ``date_foot.atom``
-
-.. Warning::
-
-   If you intermix flavour templates with entries, make sure you don't
-   have flavours that have the same name as the extension of your blog
-   entries.
-
-   For example, if ``.txt`` is the extension for entries in your blog,
-   don't create a **txt** flavour!
-
-
-Included flavours
-=================
-
-Douglas comes with the following flavours:
-
-* ``html`` - a basic html flavour
-* ``rss`` - an RSS 2.0 flavour for syndication
-* ``atom`` - an Atom 1.0 flavour for syndication
-
-These flavours are included with Douglas and they will work out of the
-box with no modifications and no configuration changes.
-
-When you run ``douglas-cmd create <blog-dir>``, these get copied
-into the flavourdir.
-
-Play with them!  Modify them!  Extend them!
-
-
-Overriding included flavours
-============================
-
-Douglas allows you to override templates and flavours on a
-category-by-category basis.
-
-For example, Joe has a category devoted to his work on plants which he
-wants branded differently than the rest of his blog.  Joe uses the
-category *work* for all his plant work and has a different flavour for
-this category of his blog.
-
-Joe's blog directory looks like this::
-
-   /home/joe/blog/
-             |- entries/             <-- datadir
-             |  |- work/             <-- work category of entries
-             |  |- home/             <-- home category of entries
-             |
-             |- flavours/
-                |- html.flav/        <-- html flavour
-                |  |- content_type
-                |  |- head
-                |  |- foot
-                |  |- story
-                |  |- ...
-                |
-                |- work/
-                   |- html.flav/     <-- html flavour for the work category
-                   |- ...
-
-There is a ``work`` directory in his ``flavours`` directory that
-parallels the ``work`` directory in his ``entries`` directory.  In
-Joe's blog, the work category has a different html flavour than the
-root and home categories.
-
-You can override individual templates, too.
-
-For example, if you had a math category and wanted the story template
-to look different, you could set up your blog like this::
-
-   blog/
-     |- entries/
-     |  |- math/             <-- math category in datadir
-     |
-     |- flavours/
-        |- html.flav/
-        |  |- content_type
-        |  |- head
-        |  |- date_head
-        |  |- story
-        |  |- date_foot
-        |  |- foot
-        |
-        |- math/             <-- math category in flavourdir
-           |- html.flav/
-              |- story
-
-If the request is for an entry in the math category, then the ``story``
-file will be taken from the ``flavours/math/html.flav/`` directory and
-the rest of the templates will be taken from ``flavours/html.flav/``.
-
-
-Finding new flavours
+Themes and templates
 ====================
 
-There is a flavour registry on the `Douglas website`_.  You can find
-flavours here that have been created by other people and submit
-flavours that you've created and want to share.
+A theme consists of at least:
 
-.. _Douglas website: http://douglas.github.com/
+* A ``content_type`` file which contains the mimetype of the content
+  this theme produces. e.g. ``text/plain``, ``text/html``, ``application/rss+xml``,
+  ...
+* A ``index.<themename>`` file which the Jinja2 renderer renders. This
+  file can use macros, include other templates and do whatever you
+  want provided it can be done with Jinja2 templates.
 
-Additionally, you can use flavours from `Blosxom`_ and themes from
-`WordPress`_ after spending some time converting them.
 
-.. _Blosxom: http://www.blosxom.com/
-.. _WordPress: http://wordpress.org/
+Example blog
+------------
 
-The order of overiding works like this:
+Joe has this set in his ``config.py`` file::
 
-1. Douglas looks for flavour files that came with Douglas
-2. Douglas starts at the root of the flavourdir and looks for
-   flavour files there.  If there are some, then these files override
-   the files Douglas has found so far.
-3. Douglas iterates through category directories in the flavourdir
-   if there are any that are parallel to the datadir and looks for
-   flavour directories there.  If there are some, then those files
-   override the files it has so far.
+    py["themedir"] = "/home/joe/blog/themes/"
 
-This allows you to easily override specific templates in your blog
-(like the header or footer) depending on what category the user is
-looking at.
+
+Joe's blog directory structure looks like this::
+
+   /home/joe/blog/
+             |- entries/             <-- datadir
+             |  |- work/             <-- work category of entries
+             |  |- home/             <-- home category of entries
+             |
+             |- themes/
+                |- html/             <-- html theme
+                |  |- content_type
+                |  |- index.html
+                |
+                |- rss/              <-- rss theme
+                |  |- content_type
+                |  |- index.rss
+
+
+.. Note::
+
+   There's some redundancy between the theme named directory and
+   the theme in the extension. Having the theme in the extension
+   makes it more likely your editor will use the right syntax
+   highlighting. So that's helpful. Having themes in separate
+   directories means that if you have a bunch of files, they don't
+   overlap and get all confuzzled. That's helpful, too.
 
 
 Template variables
@@ -328,37 +71,26 @@ documentation for a list of which variables they add and in which
 templates they're available.
 
 
-Variable syntax
----------------
+Variable syntax helper tips
+---------------------------
 
-To use a variable in a template, prefix the variable name with a $.
-For example, this would expand to the blog's title as an h2::
+We're using Jinja2, so we reference variables using Jinja2 syntax.
 
-   <h2>$title</h2>
+This prints a variable::
 
-To reduce ambiguity, use parenthesized variables.::
+    {{ foo }}
 
-   <h2>$(title)</h2>
+You can iterate through a list::
 
-You can also use variables that expand into functions which
-are evaluated::
+    {% for entry in content %}
+        {{ entry.title }}
+        ...
+    {% endfor %}
 
-   <h2>$(escape(title))</h2>
+Douglas has autoescaping set, so if the variable you're printing
+is HTML and it's safe, you need to use the ``safe`` filter::
 
-
-Escaping the $
---------------
-
-If you want a $ in your template that shouldn't signify variable expansion,
-then you need to escape it with a ``\``::
-
-    <p>
-       This blog is all about \$!
-    </p>
-
-renders as::
-
-    This blog is all about $!
+    {{ entry.body|safe }}
 
 
 Getting a complete list of variables
@@ -374,25 +106,6 @@ property in your ``config.py`` file to ``debug`` like this::
 That will tell you all kinds of stuff about the data structures
 involved in the request.  Don't forget to change it back when you're
 done!
-
-
-URL encoding and escaping of template variables
------------------------------------------------
-
-There are two filters allowing for escaped and urlencoded values:
-
-* ``$escape(title)`` - escapes ``$title``
-* ``$urlencode(title)`` - urlencoded ``$title``
-
-
-Plugins can add additional filters.
-
-.. Note::
-
-   Douglas versions 1.3 and 1.4 escaped and urlencoded variables
-   that ended with ``_escaped`` and ``_urlencoded``.
-
-   Deprecated in Douglas 1.5.
 
 
 Variables from config.py
@@ -440,8 +153,8 @@ are calculated based on the request.
 
    Example: ``douglas/weblogs/tools/douglas``
 
-``flavour``
-   The flavour that's being used to render this page.
+``theme``
+   The theme that's being used to render this page.
 
    Example: ``html``
 
@@ -646,82 +359,75 @@ available in your story templates.
 
 
 
-Invoking a flavour
-==================
+Invoking a theme
+================
 
-The flavour for a given page is specified in the extension of the file
+The theme for a given page is specified in the extension of the file
 being requested.  For example:
 
 * ``http://example.com/`` - 
-  brings up the index in the default flavour which is "html"
+  brings up the index in the default theme which is "html"
 
 * ``http://example.com/index.html`` - 
-  brings up the index in the "html" flavour
+  brings up the index in the "html" theme
 
 * ``http://example.com/index.rss`` -
-  brings up the index in the "rss" flavour (which by default is RSS 0.9.1)
+  brings up the index in the "rss" theme (which by default is RSS 0.9.1)
 
 * ``http://example.com/2004/05/index.joy`` -
-  brings up the index for May of 2004 in the "joy" flavour
+  brings up the index for May of 2004 in the "joy" theme
 
 
-Additionally, you can specify the flavour by adding a ``flav``
+Additionally, you can specify the theme by adding a ``theme``
 variable in the query-string.  Examples:
 
 * ``http://example.com/`` -
-  brings up the index in the default flavour which is "html"
+  brings up the index in the default theme which is "html"
 
-* ``http://example.com/?flav=rss`` -
-  brings up the index in the "rss" flavour
+* ``http://example.com/?theme=rss`` -
+  brings up the index in the "rss" theme
 
-* ``http://example.com/2004/05/index?flav=joy`` -
-  brings up the index for May of 2004 in the "joy" flavour
+* ``http://example.com/2004/05/index?theme=joy`` -
+  brings up the index for May of 2004 in the "joy" theme
 
 
-Setting default flavour
+Setting default theme
 =======================
 
-You can change the default flavour from ``html`` to some other flavour
-in your ``config.py`` file with the ``default_flavour`` property::
+You can change the default theme from ``html`` to some other theme
+in your ``config.py`` file with the ``default_theme`` property::
 
-   py["default_flavour"] = "joy"
+   py["default_theme"] = "joy"
 
 
-Doing this will set the default flavour to use when the URI the user
-has used doesn't specify which flavour to use.
+Doing this will set the default theme to use when the URI the user
+has used doesn't specify which theme to use.
 
-This url doesn't specify the flavour to use, so it will be rendered
-with the default flavour::
+This url doesn't specify the theme to use, so it will be rendered
+with the default theme::
 
    http://example.com/cgi-bin/douglas.cgi/2005/03
 
-This url specifies the flavour, so it will be rendered with that
-flavour::
+This url specifies the theme, so it will be rendered with that
+theme::
 
-   http://example.com/cgi-bin/douglas.cgi/2005/03/?flav=html
+   http://example.com/cgi-bin/douglas.cgi/2005/03/?theme=html
 
 
-Order of operations to figure out which flavour to use
+Order of operations to figure out which theme to use
 ======================================================
 
-We know that you can specify the default flavour to use in the
-``config.py`` file with the ``default_flavour`` property.  We know
-that the user can specify which flavour to use by the file extension
-of the URI.  We also know that the user can specify which flavour to
+We know that you can specify the default theme to use in the
+``config.py`` file with the ``default_theme`` property.  We know
+that the user can specify which theme to use by the file extension
+of the URI.  We also know that the user can specify which theme to
 use by using the ``flav`` variable in the query string.
 
-The order in which we figure out which flavour to use is this:
+The order in which we figure out which theme to use is this:
 
 1. look at the URI extension: if the URI has one, then we use that.
-2. look at the ``flav`` querystring variable: if there is one, 
+2. look at the ``theme`` querystring variable: if there is one, 
    then we use that.
-3. look at the ``default_flavour`` property in the ``config.py`` 
+3. look at the ``default_theme`` property in the ``config.py`` 
    file: if there is one, then we use that.
-4. use the ``html`` flavour.
-
-
-Examples of templates
-=====================
-
-For examples of templates and flavours, see the included flavours that
-come with your Douglas installation.
+4. use the ``html`` theme.

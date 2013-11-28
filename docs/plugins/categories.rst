@@ -3,11 +3,11 @@
 
    This document file was automatically generated.  If you want to edit
    the documentation, DON'T do it here--do it in the docstring of the
-   appropriate plugin.  Plugins are located in ``Douglas/plugins/``.
+   appropriate plugin.  Plugins are located in ``douglas/plugins/``.
 
-================================================
- pycategories - Builds a list of categories.... 
-================================================
+==============================================
+ categories - Builds a list of categories.... 
+==============================================
 
 Summary
 =======
@@ -21,9 +21,9 @@ which you can use in your head or foot templates.
 Install
 =======
 
-This plugin comes with Douglas.  To install, do the following:
+This plugin comes with douglas.  To install, do the following:
 
-1. Add ``Douglas.plugins.pycategories`` to the ``load_plugins`` list
+1. Add ``douglas.plugins.pycategories`` to the ``load_plugins`` list
    in your ``config.py`` file.
 
 2. Add ``$(categorylinks)`` to your head and/or foot templates.
@@ -47,11 +47,11 @@ For example, the following properties will use ``<ul>`` to open a
 category, ``</ul>`` to close a category and ``<li>`` for each item::
 
     py["category_start"] = "<ul>"
-    py["category_begin"] = "<li><ul>"
+    py["category_begin"] = "<ul>"
     py["category_item"] = (
         r'<li><a href="%(base_url)s/%(category_urlencoded)sindex">'
         r'%(category)s</a></li>')
-    py["category_end"] = "</li></ul>"
+    py["category_end"] = "</ul>"
     py["category_finish"] = "</ul>"
 
 
@@ -80,7 +80,7 @@ fullcategory_urlencoded  'dev/douglas/status/'       string
 fullcategory             'dev/douglas/status/'       string (urlencoded)
 category                 'status/'                   string
 category_urlencoded      'status/'                   string (urlencoed)
-flavour                  'html'                      string
+theme                    'html'                      string
 count                    70                          int
 indent                   '&nbsp;&nbsp;&nbsp;&nbsp;'  string
 =======================  ==========================  ====================

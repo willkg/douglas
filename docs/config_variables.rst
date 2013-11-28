@@ -1,6 +1,6 @@
-=====================
+===================
 Configuring Douglas
-=====================
+===================
 
 You configure a Douglas blog by setting configuration variables in a
 Python file called ``config.py``.  Each Douglas blog has its own
@@ -82,7 +82,7 @@ Personal configuration variables
 You can add your own personal configuration variables to
 ``config.py``.  You can put any ``py["name"] = value`` statements that
 you want in ``config.py``.  You can then refer to your configuration
-variables further down in your ``config.py`` file and in your flavour
+variables further down in your ``config.py`` file and in your theme
 templates.  This is useful for allowing you to centralize any
 configuration for your blog into your ``config.py`` file.
 
@@ -90,7 +90,7 @@ For example, you could move all your media files (JPEG images, GIF
 images, CSS, ...) into a directory on your server to be served by
 Apache and then set the config.py variable ``py["media_url"]`` to the
 directory with media files and use ``$media_url`` to refer to this URL
-in your flavour templates.
+in your theme templates.
 
 
 Codebase configuration
@@ -216,7 +216,7 @@ Blog configuration
 
       py["blog_language"] = "en"
 
-   This gets used in the RSS flavours.
+   This gets used in the RSS themes.
 
    Refer to `ISO 639-2`_ for language codes.  Many systems use
    two-letter ISO 639-1 codes supplemented by three-letter ISO 639-2
@@ -248,8 +248,8 @@ Blog configuration
       it to ``utf-8``.
 
    This value should be in the meta section of any HTML- or
-   XHTML-based flavours and it's also in the header for any feed-based
-   flavours.  An improper encoding will gummy up some/most feed
+   XHTML-based themes and it's also in the header for any feed-based
+   themes.  An improper encoding will gummy up some/most feed
    readers and web-browsers.
 
    W3C has a nice `tutorial on encoding`_.  You may refer to `IANA
@@ -354,59 +354,59 @@ Blog configuration
    datadir tree.
 
 
-.. py:data:: flavourdir
+.. py:data:: themedir
 
    (optional) string
 
-   This is the full path to where your Douglas flavours are kept.
+   This is the full path to where your Douglas themes are kept.
 
-   If you do not set the ``flavourdir``, then Douglas will look for
-   your flavours and templates in the datadir alongside your entries.
+   If you do not set the ``themedir``, then Douglas will look for
+   your themes and templates in the datadir alongside your entries.
 
    .. Note::
 
-      "flavour" is spelled using the British spelling and not the
+      "theme" is spelled using the British spelling and not the
       American one.
 
    For example, if you want to put your entries in
-   ``/home/joe/blog/entries/`` and your flavour templates in
-   ``/home/joe/blog/flavours/`` you would set ``flavourdir`` and
+   ``/home/joe/blog/entries/`` and your theme templates in
+   ``/home/joe/blog/themes/`` you would set ``themedir`` and
    ``datadir`` like this::
 
       py["datadir"] = "/home/joe/blog/entries/"
-      py["flavourdir"] = "/home/joe/blog/flavours/"
+      py["themedir"] = "/home/joe/blog/themes/"
 
 
    .. Note::
 
-      Use ``/`` to separate directories in the ``flavourdir`` path even
-      if you are using Windows.  Examples of valid ``flavourdir`` on
+      Use ``/`` to separate directories in the ``themedir`` path even
+      if you are using Windows.  Examples of valid ``themedir`` on
       Windows::
 
-         py["flavourdir"] = "/blog/flavours/"
+         py["themedir"] = "/blog/themes/"
 
       and::
 
-         py["flavourdir"] = "e:/blog/flavours/"
+         py["themedir"] = "e:/blog/themes/"
 
 
-.. py:data:: default_flavour
+.. py:data:: default_theme
 
    (optional) string; defaults to ``"html"``
 
-   This specified the flavour that will be used if the user doesn't
-   specify a flavour in the URI.
+   This specified the theme that will be used if the user doesn't
+   specify a theme in the URI.
 
-   For example, if you wanted your default flavour to be "joy", then
-   you would set ``default_flavour`` like this::
+   For example, if you wanted your default theme to be "joy", then
+   you would set ``default_theme`` like this::
 
-      py["default_flavour"] = "joy"
+      py["default_theme"] = "joy"
 
 
-   Doing this will cause Douglas to use the "joy" flavour whenever
-   URIs are requested that don't specify the flavour.
+   Doing this will cause Douglas to use the "joy" theme whenever
+   URIs are requested that don't specify the theme.
 
-   For example, the following will all use the "joy" flavour::
+   For example, the following will all use the "joy" theme::
 
       http://example.com/blog/
       http://example.com/blog/index
@@ -571,7 +571,7 @@ Logging configuration
    So on and so forth.
 
    For "production" blogs (i.e. you're not tinkering with
-   configuration, new plugins, new flavours, or anything along those
+   configuration, new plugins, new themes, or anything along those
    lines), then this should be set to ``warning`` or ``error``.
 
    For example, if you're done tinkering with your blog, you might set
@@ -579,34 +579,6 @@ Logging configuration
    being processed::
 
       py['log_level'] = "info"
-
-
-.. py:data:: log_filter
-
-   (optional) string
-
-   This let's you specify which channels should be logged.
-
-   If ``log_filter`` is set, then ONLY messages from the specified
-   channels are logged.  Everything else is silently ignored.
-
-   Each plugin can log messages on its own channel.  Therefore channel
-   name == plugin name.
-
-   Douglas logs its messages to a channel named "root".
-
-   .. Warning::
-
-      A warning about omitting root:
-
-      If you use ``log_filter`` and don't include "root", then Douglas
-      messages will be silently ignored!
-
-   For example, if you wanted to filter log messages to "root" and
-   messages from the "comments" plugin, then you would set
-   ``log_filter`` like this::
-
-      py["log_filter"] = ["root", "comments"]
 
 
 .. _plugin-configuration:
@@ -723,42 +695,6 @@ behavior for loading plugins: ``plugin_dirs`` and ``load_plugins``.
       plugins will want to have a chance to do things before other
       plugins.  This should be specified in the documentation that
       comes with those plugins.
-
-
-Caching Configuration
-=====================
-
-Enabling caching by setting the ``cacheDriver`` and ``cacheConfig``
-variables in ``config.py`` speeds up rendering of your Douglas
-pages.
-
-.. py:data:: cacheDriver
-
-   (optional) string; defaults to ""
-
-   Douglas has multiple cache mechanisms. Look at the source files
-   in ``Douglas/cache`` to see what mechanisms are available, then
-   set ``cacheDriver`` to the cache mechanism that you want. For
-   example::
-
-       py["cacheDriver"] = "entrypickle"
-
-
-.. py:data:: cacheConfig
-
-   (optional) string; defaults to ""
-
-   Read the top of the source code file in ``Douglas/cache`` for your
-   selected cache driver (e.g. ``entrypickle.py``) to see how to set the
-   ``cacheConfig`` variable for it.  For example::
-
-       py["cacheConfig"] = "/path/to/a/cache/directory"
-
-   .. Note::
-
-      ``load_plugins`` should contain a list of strings where each
-      string is a Python module---not a filename.  So don't add the
-      ``.py`` to the end of the module name!
 
 
 Static Rendering Configuration

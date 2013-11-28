@@ -55,14 +55,9 @@ Add ``$(archivelinks)`` to your head and/or foot templates.
 
 """
 
-__author__ = "Wari Wahab"
-__email__ = "wari at wari dot per dot sg"
-__version__ = "2011-10-22"
-__url__ = "http://douglas.github.com/"
 __description__ = "Builds month/year-based archives listing."
 __category__ = "archives"
 __license__ = "MIT"
-__registrytags__ = "1.4, 1.5, core"
 
 
 from douglas import tools

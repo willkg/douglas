@@ -5,7 +5,7 @@ Renderers
 =========
 
 Douglas supports multiple renderers and comes with two by default:
-debug and blosxom.
+debug and Jinja2.
 
 
 blosxom renderer
@@ -14,16 +14,13 @@ blosxom renderer
 You can set which renderer to use in your ``config.py`` file like
 this::
 
-    py["renderer"] = "blosxom"
+    py["renderer"] = "debug"
+
 
 .. Note::
 
     If you don't specify the ``renderer`` configuration variable, 
-    Douglas uses the blosxom renderer.
-
-The blosxom renderer is named as such because it operates similarly to
-blosxom.  Read the chapter on :ref:`flavours and templates
-<flavours-and-templates>`.
+    Douglas uses the Jinja2 renderer.
 
 
 debug renderer
@@ -31,7 +28,7 @@ debug renderer
 
 The debug renderer outputs your blog in a form that makes it easy to 
 see the data generated when handling a Douglas request.  This is 
-useful for debugging plugins, working on blosxom flavours and
+useful for debugging plugins, working on Jinja2 themes and
 templates, and probably other things as well.
 
 To set Douglas to use the debug renderer, do this in your
@@ -44,5 +41,5 @@ Other renderers
 ===============
 
 If you want your blog rendered by a different renderer, say one that
-uses a different template system like Jinja or Cheetah, then you will
+uses a different template system like Cheetah, then you will
 need to install a plugin that implements the ``renderer`` callback.

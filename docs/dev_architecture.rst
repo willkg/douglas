@@ -42,11 +42,11 @@ Douglas is composed of several parts:
 
    2. the ``renderers`` package - Douglas can handle different
       renderers.  The renderer gets a list of entries to be rendered
-      and can render them using whatever means it so desires: blosxom
+      and can render them using whatever means it so desires: Jinja2
       templates, htmltmpl templates, Cheetah templates, hard-coded RSS
       2.0 markup, ...
 
-      Douglas comes with two renderers: blosxom and debug.
+      Douglas comes with two renderers: Jinja2 and debug.
 
    3. the ``cache`` package - Douglas allows for entry-level
       caching.  This helps in cases where your entries are stored in a
@@ -59,8 +59,8 @@ Douglas's behavior and output is then augmented by:
    behavior.  These you can get from the plugin registry or write
    yourself.
 
-2. flavour templates - Flavour templates allow you to create the look
-   and feel of your blog.  These you can get from the flavour registry
+2. theme templates - Theme templates allow you to create the look
+   and feel of your blog.  These you can get from the theme registry
    or write yourself.
 
 
@@ -147,7 +147,7 @@ run method if none of the plugins have handled the request already.
    If there ``renderer`` is specified, Douglas instantiates that.
 
    If there ``renderer`` is not specified, Douglas uses the
-   ``blosxom`` renderer in the ``renderer`` package.
+   ``jinjarenderer`` renderer in the ``renderer`` package.
 
 2. Calls the ``pathinfo`` callback which allows all plugins to help
    figure out what to do with the HTTP URI/QUERYSTRING that's been
@@ -164,36 +164,19 @@ run method if none of the plugins have handled the request already.
 
 
 
-Lifecycle of the blosxom renderer
-=================================
+Lifecycle of the Jinja2 renderer
+================================
 
 The blosxom renderer renders the entries in a similar fashion to what
-Blosxom does.  The blosxom renderer uses flavour templates and
+Blosxom does.  The blosxom renderer uses theme templates and
 template variables.  It also has a series of callbacks allowing
 plugins to modify templates and entry data at the time of rendering
 that specific piece.
 
 1. Renders the ``content_type`` template.
 
-2. Calls the ``head`` callback and then renders the ``head`` template.
-
-3. Calls the ``date_head`` callback and renders the ``date_head``
-   template.
-
-4. For each entry:
-
-   1. If the date of this entry's mtime is different than the last
-      entry, call the ``date_foot`` callback and render the
-      ``date_foot`` template.  Then call the ``date_head`` callback
-      and render the ``date_head`` template.
-
-   2. Call the ``story`` callback and render the ``story`` template.
-
-5. Call the ``date_foot`` callback and render the ``date_foot``
-   template.
-
-6. Call the ``foot`` callback and render the ``foot`` template.
-
+2. Renders the ``index.<themename>`` template which does whatever
+   it does.
 
 
 About callbacks
@@ -447,8 +430,8 @@ variables in the data dict of the Request object:
 ``root_datadir``
    full path to the entry folder or entry file on the file system
 
-``flavour``
-   the flavour gathered from this URL
+``theme``
+   the theme gathered from this URL
 
 Functions that implement this callback will get an args dict
 containing:
@@ -489,7 +472,7 @@ cb_renderer
 
 The renderer callback allows plugins to specify a renderer to use by
 returning a renderer instance to use.  If no renderer is specified, we
-use the default blosxom renderer.
+use the default Jinja2 renderer.
 
 Functions that implement this callback will get an args dict
 containing:
@@ -667,8 +650,8 @@ containing:
 ``filelist``
     list of (url, query) tuples of all urls to be rendered
 
-``flavours``
-    list of flavours to be rendered
+``themes``
+    list of themes to be rendered
 
 ``incremental``
     whether (true) or not (false) this is an incremental static rendering
@@ -683,192 +666,3 @@ search page gets rendered::
    def cb_staticrender_filelist(args):
        filelist = args["filelist"]
        filelist.append(("/search", ""))
-
-
-cb_head
--------
-
-The head callback is called before a head flavour template is
-rendered.
-
-``cb_head`` is called before the variables in the entry are
-substituted into the template.  This is the place to modify the head
-template based on the entry content.  You can also set variables on
-the entry that will be used by the ``cb_story`` or ``cb_foot``
-templates.  You have access to all the content variables via entry.
-
-Blosxom 2.0 calls this callback ``head``.
-
-Functions that implement this callback will get an args dict
-containing:
-
-``request``
-   a Request object
-
-``renderer``
-   the ``BlosxomRenderer`` instance that called the callback
-
-``entry``
-   the entry to be rendered
-
-``template``
-   a string containing the flavour template to be processed
-
-Functions that implement this callback must return the input args dict
-whether or not they adjust anything in it.
-
-Example in which we add the number of entries being rendered to the
-``$blog_title`` variable::
-
-   def cb_head(args):
-       request = args["request"]
-       config = request.get_configuration()
-       data = request.get_data()
-
-       num_entries = len(data.get("entry_list", []))
-       bt = config.get("blog_title", "")
-       config["blog_title"] = bt + ": %d entries" % num_entries
-
-       return args
-
-
-
-cb_date_head
-------------
-
-The ``date_head`` callback is called before a ``date_head`` flavour
-template is rendered.
-
-``cb_date_head`` is called before the variables in the entry are
-substituted into the template.  This is the place to modify the
-``date_head`` template based on the entry content.  You have access to
-all the content variables via entry.
-
-Blosxom 2.0 calls this callback ``date``.
-
-Functions that implement this callback will get an args dict
-containing:
-
-``request``
-   a Request object
-
-``renderer``
-   the ``BlosxomRenderer`` instance that called the callback
-
-``entry``
-   the entry to be rendered
-
-``template``
-   a string containing the flavour template to be processed
-
-Functions that implement this callback must return the input args dict
-whether or not they adjust anything in it.
-
-
-
-cb_story
---------
-
-The ``story`` callback gets called before the entry is rendered.
-
-The template used is typically the ``story`` template, but we allow
-entries to override this if they have a ``template`` property.  If
-they have the ``template`` property, then we'll use the template of
-that name instead.
-
-``cb_story`` is called before the variables in the entry are
-substituted into the template.  This is the place to modify the
-``story`` template based on the entry content.  You have access to all
-the content variables via entry.
-
-Blosxom 2.0 calls this callback ``story``.
-
-Functions that implement this callback will get an args dict
-containing:
-
-``request``
-   a Request object
-
-``renderer``
-   the ``BlosxomRenderer`` that called the callback
-
-``entry``
-   the entry to be rendered
-
-``template``
-   a string containing the flavour template to be processed
-
-Functions that implement this callback must return the input args dict
-whether or not they adjust anything in it.
-
-Example which adds a ``guid`` variable to the entry which is available
-to use in the story template.  The ``guid`` can be manually set by
-the user in the entry metadata and if it's not there, then it
-defaults to the ``file_path`` value::
-
-    def cb_story(args):
-        # grab the entry from the args dict.
-        entry = args["entry"]
-
-        # set the "guid" variable in the entry.  it's either the "guid"
-        # value (if the user set one in the entry metadata) or it's
-        # whatever the value of "file_path" is.
-        entry["guid"] = entry.get("guid", entry.get("file_path"))
-
-        # the cb_story function _must_ return the args dict.
-        return args
-
-
-cb_story_end
-------------
-
-The ``story_end`` callback is is called after the variables in the
-entry are substituted into the template.  You have access to all the
-content variables via entry.
-
-Functions that implement this callback will get an args dict
-containing:
-
-``request``
-   a Request object
-
-``renderer``
-   the ``BlosxomRenderer`` instance that called the callback
-
-``entry``
-   the entry object to be rendered
-
-``template``
-   a string containing the flavour template to be processed
-
-Functions that implement this callback must return the input args dict
-whether or not they adjust anything in it.
-
-
-cb_foot
--------
-
-The ``foot`` callback is called before the variables in the entry are
-substituted into the foot template.  This is the place to modify the
-``foot`` template based on the entry content.  You have access to all
-the content variables via entry.
-
-Blosxom 2.0 calls this callback ``foot``.
-
-Functions that implement this callback will get an args dict
-containing:
-
-``request``
-   a Request object
-
-``renderer``
-   the ``BlosxomRenderer`` instance that called the callback
-
-``entry``
-   the entry to be rendered
-
-``template``
-   a string containing the flavour template to be processed
-
-Functions that implement this callback must return the input args dict
-whether or not they adjust anything in it.

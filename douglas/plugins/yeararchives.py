@@ -13,7 +13,7 @@ Install
 
 This plugin comes with Douglas.  To install, do the following:
 
-1. Add ``Douglas.plugins.yeararchives`` to the ``load_plugins`` list
+1. Add ``douglas.plugins.yeararchives`` to the ``load_plugins`` list
    in your ``config.py`` file.
 
 2. Add ``$(archivelinks)`` to your head and/or foot templates.
@@ -64,14 +64,9 @@ The vars available with typical example values are::
 
 """
 
-__author__ = "Will Kahn-Greene"
-__email__ = "willg at bluesock dot org"
-__version__ = "2010-05-08"
-__url__ = "http://douglas.github.com/"
 __description__ = "Builds year-based archives listing."
 __category__ = "archives"
 __license__ = "MIT"
-__registrytags__ = "1.4, 1.5, core"
 
 
 from douglas import tools, entries

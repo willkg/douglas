@@ -3,7 +3,7 @@
 
    This document file was automatically generated.  If you want to edit
    the documentation, DON'T do it here--do it in the docstring of the
-   appropriate plugin.  Plugins are located in ``Douglas/plugins/``.
+   appropriate plugin.  Plugins are located in ``douglas/plugins/``.
 
 =====================================================
  rst_parser - restructured text support for blog ... 
@@ -22,9 +22,9 @@ fine.
 Install
 =======
 
-This plugin comes with Douglas.  To install, do the following:
+This plugin comes with douglas.  To install, do the following:
 
-1. Add ``Douglas.plugins.rst_parser`` to the ``load_plugins`` list
+1. Add ``douglas.plugins.rst_parser`` to the ``load_plugins`` list
    in your ``config.py`` file.
 
 2. Install docutils.  Instructions are at

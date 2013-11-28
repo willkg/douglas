@@ -3,7 +3,7 @@
 
    This document file was automatically generated.  If you want to edit
    the documentation, DON'T do it here--do it in the docstring of the
-   appropriate plugin.  Plugins are located in ``Douglas/plugins/``.
+   appropriate plugin.  Plugins are located in ``douglas/plugins/``.
 
 ===================================================
  readmore - Breaks blog entries into summary an... 
@@ -19,9 +19,9 @@ easier to show just the summary in indexes.
 Install
 =======
 
-This plugin comes with Douglas.  To install, do the following:
+This plugin comes with douglas.  To install, do the following:
 
-1. Add ``Douglas.plugins.readmore`` to the ``load_plugins`` list in
+1. Add ``douglas.plugins.readmore`` to the ``load_plugins`` list in
    your ``config.py`` file.
 
    .. Note::
@@ -63,13 +63,13 @@ Configuration
 
    * ``%(url)s``       - the full path to the story
    * ``%(base_url)s``  - base_url
-   * ``%(flavour)s``   - the flavour selected now
+   * ``%(theme)s``   - the theme selected now
    * ``%(file_path)s`` - path to the story (without extension)
 
    .. Note::
 
       This template is formatted using Python string formatting---not
-      Douglas template formatting!
+      douglas template formatting!
 
 
 Usage

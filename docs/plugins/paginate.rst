@@ -3,7 +3,7 @@
 
    This document file was automatically generated.  If you want to edit
    the documentation, DON'T do it here--do it in the docstring of the
-   appropriate plugin.  Plugins are located in ``Douglas/plugins/``.
+   appropriate plugin.  Plugins are located in ``douglas/plugins/``.
 
 ===================================================
  paginate - Allows navigation by page for index... 
@@ -14,20 +14,21 @@ Summary
 
 Plugin for paging long index pages.
 
-Douglas uses the num_entries configuration variable to prevent more
-than ``num_entries`` being rendered by cutting the list down to
+douglas uses the ``num_entries`` configuration variable to prevent
+more than ``num_entries`` being rendered by cutting the list down to
 ``num_entries`` entries.  So if your ``num_entries`` is set to 20, you
 will only see the first 20 entries rendered.
 
-The paginate overrides this functionality and allows for paging.
+The paginate plugin overrides this functionality and allows for
+paging.
 
 
 Install
 =======
 
-This plugin comes with Douglas.  To install, do the following:
+This plugin comes with douglas.  To install, do the following:
 
-1. Add ``Douglas.plugins.paginate`` to your ``load_plugins`` list
+1. Add ``douglas.plugins.paginate`` to your ``load_plugins`` list
    variable in your ``config.py`` file.
 
    Make sure it's the first plugin in the ``load_plugins`` list so
@@ -90,10 +91,17 @@ behavior::
 Note about static rendering
 ===========================
 
-This plugin doesn't work with static rendering.  The problem is that
-it relies on the querystring to figure out which page to show and when
-you're static rendering, only the first page is rendered.  At some
-point, someone will fix this.
+This plugin works fine with static rendering, but the urls look
+different. Instead of adding a ``page=4`` kind of thing to the
+querystring, this adds it to the url.
+
+For example, say your front page was ``/index.html`` and you had 5
+pages of entries. Then the urls would look like this::
+
+    /index.html           first page
+    /index_page2.html     second page
+    /index_page3.html     third page
+    ...
 
 
 License

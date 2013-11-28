@@ -299,12 +299,13 @@ def create_blog(command, argv):
 
     def _mkdir(d):
         if verbose:
-            print "Creating '%s'..." % d
+            print "Creating '{0}'...".format(d)
         os.makedirs(d)
 
     _mkdir(d)
     _mkdir(os.path.join(d, "entries"))
     _mkdir(os.path.join(d, "plugins"))
+    _mkdir(os.path.join(d, "drafts"))
 
     source = os.path.join(os.path.dirname(__file__), "themes")
 

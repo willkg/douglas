@@ -66,24 +66,19 @@ Available variables in the category_item template:
 variable                 example                     datatype
 =======================  ==========================  ====================
 base_url                 http://joe.com/blog/        string
-fullcategory_urlencoded  'dev/douglas/status/'     string
-fullcategory             'dev/douglas/status/'     string (urlencoded)
+fullcategory_urlencoded  'dev/douglas/status/'       string
+fullcategory             'dev/douglas/status/'       string (urlencoded)
 category                 'status/'                   string
 category_urlencoded      'status/'                   string (urlencoed)
-theme                  'html'                      string
+theme                    'html'                      string
 count                    70                          int
 indent                   '&nbsp;&nbsp;&nbsp;&nbsp;'  string
 =======================  ==========================  ====================
 """
 
-__author__ = "Will Kahn-Greene"
-__email__ = "willg at bluesock dot org"
-__version__ = "$Id$"
-__url__ = "http://douglas.github.com/"
 __description__ = "Builds a list of categories."
 __category__ = "category"
 __license__ = "MIT"
-__registrytags__ = "1.4, 1.5, core"
 
 
 from douglas import tools

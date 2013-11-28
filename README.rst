@@ -40,12 +40,12 @@ Quickstart for static rendering
 5. Edit the ``mynewblog/config.py`` file. There should be instructions
    on what should get changed and how to change it.
 
-6. From ``mynewblog``, render the site::
+6. Change directories to ``mynewblog`` and then render the site::
 
        douglas-cmd staticrender
 
-7. Copy the files from the ``compiled/`` dir to where they're available
-   for serving by your web server.
+7. Copy the files from the ``compiled_site/`` dir to where they're
+   available for serving by your web server.
 
 
 Where to go from here
@@ -92,10 +92,12 @@ Entries, categories, storage:
 
 Themes:
 
-* A theme consists of a set of Jinja *templates*. It's an output
+* A theme consists of a set of Jinja *templates*. A theme is an output
   format.
 * Themes are stored in a directory called the *themedir*.
 * Douglas comes with two themes: html, rss.
+* A theme is stored in the *themedir* by name and consists of at least an
+  ``index.<name>`` file and a ``content_type`` file.
 * There's more information on themes and templates in
   the Themes and Templates chapter of the manual
   (``docs/themes_and_templates.rst`` if you're looking at the source).

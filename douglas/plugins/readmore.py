@@ -112,14 +112,9 @@ Additionally, I folded in the rst_break plugin break directive from
 Menno Smits at http://freshfoo.com/wiki/CodeIndex .
 """
 
-__author__ = "Will Kahn-Greene"
-__email__ = "willg at bluesock dot org"
-__version__ = "2011-11-05"
-__url__ = "http://douglas.github.com/"
 __description__ = "Breaks blog entries into summary and details"
 __category__ = "display"
 __license__ = "MIT"
-__registrytags__ = "1.5, core"
 
 
 import re

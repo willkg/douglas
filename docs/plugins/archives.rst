@@ -3,11 +3,11 @@
 
    This document file was automatically generated.  If you want to edit
    the documentation, DON'T do it here--do it in the docstring of the
-   appropriate plugin.  Plugins are located in ``Douglas/plugins/``.
+   appropriate plugin.  Plugins are located in ``douglas/plugins/``.
 
-=====================================================
- pyarchives - Builds month/year-based archives li... 
-=====================================================
+===================================================
+ archives - Builds month/year-based archives li... 
+===================================================
 
 Summary
 =======
@@ -21,9 +21,9 @@ your head and foot templates.
 Install
 =======
 
-This plugin comes with Douglas.  To install, do the following:
+This plugin comes with douglas.  To install, do the following:
 
-1. Add ``Douglas.plugins.pyarchives`` to the ``load_plugins`` list
+1. Add ``douglas.plugins.pyarchives`` to the ``load_plugins`` list
    in your ``config.py`` file.
 
 2. Configure using the following configuration variables.
@@ -55,7 +55,7 @@ This plugin comes with Douglas.  To install, do the following:
     .. Note::
 
        The syntax used here is the Python string formatting
-       syntax---not the Douglas template rendering syntax!
+       syntax---not the douglas template rendering syntax!
 
 
 Usage

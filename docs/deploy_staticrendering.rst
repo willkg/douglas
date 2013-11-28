@@ -38,31 +38,31 @@ These are the instructions for configuring static rendering in Douglas.
       py["static_dir"] = "/home/joe/public_html"
 
 
-2. (optional) Uncomment ``static_flavours`` in your ``config.py`` file.
+2. (optional) Uncomment ``static_themes`` in your ``config.py`` file.
 
-   The value of ``static_flavours`` should be a list of strings representing 
-   all the flavours that should be rendered.
+   The value of ``static_themes`` should be a list of strings representing 
+   all the themes that should be rendered.
 
-   Defaults to ``["html"]`` which only renders the html flavour.
+   Defaults to ``["html"]`` which only renders the html theme.
 
    For example::
 
-      py["static_flavours"] = ["html"]
+      py["static_themes"] = ["html"]
 
-3. (optional) Uncomment ``static_index_flavours`` in your ``config.py`` file.
+3. (optional) Uncomment ``static_index_themes`` in your ``config.py`` file.
 
-   ``static_index_flavours`` is just like ``static_flavours`` except
-   it's the flavours of the index files: frontpage index, category
+   ``static_index_themes`` is just like ``static_themes`` except
+   it's the themes of the index files: frontpage index, category
    indexes, date indexes, ...
 
-   Defaults to ``["html"]`` which only renders the html flavour.
+   Defaults to ``["html"]`` which only renders the html theme.
 
    For example::
 
-     py["static_index_flavours"] = ["html"]
+     py["static_index_themes"] = ["html"]
 
    If you want your index files to also be feeds, then you should add
-   a feed flavour to the list.
+   a feed theme to the list.
 
 4. (optional) Uncomment ``static_monthnames`` in your ``config.py`` file.
 
@@ -100,8 +100,8 @@ These are the instructions for configuring static rendering in Douglas.
 Here's an example of static rendering configuration::
 
    py["static_dir"] = "/home/joe/public_html/static/"
-   py["static_flavours"] = ["html"]
-   py["static_index_flavours"] = ["html", "atom"]
+   py["static_themes"] = ["html"]
+   py["static_index_themes"] = ["html", "atom"]
    py["static_monthnames"] = False    # I do not want month names
    py["static_monthnumbers"] = True   # I do want month numbers
 
@@ -195,7 +195,7 @@ Things to note
   outdated files.
 
 * You probably don't want to render an rss or Atom version of every
-  page, so don't include those flavours in ``static_flavours`` and
+  page, so don't include those themes in ``static_themes`` and
   instead specify the urls by hand in ``static_urls``.
 
 * If your website requires more files than just the ones that are
@@ -220,7 +220,7 @@ My directory layout looks like::
      |  \- js/
      |
      |- entries/       # all my blog entries
-     |- flavourdir/    # flavours and templates
+     |- themedir/      # themes and templates
      |- plugins/       # a couple of plugins I use
      |
      |- config.py      # my config.py file

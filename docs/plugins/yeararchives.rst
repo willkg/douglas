@@ -3,7 +3,7 @@
 
    This document file was automatically generated.  If you want to edit
    the documentation, DON'T do it here--do it in the docstring of the
-   appropriate plugin.  Plugins are located in ``Douglas/plugins/``.
+   appropriate plugin.  Plugins are located in ``douglas/plugins/``.
 
 =======================================================
  yeararchives - Builds year-based archives listing.... 
@@ -23,7 +23,7 @@ Install
 
 This plugin comes with Douglas.  To install, do the following:
 
-1. Add ``Douglas.plugins.yeararchives`` to the ``load_plugins`` list
+1. Add ``douglas.plugins.yeararchives`` to the ``load_plugins`` list
    in your ``config.py`` file.
 
 2. Add ``$(archivelinks)`` to your head and/or foot templates.
@@ -65,7 +65,7 @@ The vars available with typical example values are::
 
     Y      4-digit year   ex: '1978'
     y      2-digit year   ex: '78'
-    f      the flavour    ex: 'html'
+    f      the theme    ex: 'html'
 
 .. Note::
 

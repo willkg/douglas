@@ -66,9 +66,7 @@ Deployment
        % ./douglas.cgi test
 
    If that doesn't work, double-check to make sure you've completed
-   the above steps, then check the trouble-shooting section below,
-   then ask for help on IRC or the users mailing list.  More details
-   in :ref:`project-details-and-contact`.
+   the above steps, then check the trouble-shooting section below.
 
 
 If that does work, then try to run the CGI script from your
@@ -82,20 +80,9 @@ Trouble-shooting
 We're going to try to break this down a bit into categories. Bear with
 us and keep trying things. 
 
-If you have problems and have gone through this section to no avail,
-ask a question on the douglas-users mailing list or ask us on IRC.
-Details for both of these are on the `website`_.
-
-.. _website: http://douglas.github.com/
-
 
 Running ./douglas.cgi doesn't work
 ------------------------------------
-
-First, you should check to see if you have the minimum requirements
-for Douglas on your system.  They're listed in the
-:ref:`Requirements section of the Install chapter <requirements>`.  If
-not, then please install them.
 
 If Python is installed on your system, make sure the first line in
 ``douglas.cgi`` points to the correct Python interpreter.  By
@@ -142,10 +129,8 @@ If the problem is with Douglas and not your web server, then you
 should see a pretty traceback that will help you figure out what the
 specific problem is.
 
-If the traceback and information doesn't make any sense to you, ask a
-question on the douglas-users mailing list or ask us on IRC.
-Details for both of these are on the `website
-<http://douglas.github.com/>`_.
+If the traceback and information doesn't make any sense to you, add
+an issue to the issue tracker.
 
 If you don't see a traceback, then you either have a configuration
 problem with your web server or a configuration problem with Python.
@@ -189,9 +174,7 @@ That will show a lot more detail about your configuration, what the
 web server passes Douglas in environment variables, and other data
 about your blog that might help you figure out what your problem is.
 
-If that doesn't help, ask a question on the douglas-users mailing
-list or ask us on IRC.  Details for both of these are on the `website
-<http://douglas.github.com/>`_.
+If that doesn't help, add an issue to the issue tracker.
 
 
 UGH! My blog looks UGLY!
@@ -199,12 +182,12 @@ UGH! My blog looks UGLY!
 
 .. only:: text
 
-   Read the documentation regarding Flavours and Templates to help you
+   Read the documentation regarding Themes and Templates to help you
    out.
 
 .. only:: html or latex
 
-   Check out :ref:`flavours-and-templates`.
+   Check out :ref:`themes-and-templates`.
 
 
 I hate writing in HTML!

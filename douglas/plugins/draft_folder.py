@@ -1,3 +1,35 @@
+"""
+Summary
+=======
+
+Enables drafts for your blog.
+
+
+Install and Configure
+=====================
+
+1. Add ``douglas.plugins.draft_folder`` to the ``load_plugins`` list
+   in your ``config.py`` file.
+
+2. Set ``py["draftdir"]`` to the directory where your draft entries
+   will be.
+
+   This can't be a subdirectory of your datadir.
+
+   Make sure to create this directory, too.
+
+3. (optional) Set ``py["draft_trigger"]`` in your ``config.py`` file
+   to the url path you want to show drafts in. This defaults to
+   ``draft``.
+
+That's it!
+
+"""
+
+__description__ = "Draft folder"
+__category__ = "content"
+__license__ = 'MIT'
+
 import os
 
 from douglas import tools

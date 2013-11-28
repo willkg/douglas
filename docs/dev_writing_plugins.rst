@@ -14,9 +14,8 @@ This chapter covers a bunch of useful things to know when writing
 Douglas plugins.  This chapter, moreso than the rest of this manual,
 is very much a work in progress.
 
-If you need help with plugin development, sign up on the devel mailing
-list and/or join us on ``#douglas`` on ``irc.freenode.net``.  More
-details in :ref:`project-details-and-contact`.
+If you need help with plugin development, write up an issue in the
+issue tracker.
 
 FIXME - this needs more work
 
@@ -226,9 +225,9 @@ pycategories)::
     def verify_installation(request):
         config = request.get_configuration()
 
-        if not config.has_key("category_flavour"):
-            print "missing optional config property 'category_flavour' "
-            print "which allows you to specify the flavour for the category "
+        if not config.has_key("category_theme"):
+            print "missing optional config property 'category_theme' "
+            print "which allows you to specify the theme for the category "
             print "link.  refer to pycategory plugin documentation for more "
             print "details."
         return 1
@@ -385,7 +384,7 @@ after all the metadata the body of the entry::
 You can also specify the template to use by setting the
 ``"template_name"`` variable in the returned dict.  If the template
 specified doesn't exist, Douglas will use the ``story`` template for
-the specified flavour.
+the specified theme.
 
 For example, if you were creating a tumblelog and the file parsed was
 a image entry and you want image entries to be displayed on your blog

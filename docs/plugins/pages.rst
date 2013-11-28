@@ -3,7 +3,7 @@
 
    This document file was automatically generated.  If you want to edit
    the documentation, DON'T do it here--do it in the docstring of the
-   appropriate plugin.  Plugins are located in ``Douglas/plugins/``.
+   appropriate plugin.  Plugins are located in ``douglas/plugins/``.
 
 ================================================
  pages - Allows you to include non-blog-entr... 
@@ -17,20 +17,20 @@ to add other content to your blog that's not a blog entry.  For
 example, an "about this blog" page or a page covering a list of your
 development projects.
 
-This plugin allows you to have pages served by Douglas that aren't
+This plugin allows you to have pages served by douglas that aren't
 blog entries.
 
 Additionally, this plugin allows you to have a non-blog-entry front
-page.  This makes it easier to use Douglas to run your entire
+page.  This makes it easier to use douglas to run your entire
 website.
 
 
 Install
 =======
 
-This plugin comes with Douglas.  To install, do the following:
+This plugin comes with douglas.  To install, do the following:
 
-1. add ``Douglas.plugins.pages`` to the ``load_plugins`` list in
+1. add ``douglas.plugins.pages`` to the ``load_plugins`` list in
    your ``config.py`` file.
 
 2. configure the plugin using the configuration variables below
@@ -46,7 +46,7 @@ This plugin comes with Douglas.  To install, do the following:
         py["pagesdir"] = "/home/foo/blog/pages/"
 
     If you have ``blogdir`` defined in your ``config.py`` file which
-    holds your ``datadir`` and ``flavourdir`` directories, then you
+    holds your ``datadir`` and ``themedir`` directories, then you
     could set it to::
 
         py["pagesdir"] = os.path.join(blogdir, "pages")
@@ -105,11 +105,11 @@ Template
 ========
 
 pages formats the page using the ``pages`` template.  So you need a
-``pages`` template in the flavours that you want these pages to be
+``pages`` template in the themes that you want these pages to be
 rendered in.  I copy my ``story`` template and remove some bits.
 
-For example, if you're using the html flavour and that is stored in
-``/home/foo/blog/flavours/html.flav/``, then you could copy the
+For example, if you're using the html theme and that is stored in
+``/home/foo/blog/themes/html/``, then you could copy the
 ``story`` file in that directory to ``pages`` and that would become
 your ``pages`` template.
 

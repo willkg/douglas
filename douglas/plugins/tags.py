@@ -226,14 +226,9 @@ from the directory your ``config.py`` is in or::
 from anywhere.
 """
 
-__author__ = "Will Kahn-Greene"
-__email__ = "willg at bluesock dot org"
-__version__ = "2011-10-23"
-__url__ = "http://douglas.github.com/"
 __description__ = "Tags plugin"
 __category__ = "tags"
 __license__ = "MIT"
-__registrytags__ = "1.5, core"
 
 
 import os

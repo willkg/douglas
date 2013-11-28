@@ -11,9 +11,11 @@ Example entry::
    </p>
 
 returns an mtime of 01-01-2008 at 12:20:22.
-
-This is released into the public domain.
 """
+
+__description__ = "Maintain published date in file metadata."
+__category__ = "metadata"
+__license__ = 'MIT'
 
 import time
 import stat
