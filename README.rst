@@ -29,7 +29,7 @@ Quickstart for static rendering
 2. Activate the virtual environment
 3. Install Douglas into your virtual environment::
 
-       pip install https://github.com/willkg/douglas.zip#egg=douglas
+       pip install https://github.com/willkg/douglas/archive/master.zip#egg=douglas
 
 4. Create a new blog structure::
 
