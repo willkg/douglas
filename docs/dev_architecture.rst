@@ -413,7 +413,9 @@ Functions would parse this as they desire, then set the following
 variables in the data dict of the Request object:
 
 ``bl_type``
-   ``dir`` or ``file``
+   ``entry`` or ``entry_list`` or something else.  This is the template
+   that will get rendered.  ``entry`` when showing a single entry
+   and ``entry_list`` when showing a list of entries.
 
 ``pi_bl``
    typically the same as ``PATHINFO``

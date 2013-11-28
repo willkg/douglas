@@ -18,12 +18,16 @@ Themes and templates
 
 A theme consists of at least:
 
-* A ``content_type`` file which contains the mimetype of the content
-  this theme produces. e.g. ``text/plain``, ``text/html``, ``application/rss+xml``,
-  ...
-* A ``index.<themename>`` file which the Jinja2 renderer renders. This
-  file can use macros, include other templates and do whatever you
-  want provided it can be done with Jinja2 templates.
+* a ``content_type`` file which has the mimetype of the output being rendered
+  (e.g. ``text/html``)
+* an ``entry.<themename>`` file which is used when rendering a page
+  with a single entry
+* an ``entry_list.<themename>`` file which is used when rendering a
+  page with a bunch of entries (e.g. category list, date archive list,
+  front page, ...)
+
+Plugins may require additional templates. See the plugin's documentation
+for details.
 
 
 Example blog
@@ -44,11 +48,13 @@ Joe's blog directory structure looks like this::
              |- themes/
                 |- html/             <-- html theme
                 |  |- content_type
-                |  |- index.html
+                |  |- entry.html
+                |  |- entry_list.html
                 |
                 |- rss/              <-- rss theme
-                |  |- content_type
-                |  |- index.rss
+                   |- content_type
+                   |- entry.rss
+                   |- entry_list.rss
 
 
 .. Note::
@@ -61,20 +67,11 @@ Joe's blog directory structure looks like this::
    overlap and get all confuzzled. That's helpful, too.
 
 
-Template variables
-==================
+Template writing tips
+=====================
 
-This is the list of variables that are available to your templates.
-Templates contain variables that are expanded when the template is
-rendered.  Plugins may add additional variables---refer to plugin
-documentation for a list of which variables they add and in which
-templates they're available.
-
-
-Variable syntax helper tips
----------------------------
-
-We're using Jinja2, so we reference variables using Jinja2 syntax.
+We're using Jinja2, so we reference variables using Jinja2 syntax and we can
+use Jinja2 blocks, built-in functions and built-in filters.
 
 This prints a variable::
 
@@ -88,9 +85,41 @@ You can iterate through a list::
     {% endfor %}
 
 Douglas has autoescaping set, so if the variable you're printing
-is HTML and it's safe, you need to use the ``safe`` filter::
+is HTML and you know that it's safe, you can use the ``safe`` filter::
 
     {{ entry.body|safe }}
+
+Templates can inherit from other templates. It's probably the case
+you want to have a base layout template that defines the common
+parts of your site, then have the entry or entry-list specific
+stuff in those templates.
+
+To inherit from another template, use the ``extends`` tag::
+
+    {% extends "filename.ext" %}
+
+In the "super template" you can define blocks and override those
+blocks in the "sub templates".
+
+See the included html theme for an example.
+
+.. seealso::
+
+   http://jinja.pocoo.org/
+
+   http://jinja.pocoo.org/docs/templates/
+
+   http://jinja.pocoo.org/docs/templates/#template-inheritance
+
+
+Template variables
+==================
+
+This is the list of variables that are available to your templates.
+Templates contain variables that are expanded when the template is
+rendered.  Plugins may add additional variables---refer to plugin
+documentation for a list of which variables they add and in which
+templates they're available.
 
 
 Getting a complete list of variables
@@ -203,22 +232,10 @@ are calculated based on the request.
    Example: ``1.2 3/25/2005``
 
 
-Template variables only available in the date_head and date_foot templates
---------------------------------------------------------------------------
+Variables available in the content entries
+------------------------------------------
 
-``date_head`` and ``date_foot`` templates have these additional
-variables:
-
-``date``
-   The date string of this day. 
-
-   Example: ``Sun, 23 May 2004``
-
-
-Template variables only available in the story template
--------------------------------------------------------
-
-These template variables are only available in your story template.
+These template variables are available in the entries.
 
 ``title``
    The title of the entry.
@@ -357,7 +374,6 @@ You'll have two variables ``$mood`` and ``$music`` that will also be
 available in your story templates.
 
 
-
 Invoking a theme
 ================
 
@@ -391,7 +407,7 @@ variable in the query-string.  Examples:
 
 
 Setting default theme
-=======================
+=====================
 
 You can change the default theme from ``html`` to some other theme
 in your ``config.py`` file with the ``default_theme`` property::
@@ -414,7 +430,7 @@ theme::
 
 
 Order of operations to figure out which theme to use
-======================================================
+====================================================
 
 We know that you can specify the default theme to use in the
 ``config.py`` file with the ``default_theme`` property.  We know

@@ -87,7 +87,9 @@ class Renderer(RendererBase):
                 loader=ThemeLoader(os.path.join(themedir, theme)),
                 extensions=['jinja2.ext.autoescape']
             )
-            template = env.get_template('index.' + theme)
+
+            template_name = context.get('bl_type', 'entry') + '.' + theme
+            template = env.get_template(template_name)
             self.write(template.render(context))
 
         self.rendered = 1

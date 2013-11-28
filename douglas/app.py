@@ -972,11 +972,11 @@ def blosxom_file_list_handler(args):
     data = request.get_data()
     config = request.get_configuration()
 
-    if data['bl_type'] == 'dir':
+    if data['bl_type'] == 'entry_list':
         filelist = tools.walk(request,
                               data['root_datadir'],
                               int(config.get("depth", "0")))
-    elif data['bl_type'] == 'file':
+    elif data['bl_type'] == 'entry':
         filelist = [data['root_datadir']]
     else:
         filelist = []
@@ -1117,7 +1117,7 @@ def blosxom_process_path_info(args):
         # this is an absolute path
 
         data['root_datadir'] = absolute_path
-        data['bl_type'] = 'dir'
+        data['bl_type'] = 'entry_list'
 
     elif absolute_path.endswith("/index") and \
              os.path.isdir(absolute_path[:-6]):
@@ -1125,7 +1125,7 @@ def blosxom_process_path_info(args):
         # this is an absolute path with /index at the end of it
 
         data['root_datadir'] = absolute_path[:-6]
-        data['bl_type'] = 'dir'
+        data['bl_type'] = 'entry_list'
 
     else:
         # this is either a file or a date
@@ -1149,11 +1149,11 @@ def blosxom_process_path_info(args):
 
         if ext:
             # this is a file
-            data["bl_type"] = "file"
+            data["bl_type"] = "entry"
             data["root_datadir"] = absolute_path + "." + ext
 
         else:
-            data["bl_type"] = "dir"
+            data["bl_type"] = "entry_list"
 
             # it's possible to have category/category/year/month/day
             # (or something like that) so we pluck off the categories
@@ -1203,7 +1203,7 @@ def blosxom_process_path_info(args):
                 # there is still stuff in path_info to pluck out, then
                 # it's likely this wasn't a date.
                 if item or len(path_info) > 0:
-                    data["bl_type"] = "dir"
+                    data["bl_type"] = "entry_list"
                     data["root_datadir"] = absolute_path
 
     # construct our final URL
@@ -1221,7 +1221,7 @@ def blosxom_process_path_info(args):
 
     if data.get("pi_yr"):
         data["truncate"] = config.get("truncate_date", False)
-    elif data.get("bl_type") == "dir":
+    elif data.get("bl_type") == "entry_list":
         if data["path_info"] == [''] or data["path_info"] == ['index']:
             data["truncate"] = config.get("truncate_frontpage", True)
         else:

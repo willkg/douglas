@@ -8,7 +8,7 @@ class ReadmoreTest(PluginTest):
         PluginTest.setUp(self, readmore)
 
     def test_story_no_break(self):
-        req = Request({"base_url": "/"}, {}, {"bl_type": "file"})
+        req = Request({"base_url": "/"}, {}, {"bl_type": "entry"})
 
         args = {"entry": {"body": "no break",
                           "file_path": ""},
@@ -19,7 +19,7 @@ class ReadmoreTest(PluginTest):
 
     def test_story_break_single_file(self):
         # if showing a single file, then we nix the BREAK bit.
-        req = Request({"base_url": "/"}, {}, {"bl_type": "file"})
+        req = Request({"base_url": "/"}, {}, {"bl_type": "entry"})
 
         args = {"entry": {"body": "no BREAK break",
                           "file_path": ""},
@@ -33,7 +33,7 @@ class ReadmoreTest(PluginTest):
         # with the template and nix everything after BREAK.
         req = Request({"readmore_template": "FOO", "base_url": "/"},
                       {},
-                      {"bl_type": "dir"})
+                      {"bl_type": "entry_list"})
 
         args = {"entry": {"body": "no BREAK break",
                           "file_path": ""},

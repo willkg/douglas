@@ -18,7 +18,7 @@
 <item>
    <title>{{ entry.title }}</title>
    <guid isPermaLink="false">{{ entry.file_path }}</guid>
-   <link>{{ base_url }}/{{ entry.file_path }}.{{ theme }}</link>
+   <link>{{ base_url }}/{{ entry.file_path }}</link>
    <description>
 {{ entry.body }}
 </description>

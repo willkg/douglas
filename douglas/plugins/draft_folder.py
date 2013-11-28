@@ -115,7 +115,7 @@ def cb_filelist(args):
         return []
 
     data['root_datadir'] = draft_name + '.' + ext
-    data['bl_type'] = 'file'
+    data['bl_type'] = 'entry'
     filename = draftdir + draft_name + '.' + ext
 
     if not os.path.isfile(filename):

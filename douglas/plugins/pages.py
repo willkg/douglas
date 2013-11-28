@@ -288,7 +288,7 @@ def cb_filelist(args):
         return []
 
     data['root_datadir'] = page_name + '.' + ext
-    data['bl_type'] = 'file'
+    data['bl_type'] = 'entry'
     filename = pagesdir + page_name + "." + ext
 
     if not os.path.isfile(filename):

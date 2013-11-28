@@ -55,8 +55,15 @@ Each file in ``mynewblog/entries/`` is a blog entry. They are text
 files.  You can edit them with your favorite text editor.
 
 The blog is rendered using Jinja2 templates in the
-``mynewblog/themes/`` directory.  A theme consists of at least a
-``content_type`` and a ``index.<themename>`` file.
+``mynewblog/themes/`` directory.  A theme consists of at least:
+
+* a ``content_type`` file which has the mimetype of the output being rendered
+  (e.g. ``text/html``)
+* an ``entry.<themename>`` file which is used when rendering a page
+  with a single entry
+* an ``entry_list.<themename>`` file which is used when rendering a
+  page with a bunch of entries (e.g. category list, date archive list,
+  front page, ...)
 
 The following plugins are used by default:
 
@@ -79,7 +86,7 @@ The following plugins are used by default:
 
 
 Overview of Douglas
-=====================
+===================
 
 Entries, categories, storage:
 

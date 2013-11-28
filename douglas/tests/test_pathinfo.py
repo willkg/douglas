@@ -21,17 +21,17 @@ class Testpathinfo(UnitTestBase):
         try:
             # /
             self._basic_test("/",
-                             {"bl_type": "dir",
+                             {"bl_type": "entry_list",
                               "pi_yr": "", "pi_mo": "", "pi_da": "",
                               "theme": "html"})
             # /index
             self._basic_test("/index", 
-                             {"bl_type": "dir",
+                             {"bl_type": "entry_list",
                               "pi_yr": "", "pi_mo": "", "pi_da": "",
                               "theme": "html"})
             # /index.xml
             self._basic_test("/index.xml", 
-                             {"bl_type": "dir",
+                             {"bl_type": "entry_list",
                               "pi_yr": "", "pi_mo": "", "pi_da": "",
                               "theme": "xml"})
         finally:
@@ -46,12 +46,12 @@ class Testpathinfo(UnitTestBase):
         try:
             # /file1
             self._basic_test("/file1",
-                             {"bl_type": "file",
+                             {"bl_type": "entry",
                               "pi_yr": "", "pi_mo": "", "pi_da": "",
                               "theme": "html"})
             # /cata/file2
             self._basic_test("/cata/file2",
-                             {"bl_type": "file",
+                             {"bl_type": "entry",
                               "pi_yr": "", "pi_mo": "", "pi_da": "",
                               "theme": "html"})
         finally:
@@ -66,22 +66,22 @@ class Testpathinfo(UnitTestBase):
         try:
             # /cata
             self._basic_test("/cata", 
-                             {"bl_type": "dir",
+                             {"bl_type": "entry_list",
                               "pi_yr": "", "pi_mo": "", "pi_da": "",
                               "theme": "html"})
             # /cata/
             self._basic_test("/cata/", 
-                             {"bl_type": "dir",
+                             {"bl_type": "entry_list",
                               "pi_yr": "", "pi_mo": "", "pi_da": "",
                               "theme": "html"})
             # /cata/suba
             self._basic_test("/cata/suba", 
-                             {"bl_type": "dir",
+                             {"bl_type": "entry_list",
                               "pi_yr": "", "pi_mo": "", "pi_da": "",
                               "theme": "html"})
             # /cata/suba
             self._basic_test("/cata/suba/entry1.html", 
-                             {"bl_type": "file",
+                             {"bl_type": "entry",
                               "pi_yr": "", "pi_mo": "", "pi_da": "",
                               "theme": "html"})
         finally:
@@ -91,15 +91,15 @@ class Testpathinfo(UnitTestBase):
         tools.initialize()
 
         self._basic_test("/2002",
-                         {"bl_type": "dir",
+                         {"bl_type": "entry_list",
                           "pi_yr": "2002", "pi_mo": "", "pi_da": "",
                           "theme": "html"})
         self._basic_test("/2002/02",
-                         {"bl_type": "dir",
+                         {"bl_type": "entry_list",
                           "pi_yr": "2002", "pi_mo": "02", "pi_da": "",
                           "theme": "html"})
         self._basic_test("/2002/02/04", 
-                         {"bl_type": "dir",
+                         {"bl_type": "entry_list",
                           "pi_yr": "2002", "pi_mo": "02", "pi_da": "04",
                           "theme": "html"})
 
@@ -114,22 +114,22 @@ class Testpathinfo(UnitTestBase):
         try:
             # /2006/cata/
             self._basic_test("/2006/cata/", 
-                             {"bl_type": "dir",
+                             {"bl_type": "entry_list",
                               "pi_yr": "2006", "pi_mo": "", "pi_da": "",
                               "theme": "html"})
             # /2006/04/cata/
             self._basic_test("/2006/04/cata/", 
-                             {"bl_type": "dir",
+                             {"bl_type": "entry_list",
                               "pi_yr": "2006", "pi_mo": "04", "pi_da": "",
                               "theme": "html"})
             # /2006/04/02/cata/
             self._basic_test("/2006/04/02/cata/", 
-                             {"bl_type": "dir",
+                             {"bl_type": "entry_list",
                               "pi_yr": "2006", "pi_mo": "04", "pi_da": "02",
                               "theme": "html"})
             # /2006/04/02/cata/suba/
             self._basic_test("/2006/04/02/cata/suba/", 
-                             {"bl_type": "dir",
+                             {"bl_type": "entry_list",
                               "pi_yr": "2006", "pi_mo": "04", "pi_da": "02",
                               "theme": "html"})
 
@@ -145,17 +145,17 @@ class Testpathinfo(UnitTestBase):
         try:
             # /2007/              2007 here is a category
             self._basic_test("/2007/",
-                             {"bl_type": "dir",
+                             {"bl_type": "entry_list",
                               "pi_yr": "", "pi_mo": "", "pi_da": "",
                               "theme": "html"})
             # /2007/05            2007/05 here is a category
             self._basic_test("/2007/05",
-                             {"bl_type": "dir",
+                             {"bl_type": "entry_list",
                               "pi_yr": "", "pi_mo": "", "pi_da": "",
                               "theme": "html"})
             # /2007/05/entry3     2007/05/entry3 is a file
             self._basic_test("/2007/05/entry3.html",
-                             {"bl_type": "file",
+                             {"bl_type": "entry",
                               "pi_yr": "", "pi_mo": "", "pi_da": "",
                               "theme": "html"})
 

@@ -209,7 +209,7 @@ class PluginTest(unittest.TestCase):
             self.request, entry_properties, {}, gmtime)
         self.entry_list = [self.entry]
         self.data = {'entry_list': self.entry_list,
-                     'bl_type': 'file',
+                     'bl_type': 'entry',
                      }
         self.request._data = self.data
 

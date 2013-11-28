@@ -187,7 +187,7 @@ def cb_story(args):
         return
 
     # if we're showing just one entry, then we show the whole thing
-    if data["bl_type"] == 'file':
+    if data["bl_type"] == 'entry':
         entry["body"] = re.sub(breakpoint, "", entry["body"])
         return
 

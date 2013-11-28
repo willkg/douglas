@@ -28,13 +28,11 @@ This plugin comes with douglas.  To install, do the following:
 2. (optional) Add some configuration to your ``config.py`` file.
 
 3. Add the following blurb where you want page navigation to your
-   template::
+   entry_list template::
 
-       {% if bl_type == 'dir' %}
-         <p>
-           {{ page_navigation|safe }}
-         </p>
-       {% endif %}
+       <p>
+         {{ page_navigation|safe }}
+       </p>
 
 
 Configuration variables
