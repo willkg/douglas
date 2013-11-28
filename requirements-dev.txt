@@ -1,2 +1,5 @@
+-e .
+
 nose
 Sphinx
+pastescript

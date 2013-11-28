@@ -1,18 +1,18 @@
 .. _hacking-chapter:
 
-======================
- Hacking on PyBlosxom
-======================
+==================
+Hacking on Douglas
+==================
 
-This will cover installing PyBlosxom from the git repositories in a
+This will cover installing Douglas from the git repositories in a
 way that won't interfere with the packages or modules already installed on 
 the system.
 
-Installing PyBlosxom to hack on it is a little different since you:
+Installing Douglas to hack on it is a little different since you:
 
-1. want to be running PyBlosxom from a git clone
+1. want to be running Douglas from a git clone
 
-2. want PyBlosxom installed such that you don't have to keep running
+2. want Douglas installed such that you don't have to keep running
    ``python setup.py install``
 
 3. want Paste installed so you can test locally
@@ -27,7 +27,7 @@ Requirements
 
 This requires:
 
-* Python 2.4 or higher
+* Python 2.7
 * `git`_
 * `virtualenv`_
 * `PasteScript`_, the command-line frontend for the Python Paste web
@@ -37,6 +37,7 @@ This requires:
 .. _virtualenv: http://pypi.python.org/pypi/virtualenv
 .. _PasteScript: http://pypi.python.org/pypi/PasteScript
 
+
 Installation
 ============
 
@@ -45,15 +46,25 @@ To install:
 1. Create a virtual environment for Douglas into a directory of your
    choosing as denoted by ``<VIRTUAL-ENV-DIR>``::
 
-      virtualenv <VIRTUAL-ENV-DIR>
+       virtualenv <VIRTUAL-ENV-DIR>
+
+   Or use virtualenvwrapper---that's usually way easier::
+
+       mkvirtualenv douglas
+
 
    This is the virtual environment that Douglas will run in.  If you
    decide to delete Douglas at some point, you can just remove this
    virtual environment directory.
 
+
 2. Activate the virtual environment::
 
-      source <VIRTUAL-ENV-DIR>/bin/activate
+       source <VIRTUAL-ENV-DIR>/bin/activate
+
+   Or if you used virtualenvwrapper::
+
+       workon douglas
 
    Remember to activate the virtual environment **every** time you do
    something with Douglas.
@@ -68,47 +79,34 @@ To install:
 
 4. Change directories into the ``douglas`` directory and run::
 
-      python setup.py develop
+      pip install -r requirements-dev.txt
 
 
 Running Douglas
-=================
+===============
 
 When you want to run Douglas from your git clone in your virtual
 environment, you will:
 
 1. Make sure the virtual environment is activated and if it isn't do::
 
-      source <VIRTUAL-ENV-DIR>/bin/activate
+       source <VIRTUAL-ENV-DIR>/bin/activate
+
+   Or::
+
+       workon douglas
 
 2. Change directories into where you have your blog and do::
 
       paster serve blog.ini
+
 	  
-Note: If you get an error message about "paster" not being currently 
-installed, or about the system not finding PyBlosxom, it is likely
-that you have Paster and PyBlosxom installed in different places.
-To ensure Paster is installed in your virtualenv, make sure it 
-is activated (see step 1) and then use pip to install paste.
-
-Note 2: Due to a bug in some linux distributions, it is recommended
-to install paste in the following three steps::
-
-	pip install paste
-	pip install pastedeploy 
-	pip install pastescript
-
-
 Updating Douglas
-==================
+================
 
-Because you installed Douglas with ``python setup.py develop``, when
-you make changes to the Douglas code, they'll be available in the
-environment---you don't need to re-run ``python setup.py develop``.
+If you followed the instructions above, then it should just continue to work
+unless the version has changed. In that case, just do::
 
+    pip install -r requirements-dev.txt
 
-Where to go from here
-======================
-
-Once set up, you can continue to the 
-`Creating your blog <http://douglas.github.com/1.5/install.html#creating-a-blog>`_. chapter
+again.
