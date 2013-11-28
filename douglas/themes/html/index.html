@@ -17,9 +17,12 @@
       <a href="{{ base_url }}/index.rss">RSS 2.0</a>
       ]
     </p>
-    <p>
-      {{ page_navigation }}
-    </p>
+
+    {% if bl_type == 'dir' %}
+      <p>
+        {{ page_navigation|safe }}
+      </p>
+    {% endif %}
 
     {% for entry in content %}
       <h3><a name="{{ entry.fn }}">{{ entry.title }}</a></h3>
@@ -35,6 +38,12 @@
         </div>
       </div>
     {% endfor %}
+
+    {% if bl_type == 'dir' %}
+      <p>
+        {{ page_navigation|safe }}
+      </p>
+    {% endif %}
 
     <p>
       {{ blog_rights }}

@@ -25,13 +25,20 @@ This plugin comes with douglas.  To install, do the following:
    that it has a chance to operate on the entry list before other
    plugins.
 
-2. add the ``$(page_navigation)`` variable to your head or foot (or
-   both) templates.  this is where the page navigation HTML will
-   appear.
+2. (optional) Add some configuration to your ``config.py`` file.
+
+3. Add the following blurb where you want page navigation to your
+   template::
+
+       {% if bl_type == 'dir' %}
+         <p>
+           {{ page_navigation|safe }}
+         </p>
+       {% endif %}
 
 
-Here are some additional configuration variables to adjust the
-behavior::
+Configuration variables
+=======================
 
 ``paginate_count_from``
 
@@ -122,39 +129,41 @@ def verify_installation(request):
 class PageDisplay:
     def __init__(self, url_template, current_page, max_pages, count_from,
                  previous_text, next_text, linkstyle):
-        self._url_template = url_template
-        self._current_page = current_page
-        self._max_pages = max_pages
-        self._count_from = count_from
-        self._previous = previous_text
-        self._next = next_text
-        self._linkstyle = linkstyle
+        self.url_template = url_template
+        self.current_page = current_page
+        self.max_pages = max_pages
+        self.count_from = count_from
+        self.previous_text = previous_text
+        self.next_text = next_text
+        self.linkstyle = linkstyle
 
     def __str__(self):
+        # FIXME - turn this into unicode
         output = []
         # prev
-        if self._current_page != self._count_from:
-            prev_url = self._url_template % (self._current_page - 1)
+        if self.current_page != self.count_from:
+            prev_url = self.url_template % (self.current_page - 1)
             output.append('<a href="%s">%s</a>&nbsp;' %
-                          (prev_url, self._previous))
+                          (prev_url, self.previous_text))
 
         # pages
-        if self._linkstyle == 0:
-            for i in range(self._count_from, self._max_pages):
-                if i == self._current_page:
+        if self.linkstyle == 0:
+            for i in range(self.count_from, self.max_pages):
+                if i == self.current_page:
                     output.append('[%d]' % i)
                 else:
-                    page_url = self._url_template % i
+                    page_url = self.url_template % i
                     output.append('<a href="%s">%d</a>' % (page_url, i))
-        elif self._linkstyle == 1:
+
+        elif self.linkstyle == 1:
             output.append(' Page %s of %s ' %
-                          (self._current_page, self._max_pages - 1))
+                          (self.current_page, self.max_pages - 1))
 
         # next
-        if self._current_page < self._max_pages - 1:
-            next_url = self._url_template % (self._current_page + 1)
+        if self.current_page < self.max_pages - 1:
+            next_url = self.url_template % (self.current_page + 1)
             output.append('&nbsp;<a href="%s">%s</a>' %
-                          (next_url, self._next))
+                          (next_url, self.next_text))
 
         return " ".join(output)
 
