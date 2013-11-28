@@ -1,9 +1,9 @@
 import os.path
-import sys
 
 from jinja2 import BaseLoader, Environment, TemplateNotFound
 
 from douglas.renderers.base import RendererBase
+from douglas.tools import run_callback
 
 
 class ThemeLoader(BaseLoader):
@@ -70,6 +70,15 @@ class Renderer(RendererBase):
 
             context = self.build_context()
             context['content'] = content
+
+            # Allow plugins to alter the context adding additional
+            # bits
+            data['extensions'] = run_callback(
+                "context_processor",
+                {'context': context},
+                mappingfunc=lambda x,y:y,
+                defaultfunc=lambda x:x)
+
             env = Environment(
                 autoescape=guess_autoescape,
                 loader=ThemeLoader(os.path.join(themedir, theme)),

@@ -20,7 +20,7 @@ Install and Configure
 
 3. (optional) Set ``py["draft_trigger"]`` in your ``config.py`` file
    to the url path you want to show drafts in. This defaults to
-   ``draft``.
+   ``drafts``.
 
 That's it!
 
@@ -37,7 +37,7 @@ from douglas.entries.base import EntryBase
 from douglas.entries.fileentry import FileEntry
 
 
-TRIGGER = 'draft'
+TRIGGER = 'drafts'
 INIT_KEY = 'draft_folder_file_initiated'
 
 

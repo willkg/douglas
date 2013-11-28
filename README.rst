@@ -73,9 +73,9 @@ The following plugins are used by default:
 
 **published_date**
 
-    Add ``#pyblished YYYY-MM-DD HH:MM`` to your file metadata and that's
-    the published date for the blog entry rather than the mtime of the
-    file.
+    Add ``#pyblished YYYY-MM-DD HH:MM`` to the metadata in your blog
+    entries. That's the published date for the blog entry rather
+    than the mtime of the file.
 
 
 Overview of Douglas
