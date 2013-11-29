@@ -237,13 +237,3 @@ Details for both of these are on the `website`_.
 Additionally, you're not locked into using a single markup across your
 blog.  You can use any markup for an entry that you have an entry
 parser for.
-
-
-Beyond editors
-==============
-
-There's no reason that all your entries have to come from editing blog
-entry text files in your datadir.  Check the Douglas Registry for
-scripts and other utilities that generate entries from other input
-sources.
-

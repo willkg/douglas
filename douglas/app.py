@@ -66,7 +66,7 @@ class Douglas(object):
         # if the user specifies base_url in config, we use that.
         # otherwise we compose it from SCRIPT_NAME in the environment
         # or we leave it blank.
-        if not "base_url" in config:
+        if not 'base_url' in config:
             if pyhttp.has_key('SCRIPT_NAME'):
                 # allow http and https
                 config['base_url'] = '%s://%s%s' % \
@@ -74,27 +74,33 @@ class Douglas(object):
                                       pyhttp['HTTP_HOST'],
                                       pyhttp['SCRIPT_NAME'])
             else:
-                config["base_url"] = ""
+                config['base_url'] = ''
 
         # take off the trailing slash for base_url
-        if config['base_url'].endswith("/"):
-            config['base_url'] = config['base_url'][:-1]
+        config['base_url'] = config['base_url'].rstrip('/')
 
-        datadir = config["datadir"]
-        if datadir.endswith("/") or datadir.endswith("\\"):
-            datadir = datadir[:-1]
-            config['datadir'] = datadir
+        # take off trailing slashes for datadir
+        config['datadir'] = config["datadir"].rstrip('\\/')
 
         # import and initialize plugins
-        plugin_utils.initialize_plugins(config.get("plugin_dirs", []),
-                                        config.get("load_plugins", None))
+        plugin_utils.initialize_plugins(
+            config.get("plugin_dirs", []), config.get("load_plugins", None))
 
         # entryparser callback is run here first to allow other
         # plugins register what file extensions can be used
-        data['extensions'] = tools.run_callback("entryparser",
-                                        {'txt': blosxom_entry_parser},
-                                        mappingfunc=lambda x,y:y,
-                                        defaultfunc=lambda x:x)
+        extensions = tools.run_callback(
+            "entryparser",
+            {'txt': blosxom_entry_parser},
+            mappingfunc=lambda x,y:y,
+            defaultfunc=lambda x:x)
+
+        # go through the config.py and override entryparser extensions
+        for ext, parser_module in config.get('entryparsers', {}).items():
+            module, callable_name = parser_module.rsplit(':', 1)
+            module = tools.importname(None, module)
+            extensions[ext] = getattr(module, callable_name)
+
+        data['extensions'] = extensions
 
     def cleanup(self):
         """This cleans up Douglas after a run.

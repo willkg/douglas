@@ -25,8 +25,8 @@ Each configuration variable is set with a line like::
 
 where:
 
-* *blog_title* is the name of the configuration variable
-* *"Another douglas blog"* is the value
+* ``blog_title`` is the name of the configuration variable
+* ``"Another douglas blog"`` is the value
 
 Most configuration values are strings and must be enclosed in quotes,
 but some are lists, numbers or other types of values.
@@ -40,7 +40,8 @@ Examples::
     py["foo"] = (
         "This is a really long string value that breaks over "
         "multiple lines.  The parentheses cause Python to "
-        "allow this string to span several lines.")
+        "allow this string to span several lines."
+    )
 
     # this has an integer value
     py["foo"] = 4
@@ -505,12 +506,25 @@ Blog configuration
       on your web server, then you'll want to set this property.
 
 
-.. py:data:: parser
+.. py:data:: entryparsers
 
-   (optional) string; defaults to "plain"
+   (optional) dict
 
-   The default entry parser that Douglas will use to parse this
-   blog's entry files.  See :ref:`Entry parsers`.
+   Lets you override which file extensions are parsed by which entry
+   parsers. The keys are the file extension. The values are the Python
+   module path to the callable that will parse the file.
+
+   For example, by default, the blosxom_entry_parser parses files
+   ending with ``.txt``. You can also have it parse files ending in
+   ``.html``::
+
+       py["entryparsers"] = {
+           'html': 'douglas.app:blosxom_entry_parser'
+       }
+
+   The ``douglas.app`` part denotes which Python module the callable is in.
+   The ``blosxom_entry_parser`` part is the name of a function in the
+   ``douglas.app`` module which will parse the entry.
 
 
 Logging configuration
