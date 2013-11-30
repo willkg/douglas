@@ -75,9 +75,8 @@ from douglas.tools import pwrap
 import time
 
 
-def verify_installation(request):
-    config = request.get_configuration()
-    if not 'archive_template' in config:
+def verify_installation(cfg):
+    if not 'archive_template' in cfg:
         pwrap(
             "missing optional config property 'archive_template' which "
             "allows you to specify how the archive links are created.  "

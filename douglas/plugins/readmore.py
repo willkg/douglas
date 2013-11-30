@@ -128,11 +128,9 @@ READMORE_TEMPLATE = (
     '</p>')
 
 
-def verify_installation(request):
-    config = request.get_configuration()
-
+def verify_installation(cfg):
     for mem in ("readmore_template", "readmore_breakpoint"):
-        if mem not in config:
+        if mem not in cfg:
             pwrap("missing optional config property '%s'" % mem)
 
     return True

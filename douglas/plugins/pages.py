@@ -153,17 +153,15 @@ TRIGGER = "pages"
 INIT_KEY = "pages_pages_file_initiated"
 
 
-def verify_installation(req):
-    config = req.get_configuration()
-
+def verify_installation(cfg):
     retval = True
 
-    if not 'pagesdir' in config:
+    if not 'pagesdir' in cfg:
         pwrap_error("'pagesdir' property is not set in the config file.")
         retval = False
-    elif not os.path.isdir(config["pagesdir"]):
+    elif not os.path.isdir(cfg["pagesdir"]):
         pwrap_error(
-            "'pagesdir' directory does not exist. %s" % config["pagesdir"])
+            "'pagesdir' directory does not exist. %s" % cfg["pagesdir"])
         retval = False
 
     return retval

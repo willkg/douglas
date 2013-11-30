@@ -9,34 +9,54 @@ import os.path
 import sys
 import random
 import time
+from functools import wraps
 from optparse import OptionParser
 
 from douglas import __version__
 from douglas import plugin_utils
 from douglas.app import Douglas
-from douglas.tools import run_callback, pwrap, pwrap_error, setup_logging
+from douglas.tools import abort, run_callback, pwrap, pwrap_error, setup_logging
 
 
 USAGE = "%prog [options] [command] [command-options]"
 VERSION = "%prog " + __version__
 
 
-def build_douglas():
-    """Imports config.py and builds an empty douglas object.
-    """
-    pwrap("Trying to import the config module....")
-    sys.path.append('.')
+def import_config(quiet=True):
+    if not quiet:
+        pwrap("Trying to import the config module....")
+
     try:
         from config import py as cfg
-    except StandardError:
-        h, t = os.path.split(sys.argv[0])
-        scriptname = t or h
+        return cfg
 
-        pwrap_error("ERROR: Cannot find your config.py file.  Please execute "
-                    "%s in the directory with the config.py file in it or use "
-                    "the --config flag.\n\n"
-                    "See \"%s --help\" for more details." % (scriptname,
-                                                             scriptname))
+    except StandardError:
+        if not quiet:
+            h, t = os.path.split(sys.argv[0])
+            scriptname = t or h
+
+            pwrap_error(
+                'Error: Cannot find your config.py file.  Please execute '
+                '{prog} in the directory with the config.py file in it or '
+                'use the --config flag.'
+                '\n\n'
+                'See "{prog} --help" for more details.'.format(
+                    prog=scriptname))
+        return {}
+
+
+def with_config(fun):
+    @wraps(fun)
+    def _wrapped(*args, **kwargs):
+        cfg = import_config(quiet=False)
+        return fun(cfg, *args, **kwargs)
+    return _wrapped
+
+
+def build_douglas(cfg):
+    """Imports config.py and builds an empty douglas object.
+    """
+    if not cfg:
         return None
 
     setup_logging(cfg)
@@ -59,11 +79,9 @@ def build_parser(usage):
     return parser
 
 
-def generate_entries(command, argv):
-    """
-    This function is primarily for testing purposes.  It creates
-    a bunch of blog entries with random text in them.
-    """
+@with_config
+def cmd_generate(cfg, command, argv):
+    """Generates random entries to help with Douglas development."""
     parser = build_parser("%prog entries [options] <num_entries>")
     (options, args) = parser.parse_args(argv)
 
@@ -79,11 +97,9 @@ def generate_entries(command, argv):
 
     verbose = options.verbose
 
-    p = build_douglas()
-    if not p:
-        return 0
-
-    datadir = p.get_request().config["datadir"]
+    datadir = cfg.get('datadir')
+    if not datadir:
+        return abort('Error: No datadir.')
 
     sm_para = "<p>Lorem ipsum dolor sit amet.</p>"
     med_para = """<p>
@@ -109,61 +125,50 @@ def generate_entries(command, argv):
     paras = [sm_para, med_para, lg_para]
 
     if verbose:
-        print "Creating %d entries" % num_entries
+        print 'Creating {0} entries'.format(num_entries)
 
     now = time.time()
 
     for i in range(num_entries):
-        title = "post number %d\n" % (i + 1)
-        body = []
-        for _ in range(random.randrange(1, 6)):
-            body.append(random.choice(paras))
+        fn = os.path.join(datadir, 'post_{0}.txt'.format(i+1))
 
-        fn = os.path.join(datadir, "post%d.txt" % (i + 1))
-        f = open(fn, "w")
-        f.write(title)
-        f.write("\n".join(body))
-        f.close()
+        if verbose:
+            print 'Creating "{0}"...'.format(fn)
+
+        title = 'post number {0}\n'.format(i+1)
+        body = [random.choice(paras) for j in range(random.randrange(1, 6))]
+
+        with open(fn, 'w') as fp:
+            fp.write(title)
+            fp.write('\n'.join(body))
 
         mtime = now - ((num_entries - i) * 3600)
         os.utime(fn, (mtime, mtime))
-        
-        if verbose:
-            print "Creating '%s'..." % fn
 
     if verbose:
-        print "Done!"
+        print 'Done!'
     return 0
 
 
-def test_installation(command, argv):
-    """
-    This function gets called when someone starts up douglas.cgi
-    from the command line with no REQUEST_METHOD environment variable.
-    It:
+@with_config
+def cmd_test(cfg, command, argv):
+    """Tests installation and configuration for a blog."""
+    # This:
+    # 1. verifies config.py file properties
+    # 2. initializes all the plugins they have installed
+    # 3. runs ``cb_verify_installation``--plugins can print out whether
+    #    they are installed correctly (i.e. have valid config property
+    #    settings and can read/write to data files)
+    #
+    # The goal is to be as useful and informative to the user as we can
+    # be without being overly verbose and confusing.
+    #
+    # This is designed to make it easier for a user to verify their
+    # douglas installation is working and also to install new plugins
+    # and verify that their configuration is correct.
 
-    1. verifies config.py file properties
-    2. initializes all the plugins they have installed
-    3. runs ``cb_verify_installation``--plugins can print out whether
-       they are installed correctly (i.e. have valid config property
-       settings and can read/write to data files)
-
-    The goal is to be as useful and informative to the user as we can
-    be without being overly verbose and confusing.
-
-    This is designed to make it easier for a user to verify their
-    douglas installation is working and also to install new plugins
-    and verify that their configuration is correct.
-    """
     parser = build_parser("%prog test [options]")
     parser.parse_args(argv)
-
-    p = build_douglas()
-    if not p:
-        return 0
-
-    request = p.get_request()
-    config = request.config
 
     pwrap("System Information")
     pwrap("==================")
@@ -173,43 +178,42 @@ def test_installation(command, argv):
     pwrap("- sys.version:  %s" % sys.version.replace("\n", " "))
     pwrap("- os.name:      %s" % os.name)
     codebase = os.path.dirname(os.path.dirname(__file__))
-    pwrap("- codebase:     %s" % config.get("codebase", codebase))
+    pwrap("- codebase:     %s" % cfg.get("codebase", codebase))
     pwrap("")
 
     pwrap("Checking config.py file")
     pwrap("=======================")
-    pwrap("- properties set: %s" % len(config))
+    pwrap("- properties set: %s" % len(cfg))
 
-    config_keys = config.keys()
+    cfg_keys = cfg.keys()
 
-    if "datadir" not in config_keys:
+    if "datadir" not in cfg_keys:
         pwrap_error("- ERROR: 'datadir' must be set.  Refer to installation "
-              "documentation.")
+                    "documentation.")
 
-    elif not os.path.isdir(config["datadir"]):
+    elif not os.path.isdir(cfg["datadir"]):
         pwrap_error("- ERROR: datadir '%s' does not exist."
                     "  You need to create your datadir and give it "
-                    " appropriate permissions." % config["datadir"])
+                    " appropriate permissions." % cfg["datadir"])
     else:
-        pwrap("- datadir '%s' exists." % config["datadir"])
+        pwrap("- datadir '%s' exists." % cfg["datadir"])
 
-    if "themedir" not in config_keys:
+    if "themedir" not in cfg_keys:
         pwrap("- WARNING: You should consider setting themedir and putting "
               "your themedir templates there.  See the documentation for "
               "more details.")
-    elif not os.path.isdir(config["themedir"]):
+    elif not os.path.isdir(cfg["themedir"]):
         pwrap_error("- ERROR: themedir '%s' does not exist."
                     "  You need to create your themedir and give it "
-                    " appropriate permissions." % config["themedir"])
+                    " appropriate permissions." % cfg["themedir"])
     else:
-        pwrap("- themedir '%s' exists." % config["themedir"])
+        pwrap("- themedir '%s' exists." % cfg["themedir"])
 
-    if (("blog_encoding" in config_keys
-         and config["blog_encoding"].lower() != "utf-8")):
+    if (("blog_encoding" in cfg_keys
+         and cfg["blog_encoding"].lower() != "utf-8")):
         pwrap_error("- WARNING: 'blog_encoding' is set to something other "
-                    "than 'utf-8'.  As of douglas 1.5, "
-                    "this isn't a good idea unless you're absolutely certain "
-                    "it's going to work for your blog.")
+                    "than 'utf-8'.  This isn't a good idea unless you're "
+                    "absolutely certain it's going to work for your blog.")
     pwrap("")
 
     pwrap("Checking plugin configuration")
@@ -246,7 +250,7 @@ def test_installation(command, argv):
                     print "version: %s" % (str(getattr(mem, "__version__")))
 
                     try:
-                        if mem.verify_installation(request) == 1:
+                        if mem.verify_installation(cfg) == 1:
                             pwrap("PASS")
                         else:
                             pwrap_error("FAIL")
@@ -258,7 +262,7 @@ def test_installation(command, argv):
                 else:
                     mn = mem.__name__
                     mf = mem.__file__
-                    no_verification_support.append( "'%s' (%s)" % (mn, mf))
+                    no_verification_support.append("'%s' (%s)" % (mn, mf))
 
             if len(no_verification_support) > 0:
                 pwrap("")
@@ -272,12 +276,8 @@ def test_installation(command, argv):
     pwrap("Verification complete.  Correct any errors and warnings above.")
 
 
-def create_blog(command, argv):
-    """
-    Creates a blog in the specified directory.  Mostly this involves
-    copying things over, but there are a few cases where we expand
-    template variables.
-    """
+def cmd_create(command, argv):
+    """Creates directory structure for new blog."""
     parser = build_parser("%prog create [options] <dir>")
     (options, args) = parser.parse_args(argv)
 
@@ -379,9 +379,9 @@ def create_blog(command, argv):
     return 0
 
 
-def render_url(command, argv):
-    """Renders a single url.
-    """
+@with_config
+def cmd_renderurl(cfg, command, argv):
+    """Renders a single url of your blog."""
     parser = build_parser("%prog renderurl [options] <url> [<url>...]")
 
     parser.add_option("--headers",
@@ -396,9 +396,9 @@ def render_url(command, argv):
         return 0
 
     for url in args:
-        p = build_douglas()
+        p = build_douglas(cfg)
 
-        base_url = p.get_request().config.get("base_url", "")
+        base_url = cfg.get('base_url', '')
         if url.startswith(base_url):
             url = url[len(base_url):]
         p.run_render_one(url, options.headers)
@@ -406,7 +406,9 @@ def render_url(command, argv):
     return 0
 
 
-def run_static_renderer(command, argv):
+@with_config
+def cmd_staticrender(cfg, command, argv):
+    """Statically renders your blog into an HTML site."""
     parser = build_parser("%prog staticrender [options]")
     parser.add_option("--incremental",
                       action="store_true", dest="incremental", default=False,
@@ -419,32 +421,23 @@ def run_static_renderer(command, argv):
     from douglas import memcache
     memcache.usecache = True
 
-    p = build_douglas()
+    p = build_douglas(cfg)
     if not p:
         return 0
 
     return p.run_static_renderer(options.incremental)
 
 
-DEFAULT_HANDLERS = (
-    ("create", create_blog, "Creates directory structure for a new blog."),
-    ("test", test_installation,
-     "Tests installation and configuration for a blog."),
-    ("staticrender", run_static_renderer,
-     "Statically renders your blog into an HTML site."),
-    ("renderurl", render_url, "Renders a single url of your blog."),
-    ("generate", generate_entries, "Generates random entries--helps "
-     "with blog setup.")
-    )
+DEFAULT_HANDLERS = [
+    (key[4:], fun, fun.__doc__)
+    for key, fun in globals().items()
+    if key.startswith('cmd_')
+]
 
 
-def get_handlers():
-    try:
-        from config import py as cfg
-        plugin_utils.initialize_plugins(cfg.get("plugin_dirs", []),
-                                        cfg.get("load_plugins", None))
-    except ImportError:
-        pass
+def get_handlers(cfg):
+    plugin_utils.initialize_plugins(
+        cfg.get("plugin_dirs", []), cfg.get("load_plugins", []))
 
     handlers_dict = dict([(v[0], (v[1], v[2])) for v in DEFAULT_HANDLERS])
     handlers_dict = run_callback("commandline", handlers_dict,
@@ -460,84 +453,76 @@ def get_handlers():
             continue
         handlers.append((k, v[0], v[1]))
 
-    return handlers
+    return sorted(handlers)
 
 
 def main(argv):
-
+    sys.path.append('.')
 
     # FIXME - rewrite with argparse
-    if "--silent" in argv:
-        sys.stdout = open(os.devnull, "w")
-        argv.remove("--silent")
+    if '--silent' in argv:
+        sys.stdout = open(os.devnull, 'w')
+        argv.remove('--silent')
 
-    print "douglas: version {0}".format(__version__)
+    print 'douglas: version {0}'.format(__version__)
 
     # slurp off the config file setting and add it to sys.path.
     # this needs to be first to pick up plugin-based command handlers.
     configdir = None
     for i, mem in enumerate(argv):
-        if mem.startswith("--config"):
-            if "=" in mem:
-                _, configdir = mem.split("=")
+        if mem.startswith('--config='):
+            configflag, configdir = mem.split('=')
+            argv.pop(i)
+            break
+
+        elif mem == '--config':
+            try:
+                configdir = argv[i+1]
+                argv.pop(i)
+                argv.pop(i)
                 break
-            else:
-                try:
-                    configdir = argv[i+1]
-                    break
-                except IndexError:
-                    pwrap_error("Error: no config file argument specified.")
-                    pwrap_error("Exiting.")
-                    return 1
+            except IndexError:
+                return abort('Error: no config file argument specified.')
 
     if configdir is not None:
         if configdir.endswith("config.py"):
-            configdir = configdir[0:-9]
+            configdir = configdir[:-9]
 
         if not os.path.exists(configdir):
-            pwrap_error("ERROR: '%s' does not exist--cannot find config.py "
-                        "file." % configdir)
-            pwrap_error("Exiting.")
-            return 1
+            return abort('Error: "{0}" directory does not exist.'.format(
+                configdir))
 
-        if not "config.py" in os.listdir(configdir):
-            pwrap_error("Error: config.py not in '%s'.  "
-                        "Cannot find config.py file." % configdir)
-            pwrap_error("Exiting.")
-            return 1
+        if not os.path.exists(os.path.join(configdir, 'config.py')):
+            return abort('Error: config.py not in "{0}".'.format(configdir))
 
         sys.path.insert(0, configdir)
-        print "Inserting %s to beginning of sys.path...." % configdir
+        print 'Inserting {0} to beginning of sys.path....'.format(configdir)
 
-    handlers = get_handlers()
+    cfg = import_config(quiet=True)
 
-    if len(argv) == 0 or (len(argv) == 1 and argv[0] in ("-h", "--help")):
-        parser = build_parser("%prog [command]")
+    handlers = get_handlers(cfg)
+
+    if not argv or argv == ['-h'] or argv == ['--help']:
+        parser = build_parser('%prog [command]')
         parser.print_help()
-        print ""
-        print "Commands:"
-        for command_str, _, command_help in handlers:
-            print "    %-14s %s" % (command_str, command_help)
+        print ''
+        print 'Commands:'
+        for cmd_str, cmd_fun, cmd_hlp in handlers:
+            print '    %-14s %s' % (cmd_str, cmd_hlp)
+        print ''
         return 0
 
-    if argv[0] == "--version":
+    if argv[0] == '--version':
         return 0
-
-    # then we execute the named command with options, or print help
-    if argv[0].startswith("-"):
-        pwrap_error("Command '{0}' does not exist.".format(argv[0]))
-        pwrap_error('')
-        pwrap_error("Commands:")
-        for command_str, _, command_help in handlers:
-            pwrap_error ( "    %-14s %s" % (command_str, command_help))
-        return 1
 
     command = argv.pop(0)
     for (c, f, h) in handlers:
         if c == command:
             return f(command, argv)
 
-    pwrap_error("Command '{0}' does not exist.".format(command))
-    for command_str, command_func, command_help in handlers:
-        pwrap_error("    %-14s %s" % (command_str, command_help))
+    pwrap_error('Command "{0}" does not exist.'.format(command))
+    pwrap_error('')
+    pwrap_error("Commands:")
+    for cmd_str, cmd_fun, cmd_hlp in handlers:
+        pwrap_error("    %-14s %s" % (cmd_str, cmd_hlp))
     return 1

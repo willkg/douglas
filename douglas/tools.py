@@ -103,6 +103,12 @@ def pwrap_error(s):
     sys.stderr.write(starter + linesep.join(textwrap.wrap(s, 72)) + "\n")
 
 
+def abort(msg):
+    pwrap_error(msg)
+    pwrap_error("Exiting.")
+    return 1
+
+
 class ConfigSyntaxErrorException(Exception):
     """Thrown when ``convert_configini_values`` encounters a syntax
     error.

@@ -96,9 +96,8 @@ DEFAULT_END = "</ul></li>"
 DEFAULT_FINISH = "</ul>"
 
 
-def verify_installation(request):
-    config = request.get_configuration()
-    if not "category_item" in config:
+def verify_installation(cfg):
+    if not "category_item" in cfg:
         pwrap(
             "missing optional config property 'category_item' which allows "
             "you to specify how the category hierarchy is rendered.  see"

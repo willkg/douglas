@@ -98,9 +98,8 @@ import os
 from douglas.tools import pwrap_error, render_url_statically
 
 
-def verify_installation(request):
-    config = request.get_configuration()
-    if config.get('num_entries', 0) == 0:
+def verify_installation(cfg):
+    if cfg.get('num_entries', 0) == 0:
         pwrap_error(
             'Missing config property "num_entries".  paginate won\'t do '
             'anything without num_entries set.  Either set num_entries '

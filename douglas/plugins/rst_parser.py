@@ -77,7 +77,7 @@ PREFORMATTER_ID = 'reST'
 FILE_EXT = 'rst'
 
 
-def verify_installation(args):
+def verify_installation(cfg):
     # no configuration needed
     return 1
 
