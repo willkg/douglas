@@ -65,9 +65,10 @@ The blog is rendered using Jinja2 templates in the
   page with a bunch of entries (e.g. category list, date archive list,
   front page, ...)
 
-The following plugins are used by default:
+The following plugins which come with Douglas are enabled by default in
+your ``load_plugins`` config property:
 
-**draft_folder**
+``douglas.plugins.draft_folder``
 
     Creates a draft folder that you can view on the web-site, but doesn't
     show up in the archive links.  This makes it easier for other people
@@ -78,11 +79,17 @@ The following plugins are used by default:
     When you want to make an entry live, you move it from
     ``mynewblog/drafts/`` to ``mynewblog/entries/``.
 
-**published_date**
+``douglas.plugins.published_date``
 
     Add ``#published YYYY-MM-DD HH:MM`` to the metadata in your blog
     entries. That's the published date for the blog entry rather
     than the mtime of the file.
+
+Douglas comes with other useful plugins. Refer to the documentation for a list.
+
+You can write your own plugins and put them in ``mynewblog/plugins/``. When
+you do this, make sure to add the plugin Python module to the ``load_plugins``
+list in your ``config.py`` file.
 
 
 Overview of Douglas
@@ -115,6 +122,7 @@ Plugins:
 * Plugins are written in Python.
 * Plugins are loaded using the ``plugin_dirs`` and ``load_plugins``
   configuration variables.
+* Douglas comes with a handful of plugins.
 * For more information on using plugins, see Plugins in the manual
   (``docs/plugins.rst`` if you're looking at the source).
 * For more information on writing plugins see Writing Plugins
