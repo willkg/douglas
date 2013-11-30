@@ -1,9 +1,9 @@
 include WHATSNEW
 include README.rst
-include INSTALL
 include LICENSE
 include AUTHORS
-include UPGRADE
+include CONTRIBUTING.rst
+include requirements-dev.txt
 
 include setup.py
 
