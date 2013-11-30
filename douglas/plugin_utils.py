@@ -29,6 +29,10 @@ callbacks = {}
 bad_plugins = []
 
 
+class PluginDirDoesntExist(Exception):
+    pass
+
+
 def catalogue_plugin(plugin_module):
     """
     Goes through the plugin's contents and catalogues all the functions
@@ -36,15 +40,13 @@ def catalogue_plugin(plugin_module):
 
     :arg plugin_module: the module to catalogue
     """
-    listing = dir(plugin_module)
-
-    listing = [item for item in listing if item.startswith("cb_")]
+    listing = [item for item in dir(plugin_module) if item.startswith("cb_")]
 
     for mem in listing:
         func = getattr(plugin_module, mem)
-        memadj = mem[3:]
         if callable(func):
-            callbacks.setdefault(memadj, []).append(func)
+            callback_name = mem[3:]
+            callbacks.setdefault(callback_name, []).append(func)
 
 
 def get_callback_chain(chain):
@@ -57,16 +59,12 @@ def get_callback_chain(chain):
     return callbacks.get(chain, [])
 
 
-def initialize_plugins(plugin_dirs, plugin_list):
-    """
-    Imports and initializes plugins from the directories in the list
-    specified by "plugins_dir".  If no such list exists, then we don't
-    load any plugins.
+def initialize_plugins(plugin_dirs, plugin_list, raiseerrors=True):
+    """Imports and initializes plugins
 
-    If the user specifies a "load_plugins" list of plugins to load, then
-    we explicitly load those plugins in the order they're listed.  If the
-    load_plugins key does not exist, then we load all the plugins in the
-    plugins directory using an alphanumeric sorting order.
+    Adds paths specified by "plugins_dirs" to the sys.path and then
+    imports and initializes all plugins listed in "plugin_list" in
+    the order specified.
 
     .. Note::
 
@@ -74,97 +72,47 @@ def initialize_plugins(plugin_dirs, plugin_list):
        restart Douglas in order to pick up any changes to your plugins.
 
     :arg plugin_dirs: the list of directories to add to the sys.path
-                        because that's where our plugins are located.
+        because that's where our plugins are located.
 
-    :arg plugin_list: the list of plugins to load, or if None, we'll
-                        load all the plugins we find in those dirs.
+    :arg plugin_list: the list of plugins to load.
+
+    :arg raiseerrors: whether or not to throw an exception if
+        a plugin throws an exception when loading
+
     """
+    # This makes sure we only import and initialize once.
     if plugins or bad_plugins:
         return
 
-    # we clear out the callbacks dict so we can rebuild them
+    # Clear out callbacks list.
     callbacks.clear()
 
-    # handle plugin_dirs here
+    # Add directories to sys.path
     for mem in plugin_dirs:
         if os.path.isdir(mem):
             sys.path.append(mem)
         else:
-            raise Exception("Plugin directory '%s' does not exist.  " \
-                            "Please check your config file." % mem)
-
-    plugin_list = get_plugin_list(plugin_list, plugin_dirs)
+            raise PluginDirDoesntExist(
+                'Plugin directory "{0}" does not exist.  '
+                'Please check your config file.'.format(mem))
 
     for mem in plugin_list:
         try:
             _module = __import__(mem)
+
         except (SystemExit, KeyboardInterrupt):
             raise
+
         except:
-            # this needs to be a catch-all
+            # This needs to be a catch-all.
+            if raiseerrors:
+                raise
+
             bad_plugins.append((mem, "".join(traceback.format_exc())))
             continue
 
         for comp in mem.split(".")[1:]:
             _module = getattr(_module, comp)
+
         catalogue_plugin(_module)
         plugins.append(_module)
-
-
-def get_plugin_by_name(name):
-    """
-    This retrieves a plugin instance (it's a Python module instance)
-    by name.
-
-    :arg name: the name of the plugin to retrieve (ex: "xmlrpc")
-
-    :returns: the Python module instance for the plugin or None
-    """
-    if plugins:
-        for mem in plugins:
-            if mem.__name__ == name:
-                return mem
-    return None
-
-
-def get_module_name(filename):
-    """
-    Takes a filename and returns the module name from the filename.
-
-    Example: passing in "/blah/blah/blah/module.ext" returns "module"
-
-    :arg filename: the filename in question (with a full path)
-
-    :returns: the filename without path or extension
-    """
-    return os.path.splitext(os.path.split(filename)[1])[0]
-
-
-def get_plugin_list(plugin_list, plugin_dirs):
-    """
-    This handles the situation where the user has provided a series of
-    plugin dirs, but has not specified which plugins they want to load
-    from those dirs.  In this case, we load all possible plugins except
-    the ones whose names being with _ .
-
-    :arg plugin_list: List of plugins to load
-
-    :arg plugin_dirs: A list of directories where plugins can be loaded from
-
-    :return: list of python module names of the plugins to load
-    """
-    if plugin_list == None:
-        plugin_list = []
-        for mem in plugin_dirs:
-            file_list = glob.glob(os.path.join(mem, "*.py"))
-
-            file_list = [get_module_name(filename) for filename in file_list]
-
-            # remove plugins that start with a _
-            file_list = [plugin for plugin in file_list \
-                         if not plugin.startswith('_')]
-            plugin_list += file_list
-
-        plugin_list.sort()
-
-    return plugin_list

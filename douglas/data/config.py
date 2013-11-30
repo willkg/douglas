@@ -94,7 +94,6 @@ py["num_entries"] = 10
 py["default_theme"] = "html"
 
 
-
 # Logging configuration
 # =====================
 
@@ -112,30 +111,27 @@ py["default_theme"] = "html"
 # Plugin configuration
 # ====================
 
-# Plugin directories:
-# This allows you to specify which directories have plugins that you
-# want to load.  You can list as many plugin directories as you
-# want.
+# Douglas comes with a set of plugins. If you want to use plugins
+# that don't come with Douglas, including plugins that are in your
+# blog's plugins/ directory, then you must list the directories
+# those plugins are in with "plugin_dirs".
+#
 # Example: py['plugin_dirs'] = ["/home/joe/blog/plugins",
 #                               "/var/lib/douglas/plugins"]
 py["plugin_dirs"] = [os.path.join(BLOGDIR, "plugins")]
 
-# There are two ways for Douglas to load plugins:
-# 
-# The first is the default way where Douglas loads all plugins it
-# finds in the directories specified by "plugins_dir" in alphanumeric
-# order by filename.
-# 
-# The second is by specifying a "load_plugins" key here.  Specifying
-# "load_plugins" will cause Douglas to load only the plugins you name 
-# and in in the order you name them.
-# 
-# The "load_plugins" key is a list of strings where each string is
-# the name of a plugin module (i.e. the filename without the .py at
-# the end).
+# Specify the plugins your blog uses here.  Plugins are specified
+# by Python module name.  Plugins that come with Douglas all
+# start with "douglas.plugins.<pluginname>".
 # 
 # If you specify an empty list, then this will load no plugins.
-# ex: py["load_plugins"] = ["pycalendar", "pyfortune", "pyarchives"]
+#
+# For example:
+# py["load_plugins"] = [
+#     "douglas.plugins.paginate",
+#     "douglas.plugins.tags",
+#     "myfancyplugin"
+# ]
 py["load_plugins"] = [
     "douglas.plugins.paginate",
     "douglas.plugins.draft_folder",

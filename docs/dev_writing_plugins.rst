@@ -183,33 +183,31 @@ verifies that the plugin is configured correctly.  As of Douglas 0.9,
 Douglas allows users to test their configuration and installation from
 the console.
 
-You can test using either the ``douglas.cgi``
-script or the ``douglas-cmd`` script::
+You can test your blog configuration like this::
 
-    % ./douglas.cgi test
-
-or::
-
-    $ ./pyblcmd_dev.sh test --config ./newblog/
-    douglas-cmd version 1.5 dev
-    Adding ./newblog/ to sys.path....
+    $ douglas-cmd test
+    douglas: version 0.1.dev
     Trying to import the config module....
     System Information
     ==================
-    
-    - douglas:    1.5 dev
-    - sys.version:  2.6.4 (r264:75706, Dec  7 2009, 18:45:15)  [GCC 4.4.1]
+
+    - douglas:      0.1.dev
+    - sys.version:  2.7.5 (default, Nov 12 2013, 16:18:42)  [GCC 4.8.2
+      20131017 (Red Hat 4.8.2-1)]
     - os.name:      posix
-    - codebase:     /home/willg/projects/douglas/trunk/douglas
+    - codebase:     /home/willkg/projects/douglas
 
     Checking config.py file
     =======================
-    - properties set: 21
-    - datadir '/home/willg/projects/douglas/testing/newblog/entries' exists.
+    - properties set: 31
+    - datadir '/home/willkg/tmp/douglas/blog/entries' exists.
+    - themedir '/home/willkg/tmp/douglas/blog/themes' exists.
 
     Checking plugin configuration
     =============================
-    ....
+     - There are no plugins installed.
+
+    Verification complete.  Correct any errors and warnings above.
 
 
 This goes through and verifies the properties in the ``config.py``
@@ -220,7 +218,7 @@ they can.
 
 As a plugin developer, you should add a ``verify_installation``
 function to your plugin module.  Something like this (taken from
-pycategories)::
+categories)::
 
     def verify_installation(request):
         config = request.get_configuration()
@@ -274,26 +272,27 @@ First you need to get the logger instance.  After that, you can call
 debug, info, warning, error and critical on the logger instance.  For
 example::
 
-    from douglas import tools
+    import logging
+
+    log = logging.getLogger()
+
 
     def cb_prepare(args):
         # ...
-        logger = tools.get_logger()
-        logger.info("blah blah blah...")
+        log.info("blah blah blah...")
 
         try:
-            pass
             # ...
         except ValueError, e:
-            logger.error(e)
+            log.error(e)
 
 
 
 How to store plugin state between callbacks
 ===========================================
 
-The easiest way to store state between callbacks is to store the data
-in the data dict of the Request object.  For example::
+The easiest way to store state for the same request between callbacks is to
+store the data in the data dict of the Request object.  For example::
 
     STATE_KEY = "myplugin_state"
 
@@ -468,8 +467,6 @@ FIXME - write this section
 Writing a plugin that adds a commandline command
 ================================================
 
-*New in Douglas 1.5*
-
 The ``douglas-cmd`` command allows for plugin-defined commands.
 This allows your plugin to do maintenance tasks (updating an index,
 statistics, generating content, ...) and allows the user to schedule
@@ -500,5 +497,5 @@ For example, this adds a command to print command line arguments::
 Executing the command looks like this::
 
     % douglas-cmd printargs --config /path/to/config.py/dir a b c
-    douglas-cmd version 1.5
+    douglas-cmd version 0.1
     a b c

@@ -5,13 +5,18 @@ Plugins
 =======
 
 Douglas allows you to extend and augment its base functionality with
-plugins.  Plugins allow you to: to create additional variables; provide
-additional entry parsers, renderers, post-formatters, and
-pre-formatters; create new output data types; pull information from
-other non-blog sources; create images; and a variety of other things.
+plugins.  Plugins allow you to:
+
+* create additional variables
+* provide additional entry parsers, renderers, post-formatters, and
+  pre-formatters
+* create new output data types
+* pull information from other non-blog sources
+* create images
+* and a variety of other things
 
 Plugins hook into Douglas using callbacks which allow plugins to
-handle, augment, and otherwise affect Douglas's behavior.
+handle, transform, override and otherwise affect Douglas's behavior.
 
 
 Setting Douglas up to use plugins
@@ -25,20 +30,10 @@ There's more documentation on these in :ref:`plugin-configuration`.
 Finding plugins
 ===============
 
-As of 1.5, Douglas comes with a core set of plugins.  Documentation
-for these plugins is in :ref:`part-two`.
+Douglas comes with a core set of plugins.  Documentation for these
+plugins is in :ref:`part-two`.
 
-Not all plugins come with Douglas.  You can find more plugins in the
-plugin registry on the `website`_.
-
-Additionally, some people write plugins, but never register with the
-plugin registry. Sometimes this is because the author doesn't feel the
-plugin is finished for public consumption. Even so, it might meet your
-needs. The best way to find these plugins is to ask on the
-douglas-users mailing list for a plugin that has the functionality
-you desire.
-
-.. _website: http://douglas.github.com/
+Additionally, you can write your own plugins.
 
 
 Installing plugins
@@ -60,25 +55,8 @@ file to define the plugin's behavior.  That should be about it.  On
 some occasions, you may have to change the code in the plugin itself
 to meet your specific needs.
 
-.. Note::
 
-   A note about Apache, no suexec, .pyc files, and permission
-   problems:
-
-   If you're not running suexec, then Apache may not be able to
-   generate the ``.pyc`` files for your plugins.  This may result in
-   your plugins failing to load.
-
-   If that happens, you should run ``./douglas.cgi`` in your shell
-   to generate the ``.pyc`` files.
-
-   Every time you install a new plugin or change an existing plugin,
-   you'll need to remove the existing ``.pyc`` files and regenerate
-   them.
-
-
-
-Writing Your Own plugins
+Writing your own plugins
 ========================
 
 You may find that you desire functionality and there is no plugin that

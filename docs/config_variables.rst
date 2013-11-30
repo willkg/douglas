@@ -607,15 +607,18 @@ behavior for loading plugins: ``plugin_dirs`` and ``load_plugins``.
 
    (optional) list of strings; defaults to an empty list
 
-   The ``plugin_dirs`` variable tells Douglas which directories to
-   look in for plugin files to load. You can list as many plugin
-   directories as you want.
+   The ``plugin_dirs`` variable tells Douglas which directories
+   to look for plugins in addition to the plugins that Douglas comes
+   with. You can list as many directories as you want.
 
-   For example, if you stored your Douglas plugins in
-   ``/home/joe/blog/plugins/``, then you would set ``plugin_dirs``
-   like this::
+   For example, if your blog used the "paginate" plugin that comes
+   with Douglas and a "myfancyplugin" that you wrote yourself
+   that's in your blog's plugins directory, then you might set
+   ``plugin_dirs`` like this::
 
-      py["plugin_dirs"] = ["/home/joe/blog/plugins/"]
+      py["plugin_dirs"] = [
+          "/home/joe/blog/plugins/"
+      ]
 
    .. Note::
 
@@ -643,57 +646,22 @@ behavior for loading plugins: ``plugin_dirs`` and ``load_plugins``.
 
    .. Note::
 
-      Core plugins are automatically found---you don't have to specify
-      anything in your ``plugin_dirs`` in order to use core plugins.
+      Plugins that come with Douglas are automatically found---you
+      don't have to specify anything in your``plugin_dirs`` in order
+      to use core plugins.
 
 
 .. py:data:: load_plugins
 
    (optional) list of strings
 
-   If there is no ``load_plugins`` setting in ``config.py`` Douglas
-   loads all plugins it finds in the directories specified by
-   ``plugins_dir`` in alphanumeric order by filename.  Specifying
-   ``load_plugins`` causes Douglas to load only the plugins you name
-   and in in the order you name them.
+   Specifying ``load_plugins`` causes Douglas to load only the plugins
+   you name and in in the order you name them.
 
    The value of ``load_plugins`` should be a list of strings where
-   each string is the name of a plugin module (i.e. the filename
-   without the .py at the end).
+   each string is the name of a Python module.
 
    If you specify an empty list no plugins will be loaded.
-
-   For example, if you had::
-
-      py["plugin_dirs"] = ["/home/joe/blog/plugins/"]
-      # py["load_plugins"] = []
-
-   in your ``config.py`` file and there were three plugins in
-   ``/home/joe/blog/plugins/``::
-
-      /home/
-      +- joe/
-         +- blog/
-            +- plugins/
-               +- plugin_a.py
-               +- plugin_b.py
-               +- plugin_c.py
-
-   then Douglas would load all three plugins in alphabetical order
-   by filename: ``plugin_a``, then ``plugin_b``, then ``plugin_c``.
-
-   If you wanted Douglas to only load ``plugin_a`` and ``plugin_c``,
-   then you would set ``load_plugins`` to::
-
-      py["load_plugins"] = ["plugin_a", "plugin_c"]
-
-   .. Note::
-
-      In general, it's better to explicitly set ``load_plugins`` to
-      the plugins you want to use.  This reduces the confusion about
-      which plugins did what when you have problems.  It also reduces
-      the potential for accidentally loading plugins you didn't intend
-      to load.
 
    .. Note::
 
