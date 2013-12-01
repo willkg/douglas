@@ -48,18 +48,6 @@ class Douglas(object):
         pyhttp = self._request.get_http()
         config = self._request.get_configuration()
 
-        # initialize the locale, if wanted (will silently fail if locale
-        # is not available)
-        if config.get('locale', None):
-            try:
-                locale.setlocale(locale.LC_ALL, config['locale'])
-            except locale.Error:
-                # invalid locale
-                pass
-
-        # initialize the tools module
-        tools.initialize()
-
         data["douglas_version"] = __version__
         data['pi_bl'] = ''
 
@@ -82,25 +70,6 @@ class Douglas(object):
         # take off trailing slashes for datadir
         config['datadir'] = config["datadir"].rstrip('\\/')
 
-        # import and initialize plugins
-        plugin_utils.initialize_plugins(
-            config.get("plugin_dirs", []), config.get("load_plugins", None))
-
-        # entryparser callback is run here first to allow other
-        # plugins register what file extensions can be used
-        extensions = tools.run_callback(
-            "entryparser",
-            {'txt': blosxom_entry_parser},
-            mappingfunc=lambda x,y:y,
-            defaultfunc=lambda x:x)
-
-        # go through the config.py and override entryparser extensions
-        for ext, parser_module in config.get('entryparsers', {}).items():
-            module, callable_name = parser_module.rsplit(':', 1)
-            module = tools.importname(None, module)
-            extensions[ext] = getattr(module, callable_name)
-
-        data['extensions'] = extensions
 
     def cleanup(self):
         """This cleans up Douglas after a run.
@@ -264,7 +233,7 @@ class Douglas(object):
         categories = {}
 
         # first we handle entries and categories
-        listing = tools.walk(self._request, datadir)
+        listing = tools.get_entries(config, datadir)
 
         for mem in listing:
             # skip the ones that have bad extensions
@@ -389,6 +358,40 @@ class Douglas(object):
         self.cleanup()
 
 
+def initialize(cfg):
+    # initialize the locale, if wanted (will silently fail if locale
+    # is not available)
+    if cfg.get('locale', None):
+        try:
+            locale.setlocale(locale.LC_ALL, cfg['locale'])
+        except locale.Error:
+            # invalid locale
+            pass
+
+    # initialize the tools module
+    tools.initialize()
+
+    # import and initialize plugins
+    plugin_utils.initialize_plugins(
+        cfg.get("plugin_dirs", []), cfg.get("load_plugins", []))
+
+    # entryparser callback is run here first to allow other
+    # plugins register what file extensions can be used
+    extensions = tools.run_callback(
+        "entryparser",
+        {'txt': blosxom_entry_parser},
+        mappingfunc=lambda x,y:y,
+        defaultfunc=lambda x:x)
+
+    # go through the config.py and override entryparser extensions
+    for ext, parser_module in cfg.get('entryparsers', {}).items():
+        module, callable_name = parser_module.rsplit(':', 1)
+        module = tools.importname(None, module)
+        extensions[ext] = getattr(module, callable_name)
+
+    cfg['extensions'] = extensions
+
+
 class DouglasWSGIApp:
     """This class is the WSGI application for Douglas.
     """
@@ -421,6 +424,8 @@ class DouglasWSGIApp:
             sys.path.insert(0, _config["codebase"])
 
         tools.setup_logging(self.config)
+
+        initialize(self.config)
 
     def run_douglas(self, env, start_response):
         """
@@ -979,9 +984,8 @@ def blosxom_file_list_handler(args):
     config = request.get_configuration()
 
     if data['bl_type'] == 'entry_list':
-        filelist = tools.walk(request,
-                              data['root_datadir'],
-                              int(config.get("depth", "0")))
+        filelist = tools.get_entries(
+            config, data['root_datadir'], int(config.get("depth", "0")))
     elif data['bl_type'] == 'entry':
         filelist = [data['root_datadir']]
     else:
@@ -1119,15 +1123,12 @@ def blosxom_process_path_info(args):
     path_info = path_info.split("/")
 
     if os.path.isdir(absolute_path):
-
         # this is an absolute path
 
         data['root_datadir'] = absolute_path
         data['bl_type'] = 'entry_list'
 
-    elif absolute_path.endswith("/index") and \
-             os.path.isdir(absolute_path[:-6]):
-
+    elif absolute_path.endswith("/index") and os.path.isdir(absolute_path[:-6]):
         # this is an absolute path with /index at the end of it
 
         data['root_datadir'] = absolute_path[:-6]
@@ -1237,9 +1238,7 @@ def blosxom_process_path_info(args):
 
 
 def run_douglas():
-    """Executes Douglas either as a commandline script or CGI
-    script.
-    """
+    """Executes Douglas as a CGI script."""
     from config import py as cfg
     env = {}
 

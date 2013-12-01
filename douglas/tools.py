@@ -230,6 +230,50 @@ def urlencode_text(s):
     return urllib.quote(s)
 
 
+def get_entries(cfg, root, recurse=0):
+    """Returns a list of all the entries in the root
+
+    This only pulls extensions that are registered with entryparsers.
+    This uses the ``entries`` callback.
+
+    Allows plugins to remove and add items.
+
+    FIXME - fix docs
+
+    """
+    # the root must be a directory
+    if not os.path.isdir(root):
+        return []
+
+    ext = cfg.get('extensions', {})
+    pattern = re.compile(r'.*\.(' + '|'.join(ext.keys()) + r')$')
+
+    ignore = cfg.get("ignore_directories", None)
+    if isinstance(ignore, basestring):
+        ignore = [ignore]
+
+    if ignore:
+        ignore = [re.escape(i) for i in ignore]
+        ignorere = re.compile(r'.*?(' + '|'.join(ignore) + r')$')
+    else:
+        ignorere = None
+
+    entry_files = _walk_internal(root, recurse, pattern, ignorere, 0)
+    argdict = {
+        'config': cfg,
+        'entry_files': entry_files
+    }
+
+    # FIXME - this callback name sucks.
+    argdict = run_callback(
+        'entries',
+        argdict,
+        mappingfunc=lambda x, y: y,
+        defaultfunc=lambda x: x)
+
+    return argdict['entry_files']
+
+
 def walk(request, root='.', recurse=0, pattern='', return_folders=0):
     """
     This function walks a directory tree starting at a specified root
@@ -249,7 +293,7 @@ def walk(request, root='.', recurse=0, pattern='', return_folders=0):
 
     It will also skip all directories that start with a period.
 
-    :param request: the Request object
+    :param request: Request
     :param root: the root directory to walk
     :param recurse: the depth of recursion; defaults to 0 which goes all
                     the way down
@@ -287,7 +331,7 @@ def walk(request, root='.', recurse=0, pattern='', return_folders=0):
 def _walk_internal(root, recurse, pattern, ignorere, return_folders):
     """
     Note: This is an internal function--don't use it and don't expect
-    it to stay the same between douglas releases.
+    it to stay the same between Douglas releases.
     """
     # FIXME - we should either ditch this function and use os.walk or
     # something similar, or optimize this version by removing the
@@ -326,44 +370,39 @@ def _walk_internal(root, recurse, pattern, ignorere, return_folders):
     return result
 
 
-def filestat(request, filename):
+def filestat(config, filename):
     """
-    Returns the filestat on a given file.  We store the filestat in
-    case we've already retrieved it during this douglas request.
+    Returns the filestat on a given file.
 
     This returns the mtime of the file (same as returned by
     ``time.localtime()``) -- tuple of 9 ints.
 
-    :param request: the Request object
+    :param config: config
     :param filename: the file name of the file to stat
 
     :returns: the filestat (tuple of 9 ints) on the given file
+
     """
-    data = request.get_data()
-    filestat_cache = data.setdefault("filestat_cache", {})
-
-    if filestat_cache.has_key(filename):
-        return filestat_cache[filename]
-
-    argdict = {"request": request,
-               "filename": filename,
-               "mtime": (0,) * 10}
+    argdict = {
+        'config': config,
+        'filename': filename,
+        'mtime': (0,) * 10
+    }
 
     MT = stat.ST_MTIME
 
-    argdict = run_callback("filestat",
+    argdict = run_callback('filestat',
                            argdict,
                            mappingfunc=lambda x, y: y,
                            donefunc=lambda x: x and x["mtime"][MT] != 0,
                            defaultfunc=lambda x: x)
 
-    # no plugin handled cb_filestat; we default to asking the
+    # Since no plugin handled cb_filestat; we default to asking the
     # filesystem
-    if argdict["mtime"][MT] == 0:
-        argdict["mtime"] = os.stat(filename)
+    if argdict['mtime'][MT] == 0:
+        argdict['mtime'] = os.stat(filename)
 
-    timetuple = time.localtime(argdict["mtime"][MT])
-    filestat_cache[filename] = timetuple
+    timetuple = time.localtime(argdict['mtime'][MT])
 
     return timetuple
 
@@ -513,7 +552,6 @@ def run_callback(chain, input,
     :returns: varies
     """
     chain = plugin_utils.get_callback_chain(chain)
-
     output = None
 
     for func in chain:

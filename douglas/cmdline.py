@@ -14,7 +14,7 @@ from optparse import OptionParser
 
 from douglas import __version__
 from douglas import plugin_utils
-from douglas.app import Douglas
+from douglas.app import Douglas, initialize
 from douglas.tools import abort, run_callback, pwrap, pwrap_error, setup_logging
 
 
@@ -59,6 +59,7 @@ def build_douglas(cfg):
     if not cfg:
         return None
 
+    initialize(cfg)
     setup_logging(cfg)
     return Douglas(cfg, {})
 

@@ -137,7 +137,7 @@ class PyblCategories:
             theme = config.get('default_theme', 'html')
 
         # build the list of all entries in the datadir
-        elist = tools.walk(self._request, root)
+        elist = tools.get_entries(config, root)
 
         # peel off the root dir from the list of entries
         elist = [mem[len(root) + 1:] for mem in elist]

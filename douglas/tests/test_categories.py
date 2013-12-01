@@ -11,7 +11,8 @@ def parse_text():
 class Test_categories(PluginTest):
     def setUp(self):
         PluginTest.setUp(self, categories)
-        self.request.get_data()["extensions"] = {"txt": parse_text}
+        # FIXME - should run initialize here instead
+        self.request.get_configuration()["extensions"] = {"txt": parse_text}
 
     def tearDown(self):
         PluginTest.tearDown(self)

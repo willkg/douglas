@@ -88,7 +88,7 @@ def get_metadata(lines):
     return metadata
 
 
-def persistdate_cmd(command, argv):
+def cmd_persistdate(command, argv):
     import config
 
     datadir = config.py.get('datadir')
@@ -104,7 +104,7 @@ def persistdate_cmd(command, argv):
     req = p.get_request()
     tools.run_callback('start', {'request': req})
 
-    filelist = tools.walk(req, datadir)
+    filelist = tools.get_entries(config, datadir)
     print '%d files' % len(filelist)
     for fn in filelist:
         lines = open(fn, 'r').readlines()
@@ -129,5 +129,5 @@ def persistdate_cmd(command, argv):
 
 def cb_commandline(args):
     args['persistdate'] = (
-        persistdate_cmd, 'persists mtime of file into #published metadata')
+        cmd_persistdate, 'persists mtime of file into #published metadata')
     return args

@@ -91,7 +91,7 @@ class PyblArchives:
         data = self._request.get_data()
         root = config["datadir"]
         archives = {}
-        archive_list = tools.walk(self._request, root)
+        archive_list = tools.get_entries(config, root)
         fulldict = {}
         fulldict.update(config)
         fulldict.update(data)

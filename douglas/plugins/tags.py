@@ -269,29 +269,30 @@ def get_tagsfile(cfg):
 
 def buildtags(command, argv):
     """Command for building the tags index."""
-    import config
+    from config import py as cfg
 
-    datadir = config.py.get("datadir")
+    datadir = cfg.get("datadir")
     if not datadir:
         raise ValueError("config.py has no datadir property.")
 
-    sep = config.py.get("tags_separator", ",")
-    tagsfile = get_tagsfile(config.py)
+    sep = cfg.get("tags_separator", ",")
+    tagsfile = get_tagsfile(cfg)
 
     from douglas import tools
-    from douglas.app import Douglas
+    from douglas.app import Douglas, initialize
     from douglas.entries import fileentry
 
     # build a douglas object, initialize it, and run the start
     # callback.  this gives entry parsing related plugins a chance to
     # get their stuff together so that they work correctly.
-    p = Douglas(config.py, {})
+    initialize(cfg)
+    p = Douglas(cfg, {})
     p.initialize()
     req = p.get_request()
     tools.run_callback("start", {"request": req})
 
     # grab all the entries in the datadir
-    filelist = tools.walk(req, datadir)
+    filelist = tools.get_entries(cfg, datadir)
     entrylist = [fileentry.FileEntry(req, e, datadir) for e in filelist]
 
     tags_to_files = {}
@@ -315,29 +316,19 @@ def category_to_tags(command, argv):
 
     It maintains the mtime for the file.
     """
-    import config
+    from config import py as cfg
 
-    datadir = config.py.get("datadir")
+    datadir = cfg.get("datadir")
     if not datadir:
         raise ValueError("config.py has no datadir property.")
 
-    sep = config.py.get("tags_separator", ",")
+    sep = cfg.get("tags_separator", ",")
 
     from douglas import tools
-    from douglas.app import blosxom_entry_parser, Request
+    from douglas.app import initialize
 
-    data = {}
-
-    # register entryparsers so that we parse all possible file types.
-    data["extensions"] = tools.run_callback("entryparser",
-                                            {"txt": blosxom_entry_parser},
-                                            mappingfunc=lambda x, y: y,
-                                            defaultfunc=lambda x: x)
-
-    req = Request(config.py, {}, data)
-
-    # grab all the entries in the datadir
-    filelist = tools.walk(req, datadir)
+    initialize(cfg)
+    filelist = tools.get_entries(cfg, datadir)
 
     if not datadir.endswith(os.sep):
         datadir = datadir + os.sep
@@ -437,33 +428,8 @@ def cb_filelist(args):
     return entrylist
 
 
-def cb_story(args):
-    # adds tags to the entry properties
-    request = args["request"]
-    entry = args["entry"]
-    config = request.get_configuration()
-
-    sep = config.get("tags_separator", ",")
-    tags = [t.strip() for t in entry.get("tags", "").split(sep)]
-    tags.sort()
-    entry["tags_raw"] = tags
-
-    form = request.get_form()
-    try:
-        theme = form["theme"].value
-    except KeyError:
-        theme = config.get("default_theme", "html")
-    baseurl = config.get("base_url", "")
-    trigger = config.get("tags_trigger", "tag")
-    template = config.get("tags_item", '<a href="%(tagurl)s">%(tag)s</a>')
-
-    tags = [template % {"base_url": baseurl,
-                        "theme": theme,
-                        "tag": tag,
-                        "tagurl": "/".join([baseurl, trigger, tag])}
-            for tag in tags]
-    entry["tags"] = ", ".join(tags)
-    return args
+# def cb_context_processor(args):
+#     context = args['context']
 
 
 def cb_head(args):
@@ -557,7 +523,33 @@ def cb_head(args):
     return args
 
 
-cb_foot = cb_head
+def cb_story(args):
+    # adds tags to the entry properties
+    request = args["request"]
+    entry = args["entry"]
+    config = request.get_configuration()
+
+    sep = config.get("tags_separator", ",")
+    tags = [t.strip() for t in entry.get("tags", "").split(sep)]
+    tags.sort()
+    entry["tags_raw"] = tags
+
+    form = request.get_form()
+    try:
+        theme = form["theme"].value
+    except KeyError:
+        theme = config.get("default_theme", "html")
+    baseurl = config.get("base_url", "")
+    trigger = config.get("tags_trigger", "tag")
+    template = config.get("tags_item", '<a href="%(tagurl)s">%(tag)s</a>')
+
+    tags = [template % {"base_url": baseurl,
+                        "theme": theme,
+                        "tag": tag,
+                        "tagurl": "/".join([baseurl, trigger, tag])}
+            for tag in tags]
+    entry["tags"] = ", ".join(tags)
+    return args
 
 
 def cb_staticrender_filelist(args):
