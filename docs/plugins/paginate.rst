@@ -35,26 +35,18 @@ This plugin comes with douglas.  To install, do the following:
    that it has a chance to operate on the entry list before other
    plugins.
 
-2. add the ``$(page_navigation)`` variable to your head or foot (or
-   both) templates.  this is where the page navigation HTML will
-   appear.
+2. (optional) Add some configuration to your ``config.py`` file.
+
+3. Add the following blurb where you want page navigation to your
+   entry_list template::
+
+       <p>
+         {{ page_navigation|safe }}
+       </p>
 
 
-Here are some additional configuration variables to adjust the
-behavior::
-
-``paginate_count_from``
-
-   Defaults to 0.
-
-   This is the number to start counting from.  Some folks like their
-   pages to start at 0 and others like it to start at 1.  This enables
-   you to set it as you like.
-
-   Example::
-
-      py["paginate_count_from"] = 1
-
+Configuration variables
+=======================
 
 ``paginate_previous_text``
 

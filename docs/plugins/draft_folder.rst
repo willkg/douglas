@@ -30,7 +30,7 @@ Install and Configure
 
 3. (optional) Set ``py["draft_trigger"]`` in your ``config.py`` file
    to the url path you want to show drafts in. This defaults to
-   ``draft``.
+   ``drafts``.
 
 That's it!
 
