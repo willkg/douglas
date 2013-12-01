@@ -1,0 +1,13 @@
+==============
+README - Pages
+==============
+
+Pages are parts of your blog that aren't date-sensitive. For example, you
+could have an "About this blog" page.
+
+Pages files are structured the same as entries. The only major differences
+are that they exist in the pages/ directory and not the entries/ directory
+and that when rendered, pages use the ``page`` template and not the
+``entry`` template.
+
+See the documentation for more details.

@@ -96,12 +96,8 @@ Template
 
 pages formats the page using the ``pages`` template.  So you need a
 ``pages`` template in the themes that you want these pages to be
-rendered in.  I copy my ``story`` template and remove some bits.
-
-For example, if you're using the html theme and that is stored in
-``/home/foo/blog/themes/html/``, then you could copy the
-``story`` file in that directory to ``pages`` and that would become
-your ``pages`` template.
+rendered in.  If you want your pages rendered exactly like an entry,
+just extend the ``entry`` template.
 
 
 Python code blocks
@@ -165,18 +161,6 @@ def verify_installation(cfg):
         retval = False
 
     return retval
-
-
-def cb_date_head(args):
-    req = args["request"]
-    data = req.get_data()
-    if INIT_KEY in data:
-        args["template"] = ""
-    return args
-
-
-def cb_date_foot(args):
-    return cb_date_head(args)
 
 
 def eval_python_blocks(req, body):
@@ -245,71 +229,73 @@ def cb_filelist(args):
         return
 
     data[INIT_KEY] = 1
-    datadir = config["datadir"]
+    datadir = config['datadir']
     data['root_datadir'] = config['datadir']
-    pagesdir = config["pagesdir"]
+    data['bl_type'] = 'page'
+    pagesdir = config['pagesdir']
 
-    pagesdir = pagesdir.replace("/", os.sep)
+    pagesdir = pagesdir.replace('/', os.sep)
     if not pagesdir[-1] == os.sep:
         pagesdir = pagesdir + os.sep
 
-    pathinfo = pyhttp.get("PATH_INFO", "")
+    pathinfo = pyhttp.get('PATH_INFO', '')
     path, ext = os.path.splitext(pathinfo)
-    if pathinfo == "/" or path == "/index":
-        page_name = "frontpage"
+    if pathinfo == '/' or path == '/index':
+        page_name = 'frontpage'
     else:
-        page_name = pyhttp["PATH_INFO"][len("/" + TRIGGER) + 1:]
+        page_name = pyhttp['PATH_INFO'][len('/' + TRIGGER) + 1:]
 
     if not page_name:
         return
 
     # FIXME - need to do a better job of sanitizing
-    page_name = page_name.replace(os.sep, "/")
+    page_name = page_name.replace(os.sep, '/')
 
     if not page_name:
         return
 
     if page_name[-1] == os.sep:
         page_name = page_name[:-1]
-    if page_name.find("/") > 0:
-        page_name = page_name[page_name.rfind("/"):]
+    if page_name.find('/') > 0:
+        page_name = page_name[page_name.rfind('/'):]
 
     # if the page has a theme, we use that.  otherwise
     # we default to the default theme.
     page_name, theme = os.path.splitext(page_name)
     if theme:
-        data["theme"] = theme[1:]
+        data['theme'] = theme[1:]
 
-    ext = tools.what_ext(data["extensions"].keys(), pagesdir + page_name)
+    ext = tools.what_ext(config['extensions'].keys(), pagesdir + page_name)
 
     if not ext:
         return []
 
     data['root_datadir'] = page_name + '.' + ext
-    data['bl_type'] = 'entry'
-    filename = pagesdir + page_name + "." + ext
+    filename = pagesdir + page_name + '.' + ext
 
     if not os.path.isfile(filename):
         return []
 
     fe = FileEntry(req, filename, pagesdir)
     # now we evaluate python code blocks
-    body = fe.get_data()
+    body = fe['body']
     body = eval_python_blocks(req, body)
-    body = ("<!-- PAGES PAGE START -->\n\n" +
+    body = ('<!-- PAGES PAGE START -->\n\n' +
             body +
-            "<!-- PAGES PAGE END -->\n")
-    fe.set_data(body)
+            '<!-- PAGES PAGE END -->\n')
+    fe['body'] = body
 
-    fe["absolute_path"] = TRIGGER
-    fe["fn"] = page_name
-    fe["file_path"] = TRIGGER + "/" + page_name
-    fe["template_name"] = "pages"
+    fe['absolute_path'] = TRIGGER
+    fe['fn'] = page_name
+    fe['file_path'] = TRIGGER + '/' + page_name
+    fe['template_name'] = 'pages'
 
     data['blog_title_with_path'] = (
-        config.get("blog_title", "") + " : " + fe.get("title", ""))
+        config.get('blog_title', '') + ' : ' + fe.get('title', ''))
+
+    data['bl_type'] = 'page'
 
     # set the datadir back
-    config["datadir"] = datadir
+    config['datadir'] = datadir
 
     return [fe]

@@ -108,12 +108,12 @@ class FileEntry(base.EntryBase):
 
         self.set_time(self._timetuple)
 
-        data = self._request.get_data()
+        config = self._request.get_configuration()
 
         fileext = os.path.splitext(self._filename)
         if fileext:
             fileext = fileext[1][1:]
-        eparser = data['extensions'][fileext]
+        eparser = config['extensions'][fileext]
         entrydict = eparser(self._filename, self._request)
 
         # Update the _metadata directly skipping over this class'

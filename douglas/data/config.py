@@ -135,6 +135,7 @@ py["plugin_dirs"] = [os.path.join(BLOGDIR, "plugins")]
 py["load_plugins"] = [
     "douglas.plugins.paginate",
     "douglas.plugins.draft_folder",
+    "douglas.plugins.pages",
 
     "douglas.plugins.tags",
     "douglas.plugins.yeararchives",
@@ -201,8 +202,12 @@ py["tags_separator"] = "::"
 py["draftdir"] = os.path.join(BLOGDIR, 'drafts')
 
 # paginate
-# for the paginate plugin
 py['paginate_previous_text'] = "(more recent) &lt;&lt;"
 py['paginate_next_text'] = "&gt;&gt; (less recent)"
 py['paginate_count_from'] = 1
 py['paginate_linkstyle'] = 1
+
+
+# pages
+py['pagesdir'] = os.path.join(BLOGDIR, 'pages')
+py['pages_trigger'] = 'pages'

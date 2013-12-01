@@ -1,0 +1,10 @@
+{% extends "layout.html" %}
+
+{% block content %}
+  {% for entry in content %}
+    <h3><a name="{{ entry.basename }}">{{ entry.title }}</a></h3>
+    <div class="blosxomStory">
+      {{ entry.body|safe }}
+    </div>
+  {% endfor %}
+{% endblock content %}

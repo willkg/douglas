@@ -1,0 +1,12 @@
+================
+README - Plugins
+================
+
+Douglas lets you use plugins to augment the default behavior. This makes
+it a lot easier to make your blog do what you need it to do.
+
+Douglas comes with a core set of plugins. These plugins are all in the
+Douglas code--they aren't in this directory.
+
+This directory is for plugins that are't part of Douglas that you either
+wrote yourself or got from someone else.

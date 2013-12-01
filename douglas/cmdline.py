@@ -303,40 +303,14 @@ def cmd_create(command, argv):
             print "Creating '{0}'...".format(d)
         os.makedirs(d)
 
-    _mkdir(d)
-    _mkdir(os.path.join(d, "entries"))
-    _mkdir(os.path.join(d, "plugins"))
-    _mkdir(os.path.join(d, "drafts"))
-
-    source = os.path.join(os.path.dirname(__file__), "themes")
-
-    for root, dirs, files in os.walk(source):
-        if ".svn" in root:
-            continue
-
-        dest = os.path.join(d, "themes", root[len(source)+1:])
-        if not os.path.isdir(dest):
-            if verbose:
-                print "Creating '%s'..." % dest
-            os.mkdir(dest)
-
-        for mem in files:
-            if verbose:
-                print "Creating file '%s'..." % os.path.join(dest, mem)
-            fpin = open(os.path.join(root, mem), "r")
-            fpout = open(os.path.join(dest, mem), "w")
-
-            fpout.write(fpin.read())
-
-            fpout.close()
-            fpin.close()
-
-    def _copyfile(frompath, topath, fn, fix=False):
+    def _copyfile(frompath, topath, fn):
         if verbose:
             print "Creating file '%s'..." % os.path.join(topath, fn)
-        fp = open(os.path.join(frompath, fn), "r")
-        filedata = fp.readlines()
-        fp.close()
+
+        with open(os.path.join(frompath, fn), 'r') as fp:
+            filedata = fp.readlines()
+
+        fix = fn.endswith(('.ini', '.py', '.cgi', '.txt'))
 
         if fix:
             basedir = topath
@@ -344,20 +318,29 @@ def cmd_create(command, argv):
                 basedir = basedir + os.sep
             if os.sep == "\\":
                 basedir = basedir.replace(os.sep, os.sep + os.sep)
-            datamap = { "basedir": basedir,
-                        "codedir": os.path.dirname(os.path.dirname(__file__)) }
+            datamap = {
+                'basedir': basedir,
+                'codedir': os.path.dirname(os.path.dirname(__file__))
+            }
             filedata = [line % datamap for line in filedata]
 
-        fp = open(os.path.join(topath, fn), "w")
-        fp.write("".join(filedata))
-        fp.close()
+        with open(os.path.join(topath, fn), 'w') as fp:
+            fp.write(''.join(filedata))
 
-    source = os.path.join(os.path.dirname(__file__), "data")
+    _mkdir(d)
 
-    _copyfile(source, d, "config.py", fix=True)
-    _copyfile(source, d, "blog.ini", fix=True)
-    _copyfile(source, d, "douglas.cgi", fix=True)
-    _copyfile(source, d, "README.txt", fix=True)
+    # Copy over data files
+    source = os.path.join(os.path.dirname(__file__), 'data')
+    for root, dirs, files in os.walk(source):
+        dest = os.path.join(d, root[len(source)+1:])
+
+        if not os.path.isdir(dest):
+            if verbose:
+                print "Creating '%s'..." % dest
+            _mkdir(dest)
+
+        for mem in files:
+            _copyfile(root, dest, mem)
 
     datadir = os.path.join(d, "entries")
     firstpost = os.path.join(datadir, "firstpost.txt")

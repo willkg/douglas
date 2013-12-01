@@ -1,0 +1,7 @@
+===============
+README - themes
+===============
+
+The themes directory holds the themes your blog can be rendered in. By
+default this is the "html" and "rss" themes. These themes are rendered
+using Jinja2.

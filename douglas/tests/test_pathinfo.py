@@ -1,10 +1,14 @@
 from douglas import tools
-from douglas.app import blosxom_process_path_info
+from douglas.app import blosxom_process_path_info, initialize
 from douglas.tests import UnitTestBase
 
 
 class Testpathinfo(UnitTestBase):
     """This tests default parsing of the path."""
+    def setUp(self):
+        UnitTestBase.setUp(self)
+        tools.initialize()
+
     def _basic_test(self, pathinfo, expected, cfg=None, http=None, data=None):
         _http = {"PATH_INFO": pathinfo}
         if http:
@@ -88,8 +92,6 @@ class Testpathinfo(UnitTestBase):
             self.tearDown()
 
     def test_dates(self):
-        tools.initialize()
-
         self._basic_test("/2002",
                          {"bl_type": "entry_list",
                           "pi_yr": "2002", "pi_mo": "", "pi_da": "",
@@ -104,8 +106,6 @@ class Testpathinfo(UnitTestBase):
                           "theme": "html"})
 
     def test_categories_and_dates(self):
-        tools.initialize()
-
         entries = self.build_file_set(["cata/entry1.txt",
                                        "cata/suba/entry1.txt",
                                        "catb/entry1.txt"])
@@ -166,8 +166,6 @@ class Testpathinfo(UnitTestBase):
         # theme var tests
         # The theme is the default theme, the extension of the request,
         # or the theme= querystring.
-        root = self.get_temp_dir()
-
         entries = self.build_file_set(["2007/entry1.txt", 
                                        "2007/05/entry3.txt", 
                                        "cata/entry2.txt"])

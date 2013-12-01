@@ -208,7 +208,6 @@ class Douglas(object):
         self.initialize()
 
         config = self._request.get_configuration()
-        data = self._request.get_data()
         print "Performing static rendering."
         if incremental:
             print "Incremental is set."
@@ -238,7 +237,7 @@ class Douglas(object):
         for mem in listing:
             # skip the ones that have bad extensions
             ext = mem[mem.rfind(".")+1:]
-            if not ext in data["extensions"].keys():
+            if not ext in config["extensions"].keys():
                 continue
 
             # grab the mtime of the entry file
@@ -1137,14 +1136,14 @@ def blosxom_process_path_info(args):
     else:
         # this is either a file or a date
 
-        ext = tools.what_ext(data["extensions"].keys(), absolute_path)
+        ext = tools.what_ext(config["extensions"].keys(), absolute_path)
         if not ext:
             # it's possible we didn't find the file because it's got a
             # theme thing at the end--so try removing it and
             # checking again.
             newpath, theme = os.path.splitext(absolute_path)
             if theme:
-                ext = tools.what_ext(data["extensions"].keys(), newpath)
+                ext = tools.what_ext(config["extensions"].keys(), newpath)
                 if ext:
                     # there is a theme-like thing, so that's our new
                     # theme and we adjust the absolute_path and

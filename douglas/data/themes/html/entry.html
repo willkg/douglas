@@ -1,0 +1,18 @@
+{% extends "layout.html" %}
+
+{% block content %}
+  {% for entry in content %}
+    <h3><a name="{{ entry.basename }}">{{ entry.title }}</a></h3>
+    <div class="blosxomStory">
+      {{ entry.body|safe }}
+      <div class="links">
+        <p>
+          posted on: {{ entry.date }} |
+          tags: {{ entry.tags }}
+          category: <a href="{{ base_url }}/{{ entry.absolute_path }}">/{{ absolute_path }}</a> |
+          <a href="{{ base_url }}/{{ entry.file_path }}.{{ theme }}">permalink</a>
+        </p>
+      </div>
+    </div>
+  {% endfor %}
+{% endblock content %}

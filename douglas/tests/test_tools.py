@@ -144,7 +144,7 @@ class Testimportname(UnitTestBase):
 class Testwhat_ext(UnitTestBase):
     """tools.what_ext"""
     def get_ext_dir(self):
-        return os.path.join(self.get_temp_dir(), "ext")
+        return os.path.join(self.datadir, "ext")
         
     def setUp(self):
         """

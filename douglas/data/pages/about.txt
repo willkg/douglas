@@ -1,0 +1,4 @@
+About this blog
+<p>
+  This is my new blog!
+</p>

@@ -21,8 +21,7 @@ def gen_time(s):
 
 class BlogTest(UnitTestBase):
     def get_datadir(self):
-        tempdir = self.get_temp_dir()
-        return os.path.join(tempdir, "datadir")
+        return os.path.join(self.datadir, "datadir")
     
     def setup_blog(self, blist):
         datadir = self.get_datadir()
@@ -48,8 +47,6 @@ class TestBlogTest(BlogTest):
              "body": "<p>Today is Valentine's Day!  w00t!</p>"}]
 
     def test_harness(self):
-        tempdir = self.get_temp_dir()
-
         # this is kind of a bogus assert, but if we get this far
         # without raising an exception, then our test harness is
         # probably working.

@@ -1,0 +1,24 @@
+================
+README - Entries
+================
+
+The files for your blog entries go in this directory. Each subdirectory of
+this directory is a "category". This allows you to create a tree of files
+that matches the category hierarchy of your blog.
+
+Each entry is in a format something like this::
+
+    Title of entry
+    #metadata
+    <p>
+      Body of the entry.
+    </p>
+
+Metadata lets you specify things in your entries that affect plugins and
+rendering.
+
+The body of your entry can be in HTML using the blosxom_entry_parser,
+reStructuredText using the rst_parser, or any other format you like as long
+as there's an entry parser for it.
+
+For information on writing entries and entry parsers, see the documentation.

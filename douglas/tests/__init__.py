@@ -5,8 +5,6 @@ Includes up a number of mocks, environment variables, and Douglas
 data structures for useful testing plugins.
 """
 
-from douglas import app, tools, entries
-from douglas.renderers.jinjarenderer import Renderer
 import cgi
 import StringIO
 import os
@@ -17,6 +15,9 @@ import urllib
 import shutil
 import unittest
 
+from douglas import app, tools, entries
+from douglas.renderers.jinjarenderer import Renderer
+
 
 def req_():
     return app.Request({}, {}, {})
@@ -24,29 +25,24 @@ def req_():
 
 class UnitTestBase(unittest.TestCase):
     def setUp(self):
-        self._tempdir = None
+        # set up datadir and config
+        self.datadir = tempfile.mkdtemp(prefix='douglas_test_datadir')
 
     def tearDown(self):
-        if self._tempdir:
+        if self.datadir:
             try:
-                shutil.rmtree(self._tempdir)
+                shutil.rmtree(self.datadir)
             except OSError:
                 pass
 
     def eq_(self, a, b, text=None):
         self.assertEquals(a, b, text)
 
-    def get_temp_dir(self):
-        if self._tempdir == None:
-            self._tempdir = tempfile.mkdtemp()
-        return self._tempdir
-
     def setup_files(self, files):
         # sort so that we're building the directories in order
         files.sort()
 
-        tempdir = self.get_temp_dir()
-        os.makedirs(os.path.join(tempdir, "entries"))
+        os.makedirs(os.path.join(self.datadir, "entries"))
 
         for fn in files:
             d, f = os.path.split(fn)
@@ -62,7 +58,7 @@ class UnitTestBase(unittest.TestCase):
                 f.close()
             
     def build_file_set(self, filelist):
-        return [os.path.join(self.get_temp_dir(), "entries/%s" % fn)
+        return [os.path.join(self.datadir, "entries/%s" % fn)
                 for fn in filelist]
 
     def build_request(self, cfg=None, http=None, data=None, inputstream=""):
@@ -83,11 +79,13 @@ class UnitTestBase(unittest.TestCase):
         - req.pyhttp["CONTENT_LENGTH"]    - integer
         """
         _config = {"default_theme": "html",
-                   "datadir": os.path.join(self.get_temp_dir(), "entries"),
+                   "datadir": os.path.join(self.datadir, "entries"),
                    "blog_title": "Joe's blog",
                    "base_url": "http://www.example.com/"}
         if cfg:
             _config.update(cfg)
+
+        app.initialize(_config)
 
         _data = {"extensions": {"txt": 0}}
         if data:
@@ -96,7 +94,8 @@ class UnitTestBase(unittest.TestCase):
         _http = {"wsgi.input": StringIO.StringIO(inputstream),
                  "REQUEST_METHOD": len(inputstream) and "GET" or "POST",
                  "CONTENT_LENGTH": len(inputstream)}
-        if http: _http.update(http)
+        if http:
+            _http.update(http)
 
         return app.Request(_config, _http, _data)
         
