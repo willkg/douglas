@@ -3,14 +3,17 @@ This module holds commandline related stuff.  Installation
 verification, blog creation, commandline argument parsing, ...
 """
 
+from SimpleHTTPServer import SimpleHTTPRequestHandler
+from functools import wraps
+from optparse import OptionParser
+from urlparse import urlparse
+import SocketServer
 import datetime
 import os
 import os.path
-import sys
 import random
+import sys
 import time
-from functools import wraps
-from optparse import OptionParser
 
 from douglas import __version__
 from douglas import plugin_utils
@@ -80,10 +83,97 @@ def build_parser(usage):
     return parser
 
 
+def generate_handler(cfg, host_port):
+    """Creates a closure so our DouglasHTTPRequestHandler has what it needs"""
+    base_url = cfg.get('base_url', '/')
+    base_path = urlparse(base_url).path.lstrip('/')
+    staticdir = cfg['static_dir']
+    default_theme = cfg.get('default_theme', 'html')
+    serving_base_url = 'http://{0}/{1}'.format(host_port, base_path)
+
+    class DouglasHTTPRequestHandler(SimpleHTTPRequestHandler):
+        """Handler that serves compiled_site locally at the right path"""
+        def translate_path(self, path):
+            """Translate a url path to the local file."""
+            newpath = urlparse(path).path
+            newpath = newpath.lstrip('/')
+
+            if not newpath.startswith(base_path):
+                newpath = base_path
+            else:
+                newpath = newpath[len(base_path):]
+
+            newpath = newpath.lstrip('/')
+            newpath = os.path.join(staticdir, newpath)
+
+            # If the path doesn't exist, try the path with the
+            # default_theme tacked on.
+            if not os.path.exists(newpath):
+                if os.path.exists(newpath + '.' + default_theme):
+                    newpath = newpath + '.' + default_theme
+
+            # Do some fancy footwork so we're likely to get a correct
+            # content-type.
+            if not os.path.isfile(newpath):
+                newpath = newpath + 'index.html'
+
+            return newpath
+
+        def do_GET(self):
+            if self.path == '/' and base_path:
+                # Redirect to the base_path.
+                print 'Redirecting to /{0}'.format(base_path)
+                self.send_response(302)
+                self.send_header("Location", '/' + base_path)
+                self.end_headers()
+                return
+
+            self._type = self.guess_type(self.translate_path(self.path))
+
+            SimpleHTTPRequestHandler.do_GET(self)
+
+        def copyfile(self, source, outputfile):
+            """Copies data over and replaces base_url for html files"""
+            if self._type == 'text/html':
+                data = source.read()
+                data = data.replace(base_url, serving_base_url)
+                outputfile.write(data)
+            else:
+                SimpleHTTPRequestHandler.copyfile(self, source, outputfile)
+
+    return DouglasHTTPRequestHandler
+
+
+@with_config
+def cmd_serve(cfg, command, argv):
+    """Serves the compiled_site."""
+    parser = build_parser("%prog serve [options]")
+    parser.add_option("--host",
+                      dest="host_port",
+                      help="host:port to serve at",
+                      default='127.0.0.1:8000',
+                      metavar="HOST")
+    (options, args) = parser.parse_args(argv)
+
+    # FIXME - redo value validation here
+    host_port = options.host_port
+    if ':' not in host_port:
+        host_port = host_port + ':8000'
+
+    host, port = host_port.split(':')
+    port = int(port)
+
+    handler = generate_handler(cfg, host_port)
+
+    httpd = SocketServer.TCPServer((host, port), handler)
+    print 'Serving at http://{0}:{1}'.format(host, port)
+    httpd.serve_forever()
+
+
 @with_config
 def cmd_generate(cfg, command, argv):
     """Generates random entries to help with Douglas development."""
-    parser = build_parser("%prog entries [options] <num_entries>")
+    parser = build_parser("%prog generate [options] <num_entries>")
     (options, args) = parser.parse_args(argv)
 
     if args:
