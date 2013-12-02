@@ -70,8 +70,7 @@ class UnitTestBase(unittest.TestCase):
         - req.config["datadir"]           - string
         - req.config["blog_title"]        - string
         - req.config["base_url"]          - string
-
-        - req.data["extensions"]          - dict of string -> func
+        - req.config["extensions"]        - dict of string -> func
 
         if using req.get_form():
         - req.pyhttp["wsgi.input"]        - StringIO instance
@@ -87,7 +86,7 @@ class UnitTestBase(unittest.TestCase):
 
         app.initialize(_config)
 
-        _data = {"extensions": {"txt": 0}}
+        _data = {}
         if data:
             _data.update(data)
 

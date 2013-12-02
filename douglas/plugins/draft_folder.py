@@ -109,7 +109,7 @@ def cb_filelist(args):
     if theme:
         data["theme"] = theme[1:]
 
-    ext = tools.what_ext(data["extensions"].keys(), draftdir + draft_name)
+    ext = tools.what_ext(config["extensions"].keys(), draftdir + draft_name)
 
     if not ext:
         return []

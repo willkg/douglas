@@ -167,7 +167,7 @@ def new_entry(request, yearmonth, body):
     entry["fn"] = ""
 
     entry.set_time(time.strptime(yearmonth, "%Y-%m"))
-    entry.set_data(body)
+    entry['body'] = body
 
     return entry
 

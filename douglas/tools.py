@@ -308,7 +308,7 @@ def walk(request, root='.', recurse=0, pattern='', return_folders=0):
     """
     # expand pattern
     if not pattern:
-        ext = request.get_data()['extensions']
+        ext = request.get_configuration()['extensions']
         pattern = re.compile(r'.*\.(' + '|'.join(ext.keys()) + r')$')
 
     ignore = request.get_configuration().get("ignore_directories", None)
