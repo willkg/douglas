@@ -25,7 +25,7 @@ Requirements
 
 
 Quickstart for compiling
-===============================
+========================
 
 1. Create a virtual environment
 2. Activate the virtual environment
