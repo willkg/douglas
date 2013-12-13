@@ -350,15 +350,6 @@ class Douglas(object):
 
 
 def initialize(cfg):
-    # initialize the locale, if wanted (will silently fail if locale
-    # is not available)
-    if cfg.get('locale', None):
-        try:
-            locale.setlocale(locale.LC_ALL, cfg['locale'])
-        except locale.Error:
-            # invalid locale
-            pass
-
     # import and initialize plugins
     plugin_utils.initialize_plugins(
         cfg.get("plugin_dirs", []), cfg.get("load_plugins", []))

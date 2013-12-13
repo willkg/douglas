@@ -61,12 +61,6 @@ py["blog_language"] = "en"
 # Encoding for output.  This defaults to utf-8.
 py["blog_encoding"] = "utf-8"
 
-# What is the locale for this blog?  This is used when formatting dates
-# and other locale-sensitive things.  Make sure the locale is valid for
-# your system.  See the configuration chapter in the Douglas documentation
-# for details.
-#py["locale"] = "en_US.iso-8859-1"
-
 # Where are this blog's entries kept?
 py["datadir"] = os.path.join(BLOGDIR, "entries")
 

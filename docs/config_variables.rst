@@ -261,28 +261,6 @@ Blog configuration
    .. _IANA charset registry: http://www.iana.org/assignments/character-sets
 
 
-.. py:data:: locale
-
-   (optional) string; defaults to ``"C"``
-
-   Douglas uses the locale config variable to adjust the values for
-   month names and dates.
-
-   In general, you don't need to set this unless you know you're not
-   using en_US or en_UK.
-
-   A listing of language codes is at
-   http://ftp.ics.uci.edu/pub/ietf/http/related/iso639.txt
-
-   A listing of country codes is at:
-   http://userpage.chemie.fu-berlin.de/diverse/doc/ISO_3166.html
-
-   For example, if you wanted to set the locale to the Dutch language in
-   the Netherlands you'd set locale to::
-
-      py["locale"] = "nl_NL.UTF-8"
-
-
 .. py:data:: datadir
 
    string
