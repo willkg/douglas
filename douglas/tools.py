@@ -667,22 +667,22 @@ def update_static_entry(cdict, entry_filename):
         render_url_statically(cdict, mem[0], mem[1])
 
 
-def render_url_statically(cdict, url, querystring):
+def render_url_statically(cfg, url, querystring):
     """Renders a url and saves the rendered output to the
     filesystem.
 
-    :param cdict: config dict
+    :param cfg: config dict
     :param url: url to render
     :param querystring: querystring of the url to render or ""
     """
-    staticdir = cdict.get("static_dir", "")
+    staticdir = cfg.get("static_dir", "")
 
     # if there is no staticdir, then they're not set up for static
     # rendering.
     if not staticdir:
         raise Exception("You must set static_dir in your config file.")
 
-    response = render_url(cdict, url, querystring)
+    response = render_url(cfg, url, querystring)
     response.seek(0)
 
     fn = os.path.normpath(staticdir + os.sep + url)

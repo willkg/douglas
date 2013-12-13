@@ -18,7 +18,9 @@ import time
 from douglas import __version__
 from douglas import plugin_utils
 from douglas.app import Douglas, initialize
-from douglas.tools import abort, run_callback, pwrap, pwrap_error, setup_logging
+from douglas.tools import (
+    abort, run_callback, pwrap, pwrap_error, setup_logging,
+    render_url_statically)
 
 
 USAGE = "%prog [options] [command] [command-options]"
@@ -83,7 +85,7 @@ def build_parser(usage):
     return parser
 
 
-def generate_handler(cfg, host_port):
+def generate_handler(doug, cfg, host_port):
     """Creates a closure so our DouglasHTTPRequestHandler has what it needs"""
     base_url = cfg.get('base_url', '/')
     base_path = urlparse(base_url).path.lstrip('/')
@@ -128,6 +130,14 @@ def generate_handler(cfg, host_port):
                 self.end_headers()
                 return
 
+            # Re-render this url, so it's up-to-date.
+            url = self.path
+            url = url[len(base_path)+1:]
+            print 're-render {0}'.format(url)
+            render_url_statically(dict(cfg), url, '')
+
+            # Need to know whether htis is an html file or not because
+            # we need to translate the urls.
             self._type = self.guess_type(self.translate_path(self.path))
 
             SimpleHTTPRequestHandler.do_GET(self)
@@ -163,7 +173,9 @@ def cmd_serve(cfg, command, argv):
     host, port = host_port.split(':')
     port = int(port)
 
-    handler = generate_handler(cfg, host_port)
+    doug = build_douglas(cfg)
+
+    handler = generate_handler(doug, cfg, host_port)
 
     httpd = SocketServer.TCPServer((host, port), handler)
     print 'Serving at http://{0}:{1}'.format(host, port)

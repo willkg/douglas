@@ -70,7 +70,6 @@ class Douglas(object):
         # take off trailing slashes for datadir
         config['datadir'] = config["datadir"].rstrip('\\/')
 
-
     def cleanup(self):
         """This cleans up Douglas after a run.
 
