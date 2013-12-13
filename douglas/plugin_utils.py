@@ -5,7 +5,6 @@ for which callbacks are available and their behavior.
 """
 
 import os
-import glob
 import sys
 import os.path
 import traceback

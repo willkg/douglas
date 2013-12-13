@@ -92,7 +92,7 @@ class RendererBase(object):
 
         while args:
             key = args.pop(0).strip()
-            if key.find(' ') != -1 or key.find(':') != -1:
+            if ' ' in key or ':' in key:
                 raise ValueError('There should be no spaces in header keys')
             value = args.pop(0).strip()
             self._header.append( (key, value) )

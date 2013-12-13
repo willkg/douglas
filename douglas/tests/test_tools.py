@@ -13,25 +13,26 @@ req = app.Request({}, {}, {})
 class Testis_year(UnitTestBase):
     """tools.is_year"""
     def test_must_be_four_digits(self):
-        for mem in (("abab", 0),
-                    ("ab", 0),
-                    ("199", 0),
-                    ("19999", 0),
-                    ("1997", 1),
-                    ("2097", 1)):
+        for mem in (("abab", False),
+                    ("ab", False),
+                    ("199", False),
+                    ("19999", False),
+                    ("1997", True),
+                    ("2097", True)):
             self.eq_(tools.is_year(mem[0]), mem[1])
 
     def test_must_start_with_19_or_20(self):
-        for mem in (("3090", 0),
-                    ("0101", 0)):
+        for mem in (("3090", False),
+                    ("0101", False)):
             self.eq_(tools.is_year(mem[0]), mem[1])
 
     def test_everything_else_returns_false(self):
-        for mem in ((None, 0),
-                    ("", 0),
-                    ("ab", 0),
-                    ("97", 0)):
+        for mem in ((None, False),
+                    ("", False),
+                    ("ab", False),
+                    ("97", False)):
             self.eq_(tools.is_year(mem[0]), mem[1])
+
 
 class Test_generate_rand_str(UnitTestBase):
     """tools.generate_rand_str
@@ -55,6 +56,7 @@ class Test_generate_rand_str(UnitTestBase):
 
         for i in range(5):
             self._gen_checker(tools.generate_rand_str(3, 12), 3, 12)
+
 
 class Testescape_text(UnitTestBase):
     """tools.escape_text"""
@@ -87,6 +89,7 @@ class Testescape_text(UnitTestBase):
                     ("", ""),
                     ("abc", "abc")):
             self.eq_(tools.escape_text(mem[0]), mem[1])
+
 
 class Testurlencode_text(UnitTestBase):
     """tools.urlencode_text"""
@@ -141,6 +144,7 @@ class Testimportname(UnitTestBase):
     def test_badimport(self):
         self.eq_(tools.importname("", "foo"), None)
 
+
 class Testwhat_ext(UnitTestBase):
     """tools.what_ext"""
     def get_ext_dir(self):
@@ -173,28 +177,6 @@ class Testwhat_ext(UnitTestBase):
         self.eq_(tools.what_ext([], os.path.join(d, "a")), None)
         self.eq_(tools.what_ext(["html"], os.path.join(d, "a")), None)
 
-## class Testrun_callback:
-##     """tools.run_callback
-
-##     This tests run_callback functionality.
-##     """
-##     def test_run_callback(self):
-##         def fun1(args):
-##             eq_(args["x"], 0)
-##             return {"x": 1}
-
-##         def fun2(args):
-##             eq_(args["x"], 1)
-##             return {"x": 2}
-
-##         def fun3(args):
-##             eq_(args["x"], 2)
-##             return {"x": 3}
-
-##         args = {"x": 0}
-##         ret = tools.run_callback([fun1, fun2, fun3], args,
-##                                  mappingfunc=lambda x,y: y)
-##         eq_(ret["x"], 3)
 
 class Testconvert_configini_values(UnitTestBase):
     """tools.convert_configini_values

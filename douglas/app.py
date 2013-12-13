@@ -129,37 +129,6 @@ class Douglas(object):
         if compiling == False:
             self.cleanup()
 
-    def run_callback(self, callback='help'):
-        """This method executes the start callback (initializing
-        plugins), executes the requested callback, and then executes
-        the end callback.
-
-        This is useful for scripts outside of Douglas that need to
-        do things inside of the Douglas framework.
-
-        If you want to run a callback from a plugin, use
-        ``tools.run_callback`` instead.
-
-        :param callback: the name of the callback to execute.
-
-        :returns: the results of the callback.
-        """
-        self.initialize()
-
-        # run the start callback
-        tools.run_callback('start', {'request': self._request})
-
-        # invoke all callbacks for the 'callback'
-        handled = tools.run_callback(callback,
-                                     {'request': self._request},
-                                     mappingfunc=lambda x,y:x,
-                                     donefunc=lambda x:x)
-
-        # do end callback
-        tools.run_callback('end', {'request': self._request})
-
-        return handled
-
     def run_render_one(self, url, headers):
         """Renders a single page from the blog.
 
@@ -906,34 +875,34 @@ def blosxom_entry_parser(filename, request):
 
     entry_data = {}
 
-    f = open(filename, "r")
+    f = open(filename, 'r')
     lines = f.readlines()
     f.close()
 
     # the file has nothing in it...  so we're going to return a blank
     # entry data object.
     if len(lines) == 0:
-        return {"title": "", "body": ""}
+        return {'title': '', 'body': ''}
 
     # the first line is the title
-    entry_data["title"] = lines.pop(0).strip()
+    entry_data['title'] = lines.pop(0).strip()
 
     # absorb meta data lines which begin with a #
-    while lines and lines[0].startswith("#"):
+    while lines and lines[0].startswith('#'):
         meta = lines.pop(0)
         # remove the hash
         meta = meta[1:].strip()
-        meta = meta.split(" ", 1)
+        meta = meta.split(' ', 1)
         # if there's no value, we append a 1
         if len(meta) == 1:
-            meta.append("1")
+            meta.append('1')
         entry_data[meta[0].strip()] = meta[1].strip()
 
     # call the preformat function
     args = {'parser': entry_data.get('parser', config.get('parser', 'plain')),
             'story': lines,
             'request': request}
-    entry_data["body"] = tools.run_callback(
+    entry_data['body'] = tools.run_callback(
         'preformat',
         args,
         donefunc=lambda x: x != None,
@@ -988,7 +957,7 @@ def blosxom_file_list_handler(args):
                                    donefunc=lambda x: x != None,
                                    defaultfunc=blosxom_sort_list_handler)
 
-    args = {"request": request, "entry_list": entrylist}    
+    args = {"request": request, "entry_list": entrylist}
     entrylist = tools.run_callback("truncatelist",
                                    args,
                                    donefunc=lambda x: x != None,
@@ -1055,6 +1024,7 @@ def blosxom_process_path_info(args):
       in category.
 
     :param args: dict containing the incoming Request object
+
     """
     request = args['request']
     config = request.get_configuration()
@@ -1093,8 +1063,7 @@ def blosxom_process_path_info(args):
         data["theme"] = ext[1:]
         path_info = newpath
 
-    while path_info and path_info.startswith("/"):
-        path_info = path_info[1:]
+    path_info = path_info.lstrip('/')
 
     absolute_path = os.path.join(config["datadir"], path_info)
 
@@ -1144,8 +1113,8 @@ def blosxom_process_path_info(args):
             # (or something like that) so we pluck off the categories
             # here.
             pi_bl = ""
-            while len(path_info) > 0 and \
-                      not (len(path_info[0]) == 4 and path_info[0].isdigit()):
+            while (len(path_info) > 0
+                   and not (len(path_info[0]) == 4 and path_info[0].isdigit())):
                 pi_bl = os.path.join(pi_bl, path_info.pop(0))
 
             # handle the case where we do in fact have a category
@@ -1215,9 +1184,8 @@ def blosxom_process_path_info(args):
         data["truncate"] = False
 
 
-def run_douglas():
+def run_cgi(cfg):
     """Executes Douglas as a CGI script."""
-    from config import py as cfg
     env = {}
 
     # names taken from wsgi instead of inventing something new

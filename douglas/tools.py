@@ -378,12 +378,7 @@ def is_year(s):
     if not s:
         return False
 
-    if (len(s) == 4
-        and s.isdigit()
-        and s.startswith(('19', '20'))):
-
-        return True
-    return False
+    return re.compile(r'^(19|20)\d\d$').match(s) is not None
 
 
 def importname(modulename, name):

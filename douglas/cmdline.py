@@ -131,8 +131,7 @@ def generate_handler(doug, cfg, host_port):
                 return
 
             # Re-render this url, so it's up-to-date.
-            url = self.path
-            url = url[len(base_path)+1:]
+            url = self.path[len(base_path)+1:]
             print 're-render {0}'.format(url)
             render_url_statically(dict(cfg), url, '')
 
@@ -257,6 +256,7 @@ def cmd_generate(cfg, command, argv):
 def cmd_test(cfg, command, argv):
     """Tests installation and configuration for a blog."""
     # This:
+    #
     # 1. verifies config.py file properties
     # 2. initializes all the plugins they have installed
     # 3. runs ``cb_verify_installation``--plugins can print out whether
@@ -384,18 +384,14 @@ def cmd_create(command, argv):
     parser = build_parser("%prog create [options] <dir>")
     (options, args) = parser.parse_args(argv)
 
-    if args:
-        d = args[0]
-    else:
-        d = "."
+    verbose = options.verbose
+
+    d = args[0] if args else '.'
 
     if d == ".":
         d = "." + os.sep + "blog"
 
     d = os.path.abspath(d)
-
-    verbose = options.verbose
-
     if os.path.isfile(d) or os.path.isdir(d):
         pwrap_error("ERROR: Cannot create '%s'--something is in the way." % d)
         return 0
@@ -467,13 +463,13 @@ def cmd_create(command, argv):
 
 @with_config
 def cmd_renderurl(cfg, command, argv):
-    """Renders a single url of your blog."""
-    parser = build_parser("%prog renderurl [options] <url> [<url>...]")
+    """Renders a single url of your blog to stdout."""
+    parser = build_parser('%prog renderurl [options] <url> [<url>...]')
 
-    parser.add_option("--headers",
-                      action="store_true", dest="headers", default=False,
-                      help="Option that causes headers to be displayed "
-                      "when rendering a single url.")
+    parser.add_option('--headers',
+                      action='store_true', dest='headers', default=False,
+                      help='Option that causes headers to be displayed '
+                      'when rendering a single url.')
 
     (options, args) = parser.parse_args(argv)
 
@@ -515,8 +511,7 @@ def cmd_compile(cfg, command, argv):
 
 DEFAULT_HANDLERS = [
     (key[4:], fun, fun.__doc__)
-    for key, fun in globals().items()
-    if key.startswith('cmd_')
+    for key, fun in globals().items() if key.startswith('cmd_')
 ]
 
 

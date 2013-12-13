@@ -3,8 +3,13 @@ This is the debug renderer.  This is very useful for debugging plugins
 and templates.
 """
 
+import os
+
 from douglas.renderers.base import RendererBase
 from douglas import tools, plugin_utils
+
+
+HBAR = ('-' * 70) + '\n'
 
 
 def escv(s):
@@ -24,26 +29,33 @@ def escv(s):
 
     return tools.escape_text(s)
 
-def print_map(printfunc, keymap):
-    """
-    Takes a map of keys to values and applies the function f to a pretty
-    printed version of each key/value pair.
-
-    :param printfunc: function for printing
-
-    :param keymap: a mapping of key/value pairs
-    """
-    keys = keymap.keys()
-    keys.sort()
-    for key in keys:
-        printfunc("<font color=\"#0000ff\">%s</font> -&gt; %s\n" % \
-                  (escv(key), escv(keymap[key])))
-
 class Renderer(RendererBase):
     """
     This is the debug renderer.  This is very useful for debugging
     plugins and templates.
     """
+    def print_map(self, keymap):
+        """
+        Takes a map of keys to values and applies the function f to a pretty
+        printed version of each key/value pair.
+
+        :param printfunc: function for printing
+
+        :param keymap: a mapping of key/value pairs
+        """
+        keys = keymap.keys()
+        keys.sort()
+        for key in keys:
+            self.write("<font color=\"#0000ff\">%s</font> -&gt; %s\n" % \
+                       (escv(key), escv(keymap[key])))
+
+    def print_section(self, title, section=None):
+        self.write(HBAR)
+        self.write(title + '\n')
+        self.write(HBAR)
+        if section:
+            self.print_map(section)
+
     def render(self, render_headers=True):
         """
         Renders a douglas request after we've gone through all the
@@ -57,9 +69,6 @@ class Renderer(RendererBase):
         data = self._request.get_data()
         printout = self.write
 
-        hbar = "------------------------------------------------------\n"
-
-
         if render_headers:
             self.add_header('Content-type', 'text/html')
             self.show_headers()
@@ -70,22 +79,14 @@ class Renderer(RendererBase):
         printout("Welcome to debug mode!\n")
         printout("You requested the %(theme)s theme.\n" % data)
 
-        printout(hbar)
-        printout("HTTP return headers:\n")
-        printout(hbar)
+        self.print_section('HTTP return headers:')
         for k, v in self._header:
             printout("<font color=\"#0000ff\">%s</font> -&gt; %s\n" % \
                      (escv(k), escv(v)))
 
-        printout(hbar)
-        printout("The OS environment contains:\n")
-        printout(hbar)
-        import os
-        print_map(printout, os.environ)
+        self.print_section('The OS environment contains:', os.environ)
 
-        printout(hbar)
-        printout("Plugins:\n")
-        printout(hbar)
+        self.print_section('Plugins:')
         printout("Plugins that loaded:\n")
         if plugin_utils.plugins:
             for plugin in plugin_utils.plugins:
@@ -104,41 +105,26 @@ class Renderer(RendererBase):
         else:
             printout("None\n")
 
-        printout(hbar)
-        printout("Request.get_http() dict contains:\n")
-        printout(hbar)
-        print_map(printout, pyhttp)
+        self.print_section('Request.get_http() dict contains:', pyhttp)
+        self.print_section('Request.get_configuration() dict contains:', config)
+        self.print_section('Request.get_data() dict contains:', data)
 
-        printout(hbar)
-        printout("Request.get_configuration() dict contains:\n")
-        printout(hbar)
-        print_map(printout, config)
-
-        printout(hbar)
-        printout("Request.get_data() dict contains:\n")
-        printout(hbar)
-        print_map(printout, data)
-
-        printout(hbar)
-        printout("Entries to process:\n")
-        printout(hbar)
+        self.print_section('Entries to process:')
         for content in self._content:
             if not isinstance(content, str):
                 printout("%s\n" %
                          escv(content.get('filename', 'No such file\n')))
 
-        printout(hbar)
-        printout("Entries processed:\n")
-        printout(hbar)
+        self.print_section('Entries processed:')
         for content in self._content:
             if not isinstance(content, str):
-                printout(hbar)
+                printout(HBAR)
                 emsg = escv(content.get('filename', 'No such file\n'))
                 printout("Items for %s:\n" % emsg)
-                printout(hbar)
-                print_map(printout, content)
+                printout(HBAR)
+                self.print_map(content)
 
-        printout(hbar)
+        printout(HBAR)
 
         printout("</body>")
         printout("</html>")

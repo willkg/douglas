@@ -40,7 +40,7 @@ from config import py as cfg
 if cfg.has_key("codebase"):
     sys.path.insert(0, cfg["codebase"])
 
-from douglas.app import run_douglas
+from douglas.app import run_cgi
 
 if __name__ == '__main__':
-    run_douglas()
+    run_cgi(cfg)
