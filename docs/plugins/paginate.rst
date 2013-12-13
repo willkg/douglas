@@ -80,12 +80,12 @@ Configuration variables
    plugin and implement your own style.
 
 
-Note about static rendering
-===========================
+Note about compiling
+====================
 
-This plugin works fine with static rendering, but the urls look
-different. Instead of adding a ``page=4`` kind of thing to the
-querystring, this adds it to the url.
+This plugin works fine with compiling, but the urls look different.
+Instead of adding a ``page=4`` kind of thing to the querystring, this
+adds it to the url.
 
 For example, say your front page was ``/index.html`` and you had 5
 pages of entries. Then the urls would look like this::

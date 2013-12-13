@@ -11,8 +11,8 @@ def memcache_decorator(scope, instance=False):
     no expiration of cached data---it just hangs out in memory
     forever.
 
-    This is great for static rendering, but probably not for running
-    as a CGI/WSGI application.
+    This is great for compiling, but probably not for running as a
+    CGI/WSGI application.
 
     This is disabled by default. It must be explicitly enabled
     to have effect.
@@ -21,13 +21,14 @@ def memcache_decorator(scope, instance=False):
 
     1. the function arguments MUST be hashable--no dicts, lists, etc.
     2. this probably does not play well with
-       non-static-rendering--that should get checked.
+       non-compiling--that should get checked.
     3. TODO: the two arguments are poorly named--that should get fixed.
 
     :arg scope: string defining the scope. e.g. 'pycategories'.
     :arg instance: whether or not the function being decorated is
         bound to an instance (i.e. is the first argument "self" or
         "cls"?)
+
     """
     def _memcache(fun):
         def _memcache_decorated(*args, **kwargs):

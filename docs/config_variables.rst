@@ -679,9 +679,9 @@ behavior for loading plugins: ``plugin_dirs`` and ``load_plugins``.
       comes with those plugins.
 
 
-Static Rendering Configuration
-==============================
+Compiling Configuration
+=======================
 
-If you are using static rendering to deploy your Douglas blog you
+If you are using compiling to deploy your Douglas blog you
 need to set some additional configuration variables in your
-``config.py`` file, see :ref:`static-rendering`.
+``config.py`` file, see :ref:`compiling`.

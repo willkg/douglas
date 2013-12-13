@@ -156,40 +156,39 @@ py["load_plugins"] = [
 
 
 
-# Static rendering
-# ================
+# Compiling
+# =========
 
-# Doing static rendering?  Static rendering essentially "compiles" your
-# blog into a series of static html pages.  For more details, see the
-# documentation.
+# Planning to compile your blog to a static HTML site?  This is the
+# section for you!  For more details, see the documentation.
 # 
-# What directory do you want your static html pages to go into?
-py["static_dir"] = os.path.join(BLOGDIR, "compiled_site")
+# What directory do you want your compiled site to go into?
+py["compiledir"] = os.path.join(BLOGDIR, "compiled_site")
 
 # What themes should get generated?
-py["static_themes"] = ["html"]
+py["compile_themes"] = ["html"]
 
-# What other paths should we statically render?
+# What other paths should we compileally render?
 # This is for additional urls handled by other plugins like the booklist
 # and plugin_info plugins.  If there are multiple themes you want
 # to capture, specify each:
-# ex: py["static_urls"] = ["/booklist.rss", "/booklist.html"]
-# py["static_urls"] = ["/path/to/url1", "/path/to/url2"]
+# ex: py["compile_urls"] = ["/booklist.rss", "/booklist.html"]
+# py["compile_urls"] = ["/path/to/url1", "/path/to/url2"]
 
-py["static_index_themes"] = ["html", "rss"]
+# What themes should index pages be compiled with?
+py["compile_index_themes"] = ["html", "rss"]
 
+# Whether (True) or not (False) you want to generate day-based
+# indexes?  (ex. /2004/04/01)  Defaults to False.
+py["compile_day_indexes"] = False
 
-# Whether (True) or not (False) you want to generate date indexes with month
-# names?  (ex. /2004/Apr/01)  Defaults to True.
-py["static_monthnames"] = False
+# Whether (True) or not (False) you want to generate month-based
+# indexes?  (ex. /2004/04)  Defaults to False.
+py["compile_month_indexes"] = False
 
-# Whether (True) or not (False) you want to generate date indexes
-# using month numbers?  (ex. /2004/04/01)  Defaults to False.
-py["static_monthnumbers"] = False
-
-# Whether (True) or not (False) you want to generate year indexes?
-# (ex. /2004)  Defaults to True.
-py["static_yearindexes"] = True
+# Whether (True) or not (False) you want to generate year-based
+# indexes?  (ex. /2004)  Defaults to True.
+py["compile_year_indexes"] = True
 
 
 # Plugins

@@ -1,4 +1,3 @@
-import locale
 import os
 import os.path
 import re
@@ -12,69 +11,8 @@ import urllib
 from douglas import plugin_utils
 
 
-# Note: month names tend to differ with locale
-
-# month name (Jan) to number (1)
-month2num = None
-# month number (1) to name (Jan)
-num2month = None
-# list of all month numbers and names
-MONTHS    = None
-
-
-def initialize():
-    """Initializes locale-ish things.
-
-    This should be called from ``douglas.app.Douglas.initialize`` after
-    locale has been set.
-
-    """
-    # Month names tend to differ with locale
-    global month2num
-
-    try:
-        month2num = {
-            'nil' : '00',
-            locale.nl_langinfo(locale.ABMON_1) : '01',
-            locale.nl_langinfo(locale.ABMON_2) : '02',
-            locale.nl_langinfo(locale.ABMON_3) : '03',
-            locale.nl_langinfo(locale.ABMON_4) : '04',
-            locale.nl_langinfo(locale.ABMON_5) : '05',
-            locale.nl_langinfo(locale.ABMON_6) : '06',
-            locale.nl_langinfo(locale.ABMON_7) : '07',
-            locale.nl_langinfo(locale.ABMON_8) : '08',
-            locale.nl_langinfo(locale.ABMON_9) : '09',
-            locale.nl_langinfo(locale.ABMON_10) : '10',
-            locale.nl_langinfo(locale.ABMON_11) : '11',
-            locale.nl_langinfo(locale.ABMON_12) : '12'
-        }
-
-    except AttributeError:
-        # Windows doesn't have nl_langinfo, so we use one that
-        # only return English.
-        # FIXME - need a better hack for this issue.
-        month2num = {
-            'nil': '00',
-            "Jan": '01',
-            "Feb": '02',
-            "Mar": '03',
-            "Apr": '04',
-            "May": '05',
-            "Jun": '06',
-            "Jul": '07',
-            "Aug": '08',
-            "Sep": '09',
-            "Oct": '10',
-            "Nov": '11',
-            "Dec": '12'
-        }
-
-    global num2month
-    num2month = dict(zip(month2num.itervalues(), month2num))
-
-    # all the valid month possibilities
-    global MONTHS
-    MONTHS = num2month.keys() + month2num.keys()
+MONTHS = ['01', '02', '03', '04', '05', '06',
+          '07', '08', '09', '10', '11', '12']
 
 
 def pwrap(s):
@@ -440,8 +378,10 @@ def is_year(s):
     if not s:
         return False
 
-    if len(s) == 4 and s.isdigit() and \
-            (s.startswith("19") or s.startswith("20")):
+    if (len(s) == 4
+        and s.isdigit()
+        and s.startswith(('19', '20'))):
+
         return True
     return False
 
@@ -460,20 +400,20 @@ def importname(modulename, name):
     if not modulename:
         m = name
     else:
-        m = "%s.%s" % (modulename, name)
+        m = '%s.%s' % (modulename, name)
 
     try:
         module = __import__(m)
-        for c in m.split(".")[1:]:
+        for c in m.split('.')[1:]:
             module = getattr(module, c)
         return module
 
     except ImportError, ie:
-        logger.error("Module %s in package %s won't import: %s" % \
+        logger.error('Module %s in package %s won\'t import: %s' % \
                      (repr(modulename), repr(name), ie))
 
     except StandardError, e:
-        logger.error("Module %s not in in package %s: %s" % \
+        logger.error('Module %s not in in package %s: %s' % \
                      (repr(modulename), repr(name), e))
 
     return None
@@ -606,13 +546,13 @@ def create_entry(datadir, category, filename, mtime, title, metadata, body):
     """
 
     # format the metadata lines for the entry
-    metadatalines = ["#%s %s" % (key, metadata[key])
+    metadatalines = ['#{0} {1}'.format(key, metadata[key])
                      for key in metadata.keys()]
 
     if not title.endswith('\n'):
         title = title + '\n'
 
-    entry = title + "\n".join(metadatalines) + body
+    entry = title + '\n'.join(metadatalines) + body
 
     # create the category directories
     d = os.path.join(datadir, category)
@@ -620,51 +560,18 @@ def create_entry(datadir, category, filename, mtime, title, metadata, body):
         os.makedirs(d)
 
     if not os.path.isdir(d):
-        raise IOError("%s exists, but isn't a directory." % d)
+        raise IOError('{0} exists, but is not a directory.'.format(d))
 
     # create the filename
     fn = os.path.join(datadir, category, filename)
 
     # write the entry to disk
-    f = open(fn, "w")
+    f = open(fn, 'w')
     f.write(entry)
     f.close()
 
     # set the mtime on the entry
     os.utime(fn, (mtime, mtime))
-
-
-def update_static_entry(cdict, entry_filename):
-    """
-    This is a utility function that allows plugins to easily update
-    statically rendered entries without going through all the
-    rigamarole.
-
-    First we figure out whether this blog is set up for static
-    rendering.  If not, then we return--no harm done.
-
-    If we are, then we call ``render_url`` for each ``static_theme``
-    of the entry and then for each ``static_theme`` of the index
-    page.
-
-    :param cdict: the config.py dict
-    :param entry_filename: the url path of the entry to be updated;
-                           example: ``/movies/xmen2``
-    """
-    staticdir = cdict.get("static_dir", "")
-
-    if not staticdir:
-        return
-
-    staticthemes = cdict.get("static_themes", ["html"])
-
-    renderme = []
-    for mem in staticthemes:
-        renderme.append("/index" + "." + mem, "")
-        renderme.append(entry_filename + "." + mem, "")
-
-    for mem in renderme:
-        render_url_statically(cdict, mem[0], mem[1])
 
 
 def render_url_statically(cfg, url, querystring):
@@ -674,22 +581,23 @@ def render_url_statically(cfg, url, querystring):
     :param cfg: config dict
     :param url: url to render
     :param querystring: querystring of the url to render or ""
-    """
-    staticdir = cfg.get("static_dir", "")
 
-    # if there is no staticdir, then they're not set up for static
-    # rendering.
-    if not staticdir:
-        raise Exception("You must set static_dir in your config file.")
+    """
+    compiledir = cfg.get("compile_dir", "")
+
+    # If there is no compile_dir, then they're not set up for
+    # compiling.
+    if not compiledir:
+        raise Exception("You must set compile_dir in your config file.")
 
     response = render_url(cfg, url, querystring)
     response.seek(0)
 
-    fn = os.path.normpath(staticdir + os.sep + url)
+    fn = os.path.normpath(compiledir + os.sep + url)
     if not os.path.isdir(os.path.dirname(fn)):
         os.makedirs(os.path.dirname(fn))
 
-    # by using the response object the cheesy part of removing the
+    # By using the response object the cheesy part of removing the
     # HTTP headers from the file is history.
     f = open(fn, "w")
     f.write(response.read())
@@ -699,37 +607,38 @@ def render_url_statically(cfg, url, querystring):
 def render_url(cdict, pathinfo, querystring=""):
     """
     Takes a url and a querystring and renders the page that
-    corresponds with that by creating a Request and a douglas object
+    corresponds with that by creating a Request and a Douglas object
     and passing it through.  It then returns the resulting Response.
 
     :param cdict: the config.py dict
     :param pathinfo: the ``PATH_INFO`` string;
-                     example: ``/dev/douglas/firstpost.html``
+        example: ``/dev/douglas/firstpost.html``
     :param querystring: the querystring (if any); example: debug=yes
 
     :returns: a douglas ``Response`` object.
+
     """
     from douglas.app import Douglas
 
     if querystring:
-        request_uri = pathinfo + "?" + querystring
+        request_uri = pathinfo + '?' + querystring
     else:
         request_uri = pathinfo
 
     env = {
-        "HTTP_HOST": "localhost",
-        "HTTP_REFERER": "",
-        "HTTP_USER_AGENT": "static renderer",
-        "PATH_INFO": pathinfo,
-        "QUERY_STRING": querystring,
-        "REMOTE_ADDR": "",
-        "REQUEST_METHOD": "GET",
-        "REQUEST_URI": request_uri,
-        "SCRIPT_NAME": "",
-        "wsgi.errors": sys.stderr,
-        "wsgi.input": None
+        'HTTP_HOST': 'localhost',
+        'HTTP_REFERER': '',
+        'HTTP_USER_AGENT': 'static renderer',
+        'PATH_INFO': pathinfo,
+        'QUERY_STRING': querystring,
+        'REMOTE_ADDR': '',
+        'REQUEST_METHOD': 'GET',
+        'REQUEST_URI': request_uri,
+        'SCRIPT_NAME': '',
+        'wsgi.errors': sys.stderr,
+        'wsgi.input': None
     }
-    data = {"STATIC": 1}
+    data = {'COMPILING': 1}
     p = Douglas(cdict, env, data)
     p.run(static=True)
     return p.get_response()

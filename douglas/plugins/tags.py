@@ -1,5 +1,4 @@
-"""
-Summary
+"""Summary
 =======
 
 This is a tags plugin.  It uses douglas's command line abilities to
@@ -195,8 +194,8 @@ or updating an entry or you should rebuild the tags file as a cron job.
 
 .. Note::
 
-   If you're using static rendering, you need to build the tags
-   index before you statically render your blog.
+   If you're compiling your blog, you need to build the tags index
+   before you compile.
 
 
 Converting from categories to tags
@@ -224,6 +223,7 @@ from the directory your ``config.py`` is in or::
     douglas-cmd categorytotags --config=/path/to/config/file
 
 from anywhere.
+
 """
 
 __description__ = "Tags plugin"
@@ -552,7 +552,7 @@ def cb_story(args):
     return args
 
 
-def cb_staticrender_filelist(args):
+def cb_compile_filelist(args):
     req = args["request"]
 
     # We call our own cb_start() here because we need to initialize
@@ -563,7 +563,7 @@ def cb_staticrender_filelist(args):
     filelist = args["filelist"]
 
     tagsdata = req.get_data()["tagsdata"]
-    index_themes = config.get("static_index_themes", ["html"])
+    index_themes = config.get("compile_index_themes", ["html"])
     trigger = "/" + config.get("tags_trigger", "tag")
 
     # Go through and add an index for each index_theme for each tag.

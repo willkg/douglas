@@ -7,10 +7,12 @@ What is this?
 
 Douglas is a file-based blog system written in Python with the following features:
 
-* static renderer
+* compiler
 * WSGI application
+* runs as a CGI script (woo-hoo!)
 * plugin system for easy adjustment of transforms
 * Jinja renderer
+* basic set of built-in plugins
 
 Douglas is based on `Pyblosxom <http://pyblosxom.github.io>`_.
 
@@ -22,7 +24,7 @@ Requirements
 * possibly other requirements depending on what plugins you install
 
 
-Quickstart for static rendering
+Quickstart for compiling
 ===============================
 
 1. Create a virtual environment
@@ -42,7 +44,7 @@ Quickstart for static rendering
 
 6. Change directories to ``mynewblog`` and then render the site::
 
-       douglas-cmd staticrender
+       douglas-cmd compile
 
 7. Copy the files from the ``compiled_site/`` dir to where they're
    available for serving by your web server.

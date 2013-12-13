@@ -116,9 +116,9 @@ For example, this is at the top of Will's wbgpager plugin::
    That should be it!
 
 
-   Note: This plugin doesn't work particularly well with static rendering.
+   Note: This plugin doesn't work particularly well with compiling.
    The problem is that it relies on the querystring to figure out which
-   page to show and when you're static rendering, only the first page
+   page to show and when you're compiling, only the first page
    is rendered.  This will require a lot of thought to fix.  If you are
    someone who is passionate about fixing this issue, let me know.
 

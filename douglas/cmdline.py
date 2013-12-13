@@ -89,7 +89,7 @@ def generate_handler(doug, cfg, host_port):
     """Creates a closure so our DouglasHTTPRequestHandler has what it needs"""
     base_url = cfg.get('base_url', '/')
     base_path = urlparse(base_url).path.lstrip('/')
-    staticdir = cfg['static_dir']
+    compiled_dir = cfg['compiled_dir']
     default_theme = cfg.get('default_theme', 'html')
     serving_base_url = 'http://{0}/{1}'.format(host_port, base_path)
 
@@ -106,7 +106,7 @@ def generate_handler(doug, cfg, host_port):
                 newpath = newpath[len(base_path):]
 
             newpath = newpath.lstrip('/')
-            newpath = os.path.join(staticdir, newpath)
+            newpath = os.path.join(compiled_dir, newpath)
 
             # If the path doesn't exist, try the path with the
             # default_theme tacked on.
@@ -493,13 +493,12 @@ def cmd_renderurl(cfg, command, argv):
 
 
 @with_config
-def cmd_staticrender(cfg, command, argv):
-    """Statically renders your blog into an HTML site."""
-    parser = build_parser("%prog staticrender [options]")
-    parser.add_option("--incremental",
-                      action="store_true", dest="incremental", default=False,
-                      help="Option that causes static rendering to be "
-                      "incremental.")
+def cmd_compile(cfg, command, argv):
+    """Compiles your blog into a static HTML site."""
+    parser = build_parser('%prog compile [options]')
+    parser.add_option('--incremental',
+                      action='store_true', dest='incremental', default=False,
+                      help='Option that causes compiling to be incremental.')
 
     (options, args) = parser.parse_args(argv)
 
@@ -511,7 +510,7 @@ def cmd_staticrender(cfg, command, argv):
     if not p:
         return 0
 
-    return p.run_static_renderer(options.incremental)
+    return p.run_compile(options.incremental)
 
 
 DEFAULT_HANDLERS = [

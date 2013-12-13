@@ -76,12 +76,11 @@ class Douglas(object):
         This should be called when Douglas has done everything it
         needs to do before exiting.
         """
-        # log some useful stuff for debugging
-        # this will only be logged if the log_level is "debug"
+        # Log some useful stuff for debugging.
         log = tools.logging.getLogger()
         response = self.get_response()
-        log.debug("status = %s" % response.status)
-        log.debug("headers = %s" % response.headers)
+        log.debug('status = %s' % response.status)
+        log.debug('headers = %s' % response.headers)
 
     def get_request(self):
         """Returns the Request object for this Douglas instance.
@@ -93,27 +92,27 @@ class Douglas(object):
         """
         return self._request.get_response()
 
-    def run(self, static=False):
+    def run(self, compiling=False):
         """This is the main loop for Douglas.  This method will run
         the handle callback to allow registered handlers to handle the
         request.  If nothing handles the request, then we use the
         ``default_blosxom_handler``.
 
-        :param static: True if Douglas should execute in "static rendering
-                       mode" and False otherwise.
+        :param compiling: True if Douglas should execute in compiling
+            mode and False otherwise.
         """
         self.initialize()
 
-        # buffer the input stream in a StringIO instance if dynamic
+        # Buffer the input stream in a StringIO instance if dynamic
         # rendering is used.  This is done to have a known/consistent
         # way of accessing incomming data.
-        if static == False:
+        if compiling == False:
             self.get_request().buffer_input_stream()
 
-        # run the start callback
+        # Run the start callback
         tools.run_callback("start", {'request': self._request})
 
-        # allow anyone else to handle the request at this point
+        # Allow anyone else to handle the request at this point
         handled = tools.run_callback("handle",
                         {'request': self._request},
                         mappingfunc=lambda x,y:x,
@@ -122,15 +121,15 @@ class Douglas(object):
         if not handled == 1:
             blosxom_handler(self._request)
 
-        # do end callback
+        # Do end callback
         tools.run_callback("end", {'request': self._request})
 
-        # we're done, clean up.
-        # only call this if we're not in static rendering mode.
-        if static == False:
+        # We're done, clean up.  Only call this if we're not in
+        # compiling mode.
+        if compiling == False:
             self.cleanup()
 
-    def run_callback(self, callback="help"):
+    def run_callback(self, callback='help'):
         """This method executes the start callback (initializing
         plugins), executes the requested callback, and then executes
         the end callback.
@@ -148,7 +147,7 @@ class Douglas(object):
         self.initialize()
 
         # run the start callback
-        tools.run_callback("start", {'request': self._request})
+        tools.run_callback('start', {'request': self._request})
 
         # invoke all callbacks for the 'callback'
         handled = tools.run_callback(callback,
@@ -157,7 +156,7 @@ class Douglas(object):
                                      donefunc=lambda x:x)
 
         # do end callback
-        tools.run_callback("end", {'request': self._request})
+        tools.run_callback('end', {'request': self._request})
 
         return handled
 
@@ -191,42 +190,44 @@ class Douglas(object):
         # we're done, clean up
         self.cleanup()
 
-    def run_static_renderer(self, incremental=False):
-        """This will go through all possible things in the blog and
-        statically render everything to the ``static_dir`` specified
-        in the config file.
+    def run_compile(self, incremental=False):
+        """Compiles the blog into an HTML site.
+
+        This will go through all possible things in the blog and
+        compile the blog to the ``compiledir`` specified in the config
+        file.
 
         This figures out all the possible ``path_info`` settings and
         calls ``self.run()`` a bazillion times saving each file.
 
-        :param incremental: Whether (True) or not (False) to
-                            incrementally render the pages.  If we're
-                            incrementally rendering pages, then we
-                            render only the ones that have changed.
+        :param incremental: Whether (True) or not (False) to compile
+            incrementally. If we're incrementally compiling, then only
+            the urls that are likely to have changed get re-compiled.
+
         """
         self.initialize()
 
         config = self._request.get_configuration()
-        print "Performing static rendering."
-        if incremental:
-            print "Incremental is set."
+        compiledir = config.get('compiledir', '')
+        datadir = config['datadir']
 
-        staticdir = config.get("static_dir", "")
-        datadir = config["datadir"]
-
-        if not staticdir:
-            print "Error: You must set static_dir in your config file."
+        if not compiledir:
+            print 'Error: You must set compiledir in your config file.'
             return 0
 
-        themes = config.get("static_themes", ["html"])
-        index_themes = config.get("static_index_themes", ["html"])
+        print 'Compiling to {0}.'.format(compiledir)
+        if incremental:
+            print 'Incremental is set.'
+
+
+        themes = config.get('compile_themes', ['html'])
+        index_themes = config.get('compile_index_themes', ['html'])
+
+        dayindexes = config.get('compile_day_indexes', False)
+        monthindexes = config.get('compile_year_indexes', False)
+        yearindexes = config.get('compile_yearindexes', True)
 
         renderme = []
-
-        monthnames = config.get("static_monthnames", True)
-        monthnumbers = config.get("static_monthnumbers", False)
-        yearindexes = config.get("static_yearindexes", True)
-
         dates = {}
         categories = {}
 
@@ -235,29 +236,28 @@ class Douglas(object):
 
         for mem in listing:
             # skip the ones that have bad extensions
-            ext = mem[mem.rfind(".")+1:]
-            if not ext in config["extensions"].keys():
+            ext = mem[mem.rfind('.')+1:]
+            if not ext in config['extensions'].keys():
                 continue
 
             # grab the mtime of the entry file
             mtime = time.mktime(tools.filestat(self._request, mem))
 
             # remove the datadir from the front and the bit at the end
-            mem = mem[len(datadir):mem.rfind(".")]
+            mem = mem[len(datadir):mem.rfind('.')]
 
-            # this is the static filename
-            fn = os.path.normpath(staticdir + mem)
+            # this is the compiled filename
+            fn = os.path.normpath(compiledir  + mem)
 
-            # grab the mtime of one of the statically rendered file
+            # grab the mtime of one of compiled files
             try:
-                smtime = os.stat(fn + "." + themes[0])[8]
-            except:
+                smtime = os.stat(fn + '.' + themes[0])[8]
+            except IOError:
                 smtime = 0
 
-            # if the entry is more recent than the static, we want to
-            # re-render
+            # if the entry is more recent than the compiled version,
+            # we want to re-compile.
             if smtime < mtime or not incremental:
-
                 # grab the categories
                 temp = os.path.dirname(mem).split(os.sep)
                 for i in range(len(temp)+1):
@@ -266,77 +266,70 @@ class Douglas(object):
 
                 # grab the date
                 mtime = time.localtime(mtime)
-                year = time.strftime("%Y", mtime)
-                month = time.strftime("%m", mtime)
-                day = time.strftime("%d", mtime)
+                year = time.strftime('%Y', mtime)
+                month = time.strftime('%m', mtime)
+                day = time.strftime('%d', mtime)
 
                 if yearindexes:
                     dates[year] = 1
 
-                if monthnumbers:
-                    dates[year + "/" + month] = 1
-                    dates[year + "/" + month + "/" + day] = 1
+                if monthindexes:
+                    dates[year + '/' + month] = 1
 
-                if monthnames:
-                    monthname = tools.num2month[month]
-                    dates[year + "/" + monthname] = 1
-                    dates[year + "/" + monthname + "/" + day] = 1
+                if dayindexes:
+                    dates[year + '/' + month + '/' + day] = 1
 
                 # toss in the render queue
                 for f in themes:
-                    renderme.append((mem + "." + f, ""))
+                    renderme.append((mem + '.' + f, ''))
 
-        print "rendering %d entries." % len(renderme)
+        print 'Rendering {0} entries.'.format(len(renderme))
 
-        # handle categories
-        categories = categories.keys()
-        categories.sort()
+        if categories:
+            categories = sorted(categories.keys())
 
-        # if they have stuff in their root category, it'll add a "/"
-        # to the category list and we want to remove that because it's
-        # a duplicate of "".
-        if "/" in categories:
-            categories.remove("/")
+            # if they have stuff in their root category, it'll add a "/"
+            # to the category list and we want to remove that because it's
+            # a duplicate of "".
+            if '/' in categories:
+                categories.remove('/')
 
-        print "rendering %d category indexes." % len(categories)
+            print 'Rendering {0} category indexes.'.format(len(categories))
 
-        for mem in categories:
-            mem = os.path.normpath(mem + "/index.")
-            for f in index_themes:
-                renderme.append((mem + f, ""))
+            for mem in categories:
+                mem = os.path.normpath(mem + '/index.')
+                for f in index_themes:
+                    renderme.append((mem + f, ''))
 
-        # now we handle dates
-        dates = dates.keys()
-        dates.sort()
+        if dates:
+            dates = ['/' + d for d in sorted(dates.keys())]
 
-        dates = ["/" + d for d in dates]
+            print 'Rendering {0} date indexes.'.format(len(dates))
 
-        print "rendering %d date indexes." % len(dates)
+            for mem in dates:
+                mem = os.path.normpath(mem + '/index.')
+                for f in index_themes:
+                    renderme.append((mem + f, ''))
 
-        for mem in dates:
-            mem = os.path.normpath(mem + "/index.")
-            for f in index_themes:
-                renderme.append((mem + f, ""))
+        additional_stuff = config.get('compile_urls', [])
+        if additional_stuff:
+            print 'Rendering {0} arbitrary urls.'.format(len(additional_stuff))
 
-        # now we handle arbitrary urls
-        additional_stuff = config.get("static_urls", [])
-        print "rendering %d arbitrary urls." % len(additional_stuff)
+            for mem in additional_stuff:
+                if mem.find('?') != -1:
+                    url = mem[:mem.find('?')]
+                    query = mem[mem.find('?')+1:]
+                else:
+                    url = mem
+                    query = ''
 
-        for mem in additional_stuff:
-            if mem.find("?") != -1:
-                url = mem[:mem.find("?")]
-                query = mem[mem.find("?")+1:]
-            else:
-                url = mem
-                query = ""
+                renderme.append((url, query))
 
-            renderme.append((url, query))
-
-        # now we pass the complete render list to all the plugins via
-        # cb_staticrender_filelist and they can add to the filelist
-        # any (url, query) tuples they want rendered.
-        print "(before) building %s files." % len(renderme)
-        tools.run_callback("staticrender_filelist",
+        # Pass the complete render list to all the plugins via
+        # cb_compile_filelist and they can add to the filelist any
+        # (url, query) tuples they want rendered.
+        print '(before) building %s files.' % len(renderme)
+        tools.run_callback('compile_filelist',
                            {'request': self._request,
                             'filelist': renderme,
                             'themes': themes,
@@ -344,11 +337,11 @@ class Douglas(object):
 
         renderme = sorted(set(renderme))
 
-        print "building %s files." % len(renderme)
+        print 'Building {0} files total.'.format(len(renderme))
 
         for url, q in renderme:
-            url = url.replace(os.sep, "/")
-            print "rendering '%s' ..." % url
+            url = url.replace(os.sep, '/')
+            print 'Rendering %s ...'.format(url)
 
             tools.render_url_statically(dict(config), url, q)
 
@@ -365,9 +358,6 @@ def initialize(cfg):
         except locale.Error:
             # invalid locale
             pass
-
-    # initialize the tools module
-    tools.initialize()
 
     # import and initialize plugins
     plugin_utils.initialize_plugins(
@@ -538,8 +528,8 @@ class Request(object):
             self._data = data
 
         # this holds the input stream.  initialized for dynamic
-        # rendering in Douglas.run.  for static rendering there is
-        # no input stream.
+        # rendering in Douglas.run.  for compiling there is no input
+        # stream.
         self._in = StringIO()
 
         # copy methods to the Request object.
@@ -993,10 +983,9 @@ def blosxom_file_list_handler(args):
 
     # if we're looking at a set of archives, remove all the entries
     # that aren't in the archive
-    if data.get("pi_yr", ""):
-        tmp_pi_mo = data.get("pi_mo", "")
-        datestr = "%s%s%s" % (data.get("pi_yr", ""),
-                              tools.month2num.get(tmp_pi_mo, tmp_pi_mo),
+    if data.get("pi_yr"):
+        datestr = "%s%s%s" % (data["pi_yr"],
+                              data.get("pi_mo", ""),
                               data.get("pi_da", ""))
         entrylist = [x for x in entrylist
                      if time.strftime("%Y%m%d%H%M%S", x["timetuple"]).startswith(datestr)]

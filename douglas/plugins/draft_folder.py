@@ -135,7 +135,7 @@ def cb_filelist(args):
     return [fe]
 
 
-def cb_staticrender_filelist(args):
+def cb_compile_filelist(args):
     req = args["request"]
 
     config = req.get_configuration()
@@ -155,7 +155,7 @@ def cb_staticrender_filelist(args):
     if not drafts:
         return
 
-    themes = config.get('static_themes', ['html'])
+    themes = config.get('compile_themes', ['html'])
     trigger = '/' + config.get('draft_trigger', TRIGGER)
 
     for mem in drafts:

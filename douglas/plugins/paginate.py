@@ -1,5 +1,4 @@
-"""
-Summary
+"""Summary
 =======
 
 Plugin for paging long index pages.
@@ -70,12 +69,12 @@ Configuration variables
    plugin and implement your own style.
 
 
-Note about static rendering
-===========================
+Note about compiling
+====================
 
-This plugin works fine with static rendering, but the urls look
-different. Instead of adding a ``page=4`` kind of thing to the
-querystring, this adds it to the url.
+This plugin works fine with compiling, but the urls look different.
+Instead of adding a ``page=4`` kind of thing to the querystring, this
+adds it to the url.
 
 For example, say your front page was ``/index.html`` and you had 5
 pages of entries. Then the urls would look like this::
@@ -181,9 +180,9 @@ def page(request, num_entries, entry_list):
     url = http.get('REQUEST_URI', http.get('HTTP_REQUEST_URI', ''))
     url_template = url
 
-    if data.get('STATIC'):
-        # This is the static rendering case, so we have to do some
-        # fancy footwork to get this to work correctly.
+    if data.get('COMPILING'):
+        # This is the compiling case, so we have to do some fancy
+        # footwork to get this to work correctly.
 
         try:
             page = data['paginate_page']
@@ -249,13 +248,12 @@ def page(request, num_entries, entry_list):
         url_template, url_template_n, page, max_pages, count_from, previous_text,
         next_text, linkstyle)
 
-    # If we're static rendering and there wasn't a page specified
-    # and this is one of the themes to statically render, then
-    # this is the first page and we need to render all the rest of
-    # the pages, so we do that here.
-    static_themes = config.get('static_themes', ['html'])
-    if ((data.get('STATIC') and page == count_from
-         and data.get('theme') in static_themes)):
+    # If we're compiling and there wasn't a page specified and this is
+    # one of the themes to compile, then this is the first page and we
+    # need to render all the rest of the pages, so we do that here.
+    compile_themes = config.get('compile_themes', ['html'])
+    if ((data.get('COMPILING') and page == count_from
+         and data.get('theme') in compile_themes)):
         # Turn http://example.com/index.html into
         # http://example.com/index_page5.html for each page.
         url = url.split('/')
@@ -282,8 +280,8 @@ def cb_pathinfo(args):
     request = args['request']
     data = request.get_data()
 
-    # This only kicks in during static rendering.
-    if not data.get('STATIC'):
+    # This only kicks in during compiling.
+    if not data.get('COMPILING'):
         return
 
     http = request.get_http()

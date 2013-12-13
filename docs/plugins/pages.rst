@@ -106,12 +106,8 @@ Template
 
 pages formats the page using the ``pages`` template.  So you need a
 ``pages`` template in the themes that you want these pages to be
-rendered in.  I copy my ``story`` template and remove some bits.
-
-For example, if you're using the html theme and that is stored in
-``/home/foo/blog/themes/html/``, then you could copy the
-``story`` file in that directory to ``pages`` and that would become
-your ``pages`` template.
+rendered in.  If you want your pages rendered exactly like an entry,
+just extend the ``entry`` template.
 
 
 Python code blocks

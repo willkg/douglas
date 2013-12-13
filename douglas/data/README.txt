@@ -7,10 +7,10 @@ To compile blog
 
 To render your blog:
 
-    douglas-cmd staticrender
+    douglas-cmd compile
 
-This will render your blog to the directory specified by "static_dir"
-in your config.py file.
+This will compile your blog to the directory specified by "compiledir" in your
+config.py file.
 
 
 To create an entry

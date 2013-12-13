@@ -26,7 +26,7 @@ purposes.
    deploy_paste
    deploy_apache_mod_wsgi
    deploy_lighttpd_fastcgi
-   deploy_staticrendering
+   deploy_compiled
    config_variables
    writing_entries
    themes_and_templates

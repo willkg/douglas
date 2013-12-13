@@ -636,12 +636,12 @@ Functions that implement this callback don't need to return anything.
    or not.  This is slightly different than blosxom.
 
 
-cb_staticrender_filelist
-------------------------
+cb_compile_filelist
+-------------------
 
 Gives plugins a chance to modify the list of (url, query) tuples that
-are about to be rendered statically.  Plugins can add additional
-tuples, remove tuples, modify tuples, ...
+are about to be compiled.  Plugins can add additional tuples, remove
+tuples, modify tuples, ...
 
 Functions that implement this callback will get an args dict
 containing:
@@ -656,7 +656,7 @@ containing:
     list of themes to be rendered
 
 ``incremental``
-    whether (true) or not (false) this is an incremental static rendering
+    whether (true) or not (false) this is an incremental compile
     run
 
 Functions that implement this callback can modify the filelist
@@ -665,6 +665,6 @@ in-place and don't have to return anything.
 Example in which the plugin adds the search page url so that the
 search page gets rendered::
 
-   def cb_staticrender_filelist(args):
+   def cb_compile_filelist(args):
        filelist = args["filelist"]
        filelist.append(("/search", ""))

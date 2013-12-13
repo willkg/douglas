@@ -5,10 +5,6 @@ from douglas.tests import UnitTestBase
 
 class Testpathinfo(UnitTestBase):
     """This tests default parsing of the path."""
-    def setUp(self):
-        UnitTestBase.setUp(self)
-        tools.initialize()
-
     def _basic_test(self, pathinfo, expected, cfg=None, http=None, data=None):
         _http = {"PATH_INFO": pathinfo}
         if http:

@@ -205,8 +205,8 @@ or updating an entry or you should rebuild the tags file as a cron job.
 
 .. Note::
 
-   If you're using static rendering, you need to build the tags
-   index before you statically render your blog.
+   If you're compiling your blog, you need to build the tags index
+   before you compile.
 
 
 Converting from categories to tags
