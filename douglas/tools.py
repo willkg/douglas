@@ -578,12 +578,12 @@ def render_url_statically(cfg, url, querystring):
     :param querystring: querystring of the url to render or ""
 
     """
-    compiledir = cfg.get("compile_dir", "")
+    compiledir = cfg.get("compiledir", "")
 
     # If there is no compile_dir, then they're not set up for
     # compiling.
     if not compiledir:
-        raise Exception("You must set compile_dir in your config file.")
+        raise Exception("You must set compiledir in your config file.")
 
     response = render_url(cfg, url, querystring)
     response.seek(0)
@@ -592,11 +592,9 @@ def render_url_statically(cfg, url, querystring):
     if not os.path.isdir(os.path.dirname(fn)):
         os.makedirs(os.path.dirname(fn))
 
-    # By using the response object the cheesy part of removing the
-    # HTTP headers from the file is history.
-    f = open(fn, "w")
-    f.write(response.read())
-    f.close()
+    # Write just the response data to the file skipping the headers.
+    with open(fn, 'w') as fp:
+        fp.write(response.read())
 
 
 def render_url(cdict, pathinfo, querystring=""):
@@ -635,7 +633,7 @@ def render_url(cdict, pathinfo, querystring=""):
     }
     data = {'COMPILING': 1}
     p = Douglas(cdict, env, data)
-    p.run(static=True)
+    p.run(compiling=True)
     return p.get_response()
 
 

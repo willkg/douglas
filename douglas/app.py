@@ -184,16 +184,16 @@ class Douglas(object):
             print 'Error: You must set compiledir in your config file.'
             return 0
 
-        print 'Compiling to {0}.'.format(compiledir)
+        print 'Compiling to "{0}".'.format(compiledir)
         if incremental:
             print 'Incremental is set.'
-
+        print ''
 
         themes = config.get('compile_themes', ['html'])
         index_themes = config.get('compile_index_themes', ['html'])
 
         dayindexes = config.get('compile_day_indexes', False)
-        monthindexes = config.get('compile_year_indexes', False)
+        monthindexes = config.get('compile_month_indexes', False)
         yearindexes = config.get('compile_yearindexes', True)
 
         renderme = []
@@ -204,55 +204,60 @@ class Douglas(object):
         listing = tools.get_entries(config, datadir)
 
         for mem in listing:
-            # skip the ones that have bad extensions
-            ext = mem[mem.rfind('.')+1:]
+            # Skip files that have extensions we don't know what to do
+            # with.
+            ext = os.path.splitext(mem)[1].lstrip('.')
             if not ext in config['extensions'].keys():
                 continue
 
-            # grab the mtime of the entry file
+            # Get the mtime of the entry.
             mtime = time.mktime(tools.filestat(self._request, mem))
 
             # remove the datadir from the front and the bit at the end
             mem = mem[len(datadir):mem.rfind('.')]
 
-            # this is the compiled filename
+            # This is the compiled file filename.
             fn = os.path.normpath(compiledir  + mem)
 
-            # grab the mtime of one of compiled files
-            try:
-                smtime = os.stat(fn + '.' + themes[0])[8]
-            except IOError:
-                smtime = 0
+            if incremental:
+                # If we're incrementally rendering, we check the mtime
+                # for the compiled file for one of the themes. If the entry
+                # is more recent than the compiled version, we recompile.
+                # Otherwise we skip it.
+                try:
+                    smtime = os.stat(fn + '.' + themes[0])[8]
+                    if smtime < mtime or not incremental:
+                        continue
 
-            # if the entry is more recent than the compiled version,
-            # we want to re-compile.
-            if smtime < mtime or not incremental:
-                # grab the categories
-                temp = os.path.dirname(mem).split(os.sep)
-                for i in range(len(temp)+1):
-                    p = os.sep.join(temp[0:i])
-                    categories[p] = 0
+                except (IOError, OSError):
+                    pass
 
-                # grab the date
-                mtime = time.localtime(mtime)
-                year = time.strftime('%Y', mtime)
-                month = time.strftime('%m', mtime)
-                day = time.strftime('%d', mtime)
+            # Figure out category indexes to re-render.
+            temp = os.path.dirname(mem).split(os.sep)
+            for i in range(len(temp)+1):
+                p = os.sep.join(temp[0:i])
+                categories[p] = 0
 
-                if yearindexes:
-                    dates[year] = 1
+            # Figure out year/month/day indexes to re-render.
+            mtime = time.localtime(mtime)
+            year = time.strftime('%Y', mtime)
+            month = time.strftime('%m', mtime)
+            day = time.strftime('%d', mtime)
 
-                if monthindexes:
-                    dates[year + '/' + month] = 1
+            if yearindexes:
+                dates[year] = 1
 
-                if dayindexes:
-                    dates[year + '/' + month + '/' + day] = 1
+            if monthindexes:
+                dates[year + '/' + month] = 1
 
-                # toss in the render queue
-                for f in themes:
-                    renderme.append((mem + '.' + f, ''))
+            if dayindexes:
+                dates[year + '/' + month + '/' + day] = 1
 
-        print 'Rendering {0} entries.'.format(len(renderme))
+            # Toss each theme for this entry in the render queue.
+            for f in themes:
+                renderme.append((mem + '.' + f, ''))
+
+        print '- Found {0} entry(es) ...'.format(len(renderme))
 
         if categories:
             categories = sorted(categories.keys())
@@ -263,7 +268,7 @@ class Douglas(object):
             if '/' in categories:
                 categories.remove('/')
 
-            print 'Rendering {0} category indexes.'.format(len(categories))
+            print '- Found {0} category index(es) ...'.format(len(categories))
 
             for mem in categories:
                 mem = os.path.normpath(mem + '/index.')
@@ -273,7 +278,7 @@ class Douglas(object):
         if dates:
             dates = ['/' + d for d in sorted(dates.keys())]
 
-            print 'Rendering {0} date indexes.'.format(len(dates))
+            print '- Found {0} date index(es) ...'.format(len(dates))
 
             for mem in dates:
                 mem = os.path.normpath(mem + '/index.')
@@ -282,7 +287,8 @@ class Douglas(object):
 
         additional_stuff = config.get('compile_urls', [])
         if additional_stuff:
-            print 'Rendering {0} arbitrary urls.'.format(len(additional_stuff))
+            print '- Found {0} arbitrary url(s) ...'.format(
+                len(additional_stuff))
 
             for mem in additional_stuff:
                 if mem.find('?') != -1:
@@ -297,7 +303,7 @@ class Douglas(object):
         # Pass the complete render list to all the plugins via
         # cb_compile_filelist and they can add to the filelist any
         # (url, query) tuples they want rendered.
-        print '(before) building %s files.' % len(renderme)
+        total = len(renderme)
         tools.run_callback('compile_filelist',
                            {'request': self._request,
                             'filelist': renderme,
@@ -305,12 +311,16 @@ class Douglas(object):
                             'incremental': incremental})
 
         renderme = sorted(set(renderme))
+        print '- Found {0} url(s) specified by plugins ...'.format(
+            len(renderme) - total)
 
-        print 'Building {0} files total.'.format(len(renderme))
+        print ''
+        print 'Compiling {0} url(s) total.'.format(len(renderme))
+        print ''
 
         for url, q in renderme:
             url = url.replace(os.sep, '/')
-            print 'Rendering %s ...'.format(url)
+            print 'Rendering {0} ...'.format(url)
 
             tools.render_url_statically(dict(config), url, q)
 

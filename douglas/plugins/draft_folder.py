@@ -69,9 +69,9 @@ def cb_filelist(args):
     if not os.path.exists(draftdir):
         return
 
-    pathinfo = pyhttp.get("PATH_INFO", "")
+    pathinfo = pyhttp.get('PATH_INFO', '')
     path, ext = os.path.splitext(pathinfo)
-    draft_name = pyhttp["PATH_INFO"][len("/" + TRIGGER) + 1:]
+    draft_name = pyhttp['PATH_INFO'][len('/' + TRIGGER) + 1:]
 
     if not draft_name:
         trigger = config.get('draft_trigger', TRIGGER)
@@ -157,9 +157,14 @@ def cb_compile_filelist(args):
 
     themes = config.get('compile_themes', ['html'])
     trigger = '/' + config.get('draft_trigger', TRIGGER)
+    extensions = config['extensions'].keys()
 
     for mem in drafts:
-        dir_, fn = os.path.split(mem)
-        fn, ext = os.path.splitext(fn)
+        fn, ext = os.path.splitext(mem)
+
+        # Ignore anything we don't recognize.
+        if not ext or ext[1:] not in extensions:
+            continue
+
         for theme in themes:
             filelist.append((trigger + '/' + fn + '.' + theme, ''))
