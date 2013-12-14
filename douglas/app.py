@@ -32,9 +32,8 @@ class Douglas(object):
         :param environ: dict containing the environment variables.
         :param data: dict containing data variables.
         """
-        # FIXME: These shouldn't be here.
-        config['douglas_name'] = "douglas"
-        config['douglas_version'] = __version__
+        environ['douglas_name'] = "douglas"
+        environ['douglas_version'] = __version__
 
         self._config = config
         self._request = Request(config, environ, data)
@@ -48,19 +47,16 @@ class Douglas(object):
         pyhttp = self._request.get_http()
         config = self._request.get_configuration()
 
-        data["douglas_version"] = __version__
         data['pi_bl'] = ''
 
         # if the user specifies base_url in config, we use that.
         # otherwise we compose it from SCRIPT_NAME in the environment
         # or we leave it blank.
         if not 'base_url' in config:
-            if pyhttp.has_key('SCRIPT_NAME'):
+            if 'SCRIPT_NAME' in pyhttp:
                 # allow http and https
-                config['base_url'] = '%s://%s%s' % \
-                                     (pyhttp['wsgi.url_scheme'],
-                                      pyhttp['HTTP_HOST'],
-                                      pyhttp['SCRIPT_NAME'])
+                config['base_url'] = '{0}://{1}{2}'.format(
+                    pyhttp['wsgi.url_scheme'], pyhttp['HTTP_HOST'], pyhttp['SCRIPT_NAME'])
             else:
                 config['base_url'] = ''
 
@@ -351,8 +347,8 @@ def initialize(cfg):
 
 
 class DouglasWSGIApp:
-    """This class is the WSGI application for Douglas.
-    """
+    """This class is the WSGI application for Douglas."""
+
     def __init__(self, environ=None, start_response=None, configini=None):
         """
         Make WSGI app for Douglas.
@@ -386,9 +382,7 @@ class DouglasWSGIApp:
         initialize(self.config)
 
     def run_douglas(self, env, start_response):
-        """
-        Executes a single run of Douglas wrapped in the crash handler.
-        """
+        """Executes a single run of Douglas wrapped in the crash handler."""
         response = None
         try:
             # ensure that PATH_INFO exists. a few plugins break if this is
@@ -419,6 +413,7 @@ def douglas_app_factory(global_config, **local_config):
     """App factory for paste.
 
     :returns: WSGI application
+
     """
     conf = global_config.copy()
     conf.update(local_config)
@@ -439,6 +434,7 @@ class EnvDict(dict):
     instead of::
 
         request.get_form()
+
     """
     def __init__(self, request, env):
         """Wraps an environment (which is a dict) and a request.
@@ -790,13 +786,13 @@ def blosxom_handler(request):
 
     if not rend:
         # get the renderer we want to use
-        rend = config.get("renderer", "jinjarenderer")
+        rend = config.get('renderer', 'jinjarenderer')
 
         # import the renderer
-        rend = tools.importname("douglas.renderers", rend)
+        rend = tools.importname('douglas.renderers', rend)
 
         # get the renderer object
-        rend = rend.Renderer(request, config.get("stdoutput", sys.stdout))
+        rend = rend.Renderer(request, config.get('stdoutput', sys.stdout))
 
     data['renderer'] = rend
 
@@ -805,35 +801,35 @@ def blosxom_handler(request):
 
     # process the path info to determine what kind of blog entry(ies)
     # this is
-    tools.run_callback("pathinfo",
-                       {"request": request},
+    tools.run_callback('pathinfo',
+                       {'request': request},
                        donefunc=lambda x:x != None,
                        defaultfunc=blosxom_process_path_info)
 
     # call the filelist callback to generate a list of entries
-    data["entry_list"] = tools.run_callback(
-        "filelist",
-        {"request": request},
+    data['entry_list'] = tools.run_callback(
+        'filelist',
+        {'request': request},
         donefunc=lambda x:x != None,
         defaultfunc=blosxom_file_list_handler)
 
     # figure out the blog-level mtime which is the mtime of the head
     # of the entry_list
-    entry_list = data["entry_list"]
+    entry_list = data['entry_list']
     if isinstance(entry_list, list) and len(entry_list) > 0:
-        mtime = entry_list[0].get("mtime", time.time())
+        mtime = entry_list[0].get('mtime', time.time())
     else:
         mtime = time.time()
     mtime_tuple = time.localtime(mtime)
     mtime_gmtuple = time.gmtime(mtime)
 
-    data["latest_date"] = time.strftime('%a, %d %b %Y', mtime_tuple)
+    data['latest_date'] = time.strftime('%a, %d %b %Y', mtime_tuple)
 
     # Make sure we get proper 'English' dates when using standards
     loc = locale.getlocale(locale.LC_ALL)
     locale.setlocale(locale.LC_ALL, 'C')
 
-    data["latest_w3cdate"] = time.strftime('%Y-%m-%dT%H:%M:%SZ',
+    data['latest_w3cdate'] = time.strftime('%Y-%m-%dT%H:%M:%SZ',
                                            mtime_gmtuple)
     data['latest_rfc822date'] = time.strftime('%a, %d %b %Y %H:%M GMT',
                                               mtime_gmtuple)
@@ -844,10 +840,10 @@ def blosxom_handler(request):
     # we pass the request with the entry_list through the prepare
     # callback giving everyone a chance to transform the data.  the
     # request is modified in place.
-    tools.run_callback("prepare", {"request": request})
+    tools.run_callback('prepare', {'request': request})
 
     # now we pass the entry_list through the renderer
-    entry_list = data["entry_list"]
+    entry_list = data['entry_list']
     renderer = data['renderer']
 
     if renderer and not renderer.rendered:
@@ -857,17 +853,18 @@ def blosxom_handler(request):
             renderer.add_header('Status', '404 Not Found')
             renderer.set_content(
                 {'title': 'The page you are looking for is not available',
-                 'body': 'Somehow I cannot find the page you want. ' +
-                 'Go Back to <a href="%s">%s</a>?'
-                 % (config["base_url"], config["blog_title"])})
+                 'body': 'Somehow I cannot find the page you want. '
+                 'Go Back to <a href="{0}">{1}</a>?'.format(
+                     config['base_url'], config['blog_title'])})
         renderer.render()
 
     elif not renderer:
         output = config.get('stdoutput', sys.stdout)
-        output.write("Content-Type: text/plain\n\n" +
-                     "There is something wrong with your setup.\n" +
-                     "Check your config files and verify that your " +
-                     "configuration is correct.\n")
+        output.write(
+            'Content-Type: text/plain\n\n'
+            'There is something wrong with your setup.\n'
+            'Check your config files and verify that your '
+            'configuration is correct.\n')
 
 
 def blosxom_entry_parser(filename, request):
@@ -987,12 +984,7 @@ def blosxom_sort_list_handler(args):
     :returns: the sorted ``entry_list``
     """
     entrylist = args["entry_list"]
-
-    entrylist = [(e._mtime, e) for e in entrylist]
-    entrylist.sort()
-    entrylist.reverse()
-    entrylist = [e[1] for e in entrylist]
-
+    entrylist.sort(key=lambda entry: entry._mtime, reverse=True)
     return entrylist
 
 
@@ -1006,16 +998,13 @@ def blosxom_truncate_list_handler(args):
 
     :returns: the truncated ``entry_list``.
     """
-    request = args["request"]
-    entrylist = args["entry_list"]
+    request = args['request']
+    data = request.get_data()
+    config = request.get_configuration()
 
-    data = request.data
-    config = request.config
-
-    num_entries = config.get("num_entries", 5)
-    truncate = data.get("truncate", 0)
-    if num_entries and truncate:
-        entrylist = entrylist[:num_entries]
+    num_entries = config.get('num_entries', 5)
+    if data.get('truncate', False) and num_entries:
+        entrylist = args['entry_list'][:num_entries]
     return entrylist
 
 
@@ -1043,155 +1032,146 @@ def blosxom_process_path_info(args):
 
     form = request.get_form()
 
+    path_info = pi_bl = pyhttp.get('PATH_INFO', '')
+    pi_yr = pi_mo = pi_da = ''
+    root_datadir = config['datadir']
+    extensions = config['extensions'].keys()
+
     # figure out which theme to use.  the theme is determined by
     # looking at the "theme" post-data variable, the "theme" query
     # string variable, the "default_theme" setting in the config.py
     # file, or "html"
-    theme = config.get("default_theme", "html")
-    if form.has_key("them"):
-        theme = form["theme"].value
-
-    data['theme'] = theme
-
-    data['pi_yr'] = ''
-    data['pi_mo'] = ''
-    data['pi_da'] = ''
-
-    path_info = pyhttp.get("PATH_INFO", "")
-
-    data['root_datadir'] = config['datadir']
-
-    data["pi_bl"] = path_info
+    theme = config.get('default_theme', 'html')
+    if 'theme' in form:
+        theme = form['theme'].value
 
     # first we check to see if this is a request for an index and we
     # can pluck the extension (which is certainly a theme) right
     # off.
     newpath, ext = os.path.splitext(path_info)
-    if newpath.endswith("/index") and ext:
+    if newpath.endswith('/index') and ext:
         # there is a theme-like thing, so that's our new theme and
         # we adjust the path_info to the new filename
-        data["theme"] = ext[1:]
+        theme = ext[1:]
         path_info = newpath
 
     path_info = path_info.lstrip('/')
+    absolute_path = os.path.join(config['datadir'], path_info)
 
-    absolute_path = os.path.join(config["datadir"], path_info)
-
-    path_info = path_info.split("/")
+    path_info = path_info.split('/')
 
     if os.path.isdir(absolute_path):
-        # this is an absolute path
-
-        data['root_datadir'] = absolute_path
-        data['bl_type'] = 'entry_list'
+        # this is an absolute path for a directory
+        root_datadir = absolute_path
+        bl_type = 'entry_list'
 
     elif absolute_path.endswith("/index") and os.path.isdir(absolute_path[:-6]):
         # this is an absolute path with /index at the end of it
-
-        data['root_datadir'] = absolute_path[:-6]
-        data['bl_type'] = 'entry_list'
+        root_datadir = absolute_path[:-6]
+        bl_type = 'entry_list'
 
     else:
         # this is either a file or a date
-
-        ext = tools.what_ext(config["extensions"].keys(), absolute_path)
+        ext = tools.what_ext(extensions, absolute_path)
         if not ext:
             # it's possible we didn't find the file because it's got a
             # theme thing at the end--so try removing it and
             # checking again.
-            newpath, theme = os.path.splitext(absolute_path)
-            if theme:
-                ext = tools.what_ext(config["extensions"].keys(), newpath)
+            newpath, possible_theme = os.path.splitext(absolute_path)
+            if possible_theme:
+                ext = tools.what_ext(extensions, newpath)
                 if ext:
                     # there is a theme-like thing, so that's our new
                     # theme and we adjust the absolute_path and
                     # path_info to the new filename
-                    data["theme"] = theme[1:]
+                    theme = possible_theme[1:]
                     absolute_path = newpath
-                    path_info, theme = os.path.splitext("/".join(path_info))
+                    path_info = os.path.splitext("/".join(path_info))[0]
                     path_info = path_info.split("/")
 
         if ext:
             # this is a file
-            data["bl_type"] = "entry"
-            data["root_datadir"] = absolute_path + "." + ext
+            root_datadir = absolute_path + '.' + ext
+            bl_type = 'entry'
 
         else:
-            data["bl_type"] = "entry_list"
+            bl_type = 'entry_list'
+            pi_bl = ''
 
             # it's possible to have category/category/year/month/day
             # (or something like that) so we pluck off the categories
             # here.
-            pi_bl = ""
-            while (len(path_info) > 0
+            while (path_info
                    and not (len(path_info[0]) == 4 and path_info[0].isdigit())):
                 pi_bl = os.path.join(pi_bl, path_info.pop(0))
 
             # handle the case where we do in fact have a category
             # preceeding the date.
             if pi_bl:
-                pi_bl = pi_bl.replace("\\", "/")
-                data["pi_bl"] = pi_bl
-                data["root_datadir"] = os.path.join(config["datadir"], pi_bl)
+                pi_bl = pi_bl.replace('\\', '/')
+                root_datadir = os.path.join(config['datadir'], pi_bl)
 
             if len(path_info) > 0:
                 item = path_info.pop(0)
                 # handle a year token
                 if len(item) == 4 and item.isdigit():
-                    data['pi_yr'] = item
-                    item = ""
+                    pi_yr = item
+                    item = ''
 
                     if (len(path_info) > 0):
                         item = path_info.pop(0)
                         # handle a month token
                         if item in tools.MONTHS:
-                            data['pi_mo'] = item
-                            item = ""
+                            pi_mo = item
+                            item = ''
 
                             if (len(path_info) > 0):
                                 item = path_info.pop(0)
                                 # handle a day token
                                 if len(item) == 2 and item.isdigit():
-                                    data["pi_da"] = item
-                                    item = ""
+                                    pi_da = item
+                                    item = ''
 
                                     if len(path_info) > 0:
                                         item = path_info.pop(0)
 
                 # if the last item we picked up was "index", then we
                 # just ditch it because we don't need it.
-                if item == "index":
-                    item = ""
+                if item == 'index':
+                    item = ''
 
                 # if we picked off an item we don't recognize and/or
                 # there is still stuff in path_info to pluck out, then
                 # it's likely this wasn't a date.
                 if item or len(path_info) > 0:
-                    data["bl_type"] = "entry_list"
-                    data["root_datadir"] = absolute_path
+                    root_datadir = absolute_path
+                    bl_type = 'entry_list'
 
-    # construct our final URL
-    url = config['base_url']
-    if data['pi_bl'].startswith("/") and url.endswith("/"):
-        url = url[:-1] + data['pi_bl']
-    elif data['pi_bl'].startswith("/") or url.endswith("/"):
-        url = url + data["pi_bl"]
-    else:
-        url = url + "/" + data['pi_bl']
-    data['url'] = url
+    # Construct complete URL
+    url = config['base_url'].rstrip('/\\') + '/' + pi_bl.lstrip('/\\')
 
-    # set path_info to our latest path_info
-    data['path_info'] = path_info
-
-    if data.get("pi_yr"):
-        data["truncate"] = config.get("truncate_date", False)
-    elif data.get("bl_type") == "entry_list":
-        if data["path_info"] == [''] or data["path_info"] == ['index']:
-            data["truncate"] = config.get("truncate_frontpage", True)
+    # Figure out whether to truncate the entry list
+    truncate = False
+    if pi_yr:
+        truncate = config.get('truncate_date', False)
+    elif bl_type == 'entry_list':
+        if path_info == [''] or path_info == ['index']:
+            truncate = config.get('truncate_frontpage', True)
         else:
-            data["truncate"] = config.get("truncate_category", True)
-    else:
-        data["truncate"] = False
+            truncate = config.get('truncate_category', True)
+
+    data.update({
+        'theme': theme,
+        'pi_yr': pi_yr,
+        'pi_mo': pi_mo,
+        'pi_da': pi_da,
+        'pi_bl': pi_bl,
+        'path_info': path_info,
+        'truncate': truncate,
+        'url': url,
+        'root_datadir': root_datadir,
+        'bl_type': bl_type,
+    })
 
 
 def run_cgi(cfg):

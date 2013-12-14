@@ -39,12 +39,8 @@ class UnitTestBase(unittest.TestCase):
         self.assertEquals(a, b, text)
 
     def setup_files(self, files):
-        # sort so that we're building the directories in order
-        files.sort()
-
         os.makedirs(os.path.join(self.datadir, "entries"))
-
-        for fn in files:
+        for fn in sorted(files):
             d, f = os.path.split(fn)
 
             try:

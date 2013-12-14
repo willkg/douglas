@@ -43,9 +43,7 @@ class Renderer(RendererBase):
 
         :param keymap: a mapping of key/value pairs
         """
-        keys = keymap.keys()
-        keys.sort()
-        for key in keys:
+        for key in sorted(keymap.keys()):
             self.write("<font color=\"#0000ff\">%s</font> -&gt; %s\n" % \
                        (escv(key), escv(keymap[key])))
 

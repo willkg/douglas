@@ -37,7 +37,7 @@ from config import py as cfg
 # If the user defined a "codebase" property in their config file,
 # then we insert that into our sys.path because that's where the
 # Douglas installation is.
-if cfg.has_key("codebase"):
+if 'codebase' in cfg:
     sys.path.insert(0, cfg["codebase"])
 
 from douglas.app import run_cgi

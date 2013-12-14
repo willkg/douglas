@@ -131,7 +131,7 @@ class PyblCategories:
 
         form = self._request.get_form()
 
-        if form.has_key('theme'):
+        if 'theme' in form:
             theme = form['theme'].value
         else:
             theme = config.get('default_theme', 'html')
@@ -165,8 +165,7 @@ class PyblCategories:
 
         # then we take the category list from the clistmap and sort it
         # alphabetically
-        clist = clistmap.keys()
-        clist.sort()
+        clist = sorted(clistmap.keys())
 
         output = []
         indent = 0

@@ -412,10 +412,7 @@ def cb_filelist(args):
     entrylist = [fileentry.FileEntry(req, e, datadir) for e in filelist]
 
     # sort the list by mtime
-    entrylist = [(e._mtime, e) for e in entrylist]
-    entrylist.sort()
-    entrylist.reverse()
-    entrylist = [e[1] for e in entrylist]
+    entrylist.sort(key=lambda entry: entry._mtime, reverse=True)
 
     data["truncate"] = config.get("truncate_tags", True)
 
@@ -441,8 +438,7 @@ def cb_head(args):
     tagsdata = data.get("tagsdata", {})
 
     # first, build the tags list
-    tags = tagsdata.keys()
-    tags.sort()
+    tags = sorted(tagsdata.keys())
 
     start_t = config.get("tags_list_start", '<p>')
     item_t = config.get("tags_list_item", ' <a href="%(tagurl)s">%(tag)s</a> ')
@@ -530,8 +526,7 @@ def cb_story(args):
     config = request.get_configuration()
 
     sep = config.get("tags_separator", ",")
-    tags = [t.strip() for t in entry.get("tags", "").split(sep)]
-    tags.sort()
+    tags = sorted([t.strip() for t in entry.get("tags", "").split(sep)])
     entry["tags_raw"] = tags
 
     form = request.get_form()

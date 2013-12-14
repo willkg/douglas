@@ -136,9 +136,7 @@ class YearArchives:
                  time.mktime(timetuple),
                  mem])
 
-        arc_keys = archives.keys()
-        arc_keys.sort()
-        arc_keys.reverse()
+        arc_keys = sorted(archives.keys(), reverse=True)
 
         result = []
         for key in arc_keys:
@@ -245,10 +243,7 @@ def cb_filelist(args):
     items = wa._items
 
     # peel off the items for this year
-    items = [m for m in items if m[0].startswith(year)]
-
-    items.sort()
-    items.reverse()
+    items = sorted([m for m in items if m[0].startswith(year)], reverse=True)
 
     # Set and use current (or default) theme for permalinks
     if not theme:

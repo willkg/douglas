@@ -167,7 +167,7 @@ def cb_start(args):
 
 def cb_story(args):
     entry = args["entry"]
-    if not entry.has_key("body"):
+    if not 'body' in entry:
         return
 
     request = args["request"]

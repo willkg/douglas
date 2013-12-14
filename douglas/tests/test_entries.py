@@ -62,11 +62,7 @@ class TestEntryBase(UnitTestBase):
         e["foo"] = "bar"
         e["body"] = "entry body"
 
-        def sortlist(l):
-            l.sort()
-            return l
-
-        eq_(sortlist(e.keys()), ["body", "foo"])
+        eq_(sorted(e.keys()), ["body", "foo"])
 
         eq_(e["foo"], "bar")
         eq_(e.get("foo"), "bar")
