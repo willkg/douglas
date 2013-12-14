@@ -287,33 +287,6 @@ example::
             log.error(e)
 
 
-
-How to store plugin state between callbacks
-===========================================
-
-The easiest way to store state for the same request between callbacks is to
-store the data in the data dict of the Request object.  For example::
-
-    STATE_KEY = "myplugin_state"
-
-    def cb_date_head(args):
-        request = args["request"]
-        data = request.get_data()
-
-        if ((data.has_key(STATE_KEY) 
-             and data[STATE_KEY]["blah"] == "blahblah")):
-            pass
-            # ...
-
-
-    def cb_filelist(args):
-        request = args["request"]
-        data = request.get_data()
-
-        data[STATE_KEY] = {}
-        data[STATE_KEY]["blah"] = "blahblah"
-
-
 How to implement a callback
 ===========================
 

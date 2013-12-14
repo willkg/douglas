@@ -179,15 +179,6 @@ def cb_prepare(args):
     data["archivelinks"] = YearArchives(request)
 
 
-def cb_date_head(args):
-    request = args["request"]
-    data = request.get_data()
-
-    if INIT_KEY in data:
-        args["template"] = ""
-    return args
-
-
 def parse_path_info(path):
     """Returns None or (year, theme) tuple.
 

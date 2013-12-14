@@ -224,15 +224,7 @@ as the blosxom 2.0 versions.
 This isn't very interesting unless you're trying to implement the
 functionality of a blosxom 2.0 plugin in Python for Douglas.
 
-The available blosxom renderer callbacks are:
-
-* cb_head - corresponds to blosxom 2.0 head
-* cb_date_head - corresponds to blosxom 2.0 date
-* cb_story - corresponds to blosxom 2.0 story
-* cb_foot - corresponds to blosoxm 2.0 foot
-
-
-Additionally, we have these lifecycle callbacks available:
+We have these lifecycle callbacks available:
 
 * the blosxom 2.0 entries callback is handled by cb_filelist
 * the blosxom 2.0 filter callback is handled by cb_prepare
