@@ -16,7 +16,6 @@ import shutil
 import unittest
 
 from douglas import app, tools, entries
-from douglas.renderers.jinjarenderer import Renderer
 
 
 def req_():
@@ -49,9 +48,8 @@ class UnitTestBase(unittest.TestCase):
                 pass
 
             if f:
-                f = open(fn, "w")
-                f.write("test file: %s\n" % fn)
-                f.close()
+                with open(fn, 'w') as fp:
+                    fp.write('test file: {0}\n'.format(fn))
             
     def build_file_set(self, filelist):
         return [os.path.join(self.datadir, "entries/%s" % fn)

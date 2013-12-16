@@ -561,9 +561,8 @@ def create_entry(datadir, category, filename, mtime, title, metadata, body):
     fn = os.path.join(datadir, category, filename)
 
     # write the entry to disk
-    f = open(fn, 'w')
-    f.write(entry)
-    f.close()
+    with open(fn, 'w') as fp:
+        fp.write(entry)
 
     # set the mtime on the entry
     os.utime(fn, (mtime, mtime))

@@ -13,9 +13,8 @@ class Testentryparser(UnitTestBase):
 
         filename = os.path.join(datadir, "firstpost.txt")
 
-        fp = open(filename, "w")
-        fp.write(filedata)
-        fp.close()
+        with open(filename, 'w') as fp:
+            fp.write(filedata)
 
         entry_dict = blosxom_entry_parser(filename, req)
 

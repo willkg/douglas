@@ -38,8 +38,9 @@ def parse_date(d):
 @memcache_decorator('published_date')
 def get_date(fn):
     """Returns time tuple or None for published time of file."""
-    f = open(fn, 'r')
-    lines = f.readlines()
+    with open(fn, 'r') as fp:
+        lines = fp.readlines()
+
     for line in lines:
         if line.startswith('#published'):
             try:

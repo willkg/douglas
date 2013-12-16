@@ -112,7 +112,8 @@ def parse(story, request):
 
 def readfile(filename, request):
     entry_data = {}
-    lines = open(filename).readlines()
+    with open(filename, 'r') as fp:
+        lines = fp.readlines()
 
     if len(lines) == 0:
         return {"title": "", "body": ""}

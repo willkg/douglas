@@ -35,19 +35,18 @@ class Test_categories(PluginTest):
         filename = os.path.join(self.datadir, filename)
         if not os.path.exists(os.path.dirname(filename)):
             os.makedirs(os.path.dirname(filename))
-            
-        file = open(filename, "w")
-        file.write("Test entry at %s\nbody body body\n" % filename)
-        file.close()
+
+        with open(filename, 'w') as fp:
+            fp.write('Test entry at {0}\nbody body body\n'.format(filename))
 
     def test_categories(self):
-        self.generate_entry("test1.txt")
-        self.generate_entry("cat1/test_cat1.txt")
-        self.generate_entry("cat2/test_cat2.txt")
+        self.generate_entry('test1.txt')
+        self.generate_entry('cat1/test_cat1.txt')
+        self.generate_entry('cat2/test_cat2.txt')
 
         categories.cb_prepare(self.args)
         self.assertEquals(
-            str(self.request.get_data()["categorylinks"]),
+            str(self.request.get_data()['categorylinks']),
             "\n".join(
                 ['<ul class="categorygroup">',
                  '<li><a href="http://example.com//index.html">/</a> (3)</li>',

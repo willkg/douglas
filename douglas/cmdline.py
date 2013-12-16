@@ -445,8 +445,8 @@ def cmd_create(command, argv):
     if verbose:
         print "Creating file '%s'..." % firstpost
     datestamp = datetime.datetime.now().strftime('%Y-%m-%d %H:%M')
-    fp = open(firstpost, "w")
-    fp.write("""First post!
+    with open(firstpost, 'w') as fp:
+        fp.write("""First post!
 #published {0}
 #tags firstpost
 <p>
@@ -454,7 +454,6 @@ def cmd_create(command, argv):
   then it's likely that everything's working nicely!
 </p>
 """.format(datestamp))
-    fp.close()
 
     if verbose:
         print "Done!"

@@ -159,9 +159,8 @@ class Testwhat_ext(UnitTestBase):
         os.mkdir(self.get_ext_dir())
 
         for mem in self._files:
-            f = open(os.path.join(self.get_ext_dir(), mem), "w")
-            f.write("lorem ipsum")
-            f.close()
+            with open(os.path.join(self.get_ext_dir(), mem), "w") as fp:
+                fp.write('lorem ipsum')
 
     def test_returns_extension_if_file_has_extension(self):
         d = self.get_ext_dir()
