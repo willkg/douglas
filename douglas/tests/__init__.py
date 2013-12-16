@@ -186,7 +186,7 @@ class PluginTest(unittest.TestCase):
         self.config = {
             'datadir': self.datadir,
             'plugin_dirs': [plugin_file],
-            'base_url': 'http://bl.og/',
+            'base_url': 'http://example.com/',
         }
 
         # set up environment vars and http request

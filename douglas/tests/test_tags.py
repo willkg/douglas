@@ -1,8 +1,7 @@
-import tempfile
-import shutil
 import os
 
-from douglas.app import Request
+from nose.tools import eq_
+
 from douglas.plugins import tags
 from douglas.tests import PluginTest
 
@@ -10,69 +9,60 @@ from douglas.tests import PluginTest
 class TagsTest(PluginTest):
     def setUp(self):
         PluginTest.setUp(self, tags)
-        self.tmpdir = tempfile.mkdtemp() 
 
-    def get_datadir(self):
-        return os.path.join(self.tmpdir, "datadir")
-
-    def tearDown(self):
-        PluginTest.tearDown(self)
-        try:
-            shutil.rmtree(self.tmpdir)
-        except OSError:
-            pass
-                
     def test_get_tagsfile(self):
-        req = Request({"datadir": self.get_datadir()}, {}, {})
+        cfg = {"datadir": self.datadir}
+        eq_(tags.get_tagsfile(cfg),
+            os.path.join(self.datadir, os.pardir, "tags.index"))
 
-        cfg = {"datadir": self.get_datadir()}
-        self.assertEquals(tags.get_tagsfile(cfg),
-                          os.path.join(self.get_datadir(), os.pardir,
-                                       "tags.index"))
-        
-        tags_filename = os.path.join(self.get_datadir(), "tags.db")
-        cfg = {"datadir": self.get_datadir(), "tags_filename": tags_filename}
-        self.assertEquals(tags.get_tagsfile(cfg), tags_filename)
+        tags_filename = os.path.join(self.datadir, "tags.db")
+        cfg = {"datadir": self.datadir, "tags_filename": tags_filename}
+        eq_(tags.get_tagsfile(cfg), tags_filename)
+
+    def test_functions(self):
+        tm = tags.TagManager(self.request)
+        tm._tagsdata = {
+            'blog': ['firstpost.txt', 'secondpost.txt'],
+            'legos': ['deathstar.txt'],
+            'kids': ['omg2yearsold.txt'],
+        }
+        tm.all_tags()
+        tm.all_tags_div()
+        tm.all_tags_cloud()
+
+        # self.entry has no tags metadata
+        tm.entry_tags(self.entry)
+        tm.entry_tags_span(self.entry)
+
+        self.entry['tags'] = 'blog,kids'
+        tm.entry_tags(self.entry)
+        tm.entry_tags_span(self.entry)
 
     def test_tag_cloud_no_tags(self):
-        # test no tags
-        self.request.get_data()["tagsdata"] = {}
-        
-        tags.cb_head(self.args)
-        self.assertEquals(
-            str(self.args["entry"]["tagcloud"]),
-            "\n".join(
-                ["<p>",
-                 "</p>"]))
+        tm = tags.TagManager(self.request)
+        tm._tagsdata = {}
+        eq_(tm.all_tags_cloud(),
+            '<div class="allTagsCloud">\n</div>'
+        )
 
     def test_tag_cloud_one_tag(self):
-        # test no tags
-        self.request.get_data()["tagsdata"] = {
-            "tag2": ["a"],
-            }
-        
-        tags.cb_head(self.args)
-        self.assertEquals(
-            str(self.args["entry"]["tagcloud"]),
-            "\n".join(
-                ["<p>",
-                 '<a class="biggestTag" href="http://bl.og//tag/tag2">tag2</a>',
-                 "</p>"]))
+        tm = tags.TagManager(self.request)
+        tm._tagsdata = {'tag2': ['a']}
+        eq_(tm.all_tags_cloud(),
+            '<div class="allTagsCloud">\n'
+            '<a class="tag smallestTag" href="http://example.com/tag/tag2.html">tag2</a>\n'
+            '</div>')
 
     def test_tag_cloud_many_tags(self):
-        # test no tags
-        self.request.get_data()["tagsdata"] = {
+        tm = tags.TagManager(self.request)
+        tm._tagsdata = {
             "tag1": ["a", "b", "c", "d", "e", "f"],
             "tag2": ["a", "b", "c", "d"],
             "tag3": ["a"]
             }
-        
-        tags.cb_head(self.args)
-        self.assertEquals(
-            str(self.args["entry"]["tagcloud"]),
-            "\n".join(
-                ["<p>",
-                 '<a class="biggestTag" href="http://bl.og//tag/tag1">tag1</a>',
-                 '<a class="biggestTag" href="http://bl.og//tag/tag2">tag2</a>',
-                 '<a class="smallestTag" href="http://bl.og//tag/tag3">tag3</a>',
-                 "</p>"]))
+        eq_(tm.all_tags_cloud(),
+            '<div class="allTagsCloud">\n'
+            '<a class="tag biggestTag" href="http://example.com/tag/tag1.html">tag1</a>\n'
+            '<a class="tag mediumTag" href="http://example.com/tag/tag2.html">tag2</a>\n'
+            '<a class="tag smallestTag" href="http://example.com/tag/tag3.html">tag3</a>\n'
+            '</div>')

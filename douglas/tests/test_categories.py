@@ -50,9 +50,9 @@ class Test_categories(PluginTest):
             str(self.request.get_data()["categorylinks"]),
             "\n".join(
                 ['<ul class="categorygroup">',
-                 '<li><a href="http://bl.og//index.html">/</a> (3)</li>',
+                 '<li><a href="http://example.com//index.html">/</a> (3)</li>',
                  '<li><ul class="categorygroup">',
-                 '<li><a href="http://bl.og//cat1/index.html">cat1/</a> (1)</li>',
-                 '<li><a href="http://bl.og//cat2/index.html">cat2/</a> (1)</li>',
+                 '<li><a href="http://example.com//cat1/index.html">cat1/</a> (1)</li>',
+                 '<li><a href="http://example.com//cat2/index.html">cat2/</a> (1)</li>',
                  '</ul></li>',
                  '</ul>']))

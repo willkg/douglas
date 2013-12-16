@@ -73,7 +73,10 @@ class Renderer(RendererBase):
 
             # Allow plugins to alter the context adding additional
             # bits
-            args = {'context': context}
+            args = {
+                'context': context,
+                'request': self._request,
+            }
             args = run_callback(
                 "context_processor",
                 args,

@@ -1,16 +1,13 @@
-"""Summary
+"""
+Summary
 =======
 
-This is a tags plugin.  It uses douglas's command line abilities to
-split generation of tags index data from display of tags index data.
+This plugin allows you to specify the tags your entry has in the
+metadata of the entry.  It adds a new command to douglas-cmd to index
+all the tags data and store it in a file.
 
-It creates a ``$(tagslist)`` variable for head and foot templates
-which lists all the tags.
-
-It creates a ``$(tags)`` variable for story templates which lists tags
-for the story.
-
-It creates a ``$(tagcloud)`` variable for the tag cloud.
+It creates a ``TagManager`` instance in the Jinja2 environment which
+you can use to iterate through and display tags data.
 
 
 Install
@@ -90,86 +87,42 @@ how tag metadata is formatted, and how tag lists triggered.
     Defaults to True.
 
 
-In the head and foot templates, you can list all the tags with the
-``$(tagslist)`` variable.  The templates for this listing use the
-following three config properties:
+Usage in templates
+==================
 
-``tags_list_start``
+The ``TagManager`` has the following methods:
 
-    Printed before the list.  Defaults to ``<p>``.
+``all_tags()``
+    Returns a list of (tag, tag_url, count) tuples.
 
-``tags_list_item``
+    You can iterate over this to render tag data for all the tags
+    on your blog.
 
-    Used for each tag in the list.  There are a bunch of variables you can
-    use:
+``all_tags_div()``
+    Generates HTML for a div of class ``allTags`` with ``a`` tags of
+    class ``tag`` in it--one for each tag.
 
-    * ``base_url`` - the baseurl for your blog
-    * ``theme`` - the default theme or theme currently showing
-    * ``tag`` - the tag name
-    * ``count`` - the number of items that are tagged with this tag
-    * ``tagurl`` - url composed of baseurl, trigger, and tag
+``all_tags_cloud()``
+    Generates HTML for a div of class ``allTagsCloud`` with ``a`` tags
+    of class ``tag`` in it--one for each tag. The ``a`` tags also have
+    one of ``biggestTag``, ``bigTag``, ``mediumTag``, ``smallTag``, or
+    ``smallestTag`` depending on how "big" the tag should show up in
+    the cloud.
 
-    Defaults to ``<a href="%(tagurl)s">%(tag)s</a>``.
+``entry_tags(entry)``
+    Returns a list of (tag, tag_url) tuples for tags for the specified
+    entry.
 
-``tags_list_finish``
-
-    Printed after the list.  Defaults to ``</p>``.
-
-
-In the head and foot templates, you can also add a tag cloud with the
-``$(tagcloud)`` variable.  The templates for the cloud use the
-following three config properties:
-
-``tags_cloud_start``
-
-    Printed before the cloud.  Defaults to ``<p>``.
-
-``tags_cloud_item``
-
-    Used for each tag in the cloud list.  There are a bunch of
-    variables you can use:
-
-    * ``base_url`` - the baseurl for your blog
-    * ``theme`` - the default theme or theme currently showing
-    * ``tag`` - the tag name
-    * ``count`` - the number of items that are tagged with this tag
-    * ``class`` - biggestTag, bigTag, mediumTag, smallTag or smallestTag--the
-      css class for this tag representing the frequency the tag is used
-    * ``tagurl`` - url composed of baseurl, trigger, and tag
-
-    Defaults to ``<a href="%(tagurl)s">%(tag)s</a>``.
-
-``tags_cloud_finish``
-
-    Printed after the cloud.  Defaults to ``</p>``.
-
-You'll also want to add CSS classes for the size classes to your CSS.
-For example, you could add this::
-
-   .biggestTag { font-size: 16pt; }
-   .bigTag { font-size: 14pt }
-   .mediumTag { font-size: 12pt }
-   .smallTag { font-size: 10pt ]
-   .smallestTag { font-size: 8pt ]
+``entry_tags_span(entry)``
+    Generates HTML for a span of class ``entryTags`` with ``a`` tags
+    of class ``tag`` in it--one for each tag.
 
 
-You can list the tags for a given entry in the story template with the
-``$(tags)`` variable.  The tag items in the story are formatted with one
-configuration property:
+.. Note::
 
-``tags_item``
-
-    This is the template for a single tag for an entry.  It can use the
-    following bits:
-
-    * ``base_url`` - the baseurl for this blog
-    * ``theme`` - the default theme or theme currently being viewed
-    * ``tag`` - the tag
-    * ``tagurl`` - url composed of baseurl, trigger and tag
-
-    Defaults to ``<a href="%(tagurl)s">%(tag)s</a>``.
-
-    Tags are joined together with ``,``.
+   If you use functions that generate HTML in a Jinja2 template, you
+   need to run them through the ``|safe`` filter. Otherwise the HTML
+   will be escaped.
 
 
 Creating the tags index file
@@ -240,11 +193,9 @@ from douglas.memcache import memcache_decorator
 
 def savefile(path, tagdata):
     """Saves tagdata to file at path."""
-    fp = open(path + ".new", "w")
-    pickle.dump(tagdata, fp)
-    fp.close()
-
-    shutil.move(path + ".new", path)
+    with open(path + '.new', 'r') as fp:
+        pickle.dump(tagdata, fp)
+    shutil.move(path + '.new', path)
 
 
 @memcache_decorator('tags')
@@ -252,38 +203,35 @@ def loadfile(path):
     """Loads tagdata from file at path."""
     if not os.path.exists(path):
         return {}
-
-    fp = open(path, "r")
-    tagdata = pickle.load(fp)
-    fp.close()
+    with open(path, 'r') as fp:
+        tagdata = pickle.load(fp)
     return tagdata
 
 
 def get_tagsfile(cfg):
     """Generates tagdata filename."""
-    datadir = cfg["datadir"]
-    tagsfile = cfg.get("tags_filename",
-                       os.path.join(datadir, os.pardir, "tags.index"))
+    tagsfile = cfg.get('tags_filename',
+                       os.path.join(cfg['datadir'], os.pardir, 'tags.index'))
     return tagsfile
 
 
-def buildtags(command, argv):
+def cmd_buildtags(command, argv):
     """Command for building the tags index."""
     from config import py as cfg
 
-    datadir = cfg.get("datadir")
+    datadir = cfg.get('datadir')
     if not datadir:
-        raise ValueError("config.py has no datadir property.")
+        raise ValueError('config.py has no datadir property.')
 
-    sep = cfg.get("tags_separator", ",")
+    sep = cfg.get('tags_separator', ',')
     tagsfile = get_tagsfile(cfg)
 
     from douglas import tools
     from douglas.app import Douglas, initialize
     from douglas.entries import fileentry
 
-    # build a douglas object, initialize it, and run the start
-    # callback.  this gives entry parsing related plugins a chance to
+    # Build a douglas object, initialize it, and run the start
+    # callback.  This gives entry parsing related plugins a chance to
     # get their stuff together so that they work correctly.
     initialize(cfg)
     p = Douglas(cfg, {})
@@ -291,9 +239,9 @@ def buildtags(command, argv):
     req = p.get_request()
     tools.run_callback("start", {"request": req})
 
-    # grab all the entries in the datadir
-    filelist = tools.get_entries(cfg, datadir)
-    entrylist = [fileentry.FileEntry(req, e, datadir) for e in filelist]
+    # Grab all the entries in the datadir
+    entrylist = [fileentry.FileEntry(req, e, datadir)
+                 for e in tools.get_entries(cfg, datadir)]
 
     tags_to_files = {}
     for mem in entrylist:
@@ -308,7 +256,7 @@ def buildtags(command, argv):
     return 0
 
 
-def category_to_tags(command, argv):
+def cmd_category_to_tags(command, argv):
     """Goes through all entries and converts the category to tags
     metadata.
 
@@ -343,15 +291,13 @@ def category_to_tags(command, argv):
 
         atime, mtime = os.stat(mem)[7:9]
 
-        fp = open(mem, "r")
-        data = fp.readlines()
-        fp.close()
+        with open(mem, 'r') as fp:
+            data = fp.readlines()
 
         data.insert(1, tags)
 
-        fp = open(mem, "w")
-        fp.write("".join(data))
-        fp.close()
+        with open(mem, 'w') as fp:
+            fp.write("".join(data))
 
         os.utime(mem, (atime, mtime))
 
@@ -359,15 +305,16 @@ def category_to_tags(command, argv):
 
 
 def cb_commandline(args):
-    args["buildtags"] = (buildtags, "builds the tags index")
-    args["categorytotags"] = (
-        category_to_tags,
-        "builds tag metadata from categories for entries")
+    args['buildtags'] = (cmd_buildtags, 'builds the tags index')
+    args['categorytotags'] = (
+        cmd_category_to_tags,
+        'builds tag metadata from categories for entries')
     return args
 
 
+# FIXME - Probably can nix this and have everything call loaddata.
 def cb_start(args):
-    request = args["request"]
+    request = args['request']
     data = request.get_data()
     tagsfile = get_tagsfile(request.get_configuration())
     if os.path.exists(tagsfile):
@@ -377,36 +324,35 @@ def cb_start(args):
             tagsdata = {}
     else:
         tagsdata = {}
-    data["tagsdata"] = tagsdata
+    data['tagsdata'] = tagsdata
 
 
 def cb_filelist(args):
     from douglas import tools
     from douglas.app import blosxom_truncate_list_handler
 
-    # handles /trigger/tag to show all the entries tagged that
-    # way
-    req = args["request"]
+    # Handles /trigger/tag to show all the entries tagged that way
+    req = args['request']
 
     pyhttp = req.get_http()
     data = req.get_data()
     config = req.get_configuration()
 
-    trigger = "/" + config.get("tags_trigger", "tag")
-    if not pyhttp["PATH_INFO"].startswith(trigger):
+    trigger = '/' + config.get('tags_trigger', 'tag')
+    if not pyhttp['PATH_INFO'].startswith(trigger):
         return
 
-    datadir = config["datadir"]
+    datadir = config['datadir']
     tagsfile = get_tagsfile(config)
     tagsdata = loadfile(tagsfile)
 
-    tag = pyhttp["PATH_INFO"][len(trigger) + 1:]
+    tag = pyhttp['PATH_INFO'][len(trigger)+1:]
     filelist = tagsdata.get(tag, [])
     if not filelist:
         tag, ext = os.path.splitext(tag)
         filelist = tagsdata.get(tag, [])
         if filelist:
-            data["theme"] = ext[1:]
+            data['theme'] = ext[1:]
 
     from douglas.entries import fileentry
     entrylist = [fileentry.FileEntry(req, e, datadir) for e in filelist]
@@ -414,10 +360,10 @@ def cb_filelist(args):
     # sort the list by mtime
     entrylist.sort(key=lambda entry: entry._mtime, reverse=True)
 
-    data["truncate"] = config.get("truncate_tags", True)
+    data['truncate'] = config.get('truncate_tags', True)
 
-    args = {"request": req, "entry_list": entrylist}
-    entrylist = tools.run_callback("truncatelist",
+    args = {'request': req, 'entry_list': entrylist}
+    entrylist = tools.run_callback('truncatelist',
                                    args,
                                    donefunc=lambda x: x != None,
                                    defaultfunc=blosxom_truncate_list_handler)
@@ -425,125 +371,135 @@ def cb_filelist(args):
     return entrylist
 
 
-# def cb_context_processor(args):
-#     context = args['context']
+class TagManager(object):
+    def __init__(self, request):
+        self.request = request
+        self._tagsdata = None
 
+    @property
+    def tagsdata(self):
+        if self._tagsdata is None:
+            tagsfile = get_tagsfile(self.request.get_configuration())
+            if os.path.exists(tagsfile):
+                try:
+                    tagsdata = loadfile(tagsfile)
+                except IOError:
+                    tagsdata = {}
+            else:
+                tagsdata = {}
+            self._tagsdata = tagsdata
+        return self._tagsdata
 
-def cb_head(args):
-    # adds a taglist to header/footer
-    request = args["request"]
-    entry = args["entry"]
-    data = request.get_data()
-    config = request.get_configuration()
-    tagsdata = data.get("tagsdata", {})
+    def all_tags(self):
+        """Returns list of (tag, tag_url, count) tuples"""
+        req = self.request
+        cfg = req.get_configuration()
 
-    # first, build the tags list
-    tags = sorted(tagsdata.keys())
+        form = req.get_form()
+        try:
+            theme = form['theme'].value
+        except KeyError:
+            theme = cfg.get('default_theme', 'html')
+        baseurl = cfg.get('base_url', '')
+        trigger = cfg.get('tags_trigger', 'tag')
 
-    start_t = config.get("tags_list_start", '<p>')
-    item_t = config.get("tags_list_item", ' <a href="%(tagurl)s">%(tag)s</a> ')
-    finish_t = config.get("tags_list_finish", '</p>')
+        tags = [
+            (tag,
+             '/'.join([baseurl.rstrip('/'), trigger, tag]) + '.' + theme,
+             len(entries))
+            for tag, entries in self.tagsdata.items()]
 
-    output = []
+        return tags
 
-    form = request.get_form()
-    try:
-        theme = form["theme"].value
-    except KeyError:
-        theme = config.get("default_theme", "html")
-    baseurl = config.get("base_url", "")
-    trigger = config.get("tags_trigger", "tag")
+    def all_tags_div(self):
+        """Generates div version of all tags"""
+        start_t = '<div class="allTags">'
+        item_t = ' <a class="tag" href="{0}">{1}</a> '
+        finish_t = '</div>'
 
-    output.append(start_t)
-    for item in tags:
-        d = {"base_url": baseurl,
-             "theme": theme,
-             "tag": item,
-             "count": len(tagsdata[item]),
-             "tagurl": "/".join([baseurl, trigger, item])}
-        output.append(item_t % d)
-    output.append(finish_t)
+        output = [start_t]
+        for tag, tag_url, count in self.all_tags():
+            output.append(item_t.format(tag_url, tag))
+        output.append(finish_t)
+        return '\n'.join(output)
 
-    entry["tagslist"] = "\n".join(output)
+    def all_tags_cloud(self):
+        """Generates div tag cloud of all tags"""
+        start_t = '<div class="allTagsCloud">'
+        item_t = '<a class="tag {0}" href="{1}">{2}</a>'
+        finish_t = '</div>'
 
-    # second, build the tags cloud
-    tags_by_file = tagsdata.items()
+        all_tags = self.all_tags()
 
-    start_t = config.get("tags_cloud_start", "<p>")
-    item_t = config.get("tags_cloud_item",
-                        '<a class="%(class)s" href="%(tagurl)s">%(tag)s</a>')
-    finish_t = config.get("tags_cloud_finish", "</p>")
+        tagcloud = [start_t]
+        if all_tags:
+            all_tags.sort(key=lambda x: x[2])
+            # the most popular tag is at the end--grab the number of files
+            # that have that tag
+            max_count = all_tags[-1][2]
+            min_count = all_tags[0][2]
 
-    tagcloud = [start_t]
+            # figure out the bin size for the tag size classes
+            b = (max_count - min_count) / 5
 
-    if len(tags_by_file) > 0:
-        tags_by_file.sort(key=lambda x: len(x[1]))
-        # the most popular tag is at the end--grab the number of files
-        # that have that tag
-        max_count = len(tags_by_file[-1][1])
-        min_count = len(tags_by_file[0])
-
-        # figure out the bin size for the tag size classes
-        b = (max_count - min_count) / 5
-
-        range_and_class = (
-            (min_count + (b * 4), "biggestTag"),
-            (min_count + (b * 3), "bigTag"),
-            (min_count + (b * 2), "mediumTag"),
-            (min_count + b, "smallTag"),
-            (0, "smallestTag")
+            range_and_class = (
+                (min_count + (b * 4), 'biggestTag'),
+                (min_count + (b * 3), 'bigTag'),
+                (min_count + (b * 2), 'mediumTag'),
+                (min_count + b, 'smallTag'),
+                (0, 'smallestTag')
             )
 
-        # sorts it alphabetically
-        tags_by_file.sort()
+            all_tags.sort()
 
-        for tag, files in tags_by_file:
-            len_files = len(files)
-            for tag_range, tag_size_class in range_and_class:
-                if len_files > tag_range:
-                    tag_class = tag_size_class
-                    break
+            for tag, tag_url, count in all_tags:
+                for tag_range, tag_size_class in range_and_class:
+                    if count > tag_range:
+                        tag_class = tag_size_class
+                        break
+                tagcloud.append(item_t.format(tag_class, tag_url, tag))
 
-            d = {"base_url": baseurl,
-                 "theme": theme,
-                 "class": tag_class,
-                 "tag": tag,
-                 "count": len(tagsdata[tag]),
-                 "tagurl": "/".join([baseurl, trigger, tag])}
+        tagcloud.append(finish_t)
+        return '\n'.join(tagcloud)
 
-            tagcloud.append(item_t % d)
+    def entry_tags(self, entry):
+        """Returns list of (tag, tag_url) tuples for this entry"""
+        req = self.request
+        cfg = req.get_configuration()
 
-    tagcloud.append(finish_t)
-    entry["tagcloud"] = "\n".join(tagcloud)
+        sep = cfg.get('tags_seperator', ',')
+        tags = sorted([t.strip() for t in entry.get('tags', '').split(sep)])
 
-    return args
+        form = req.get_form()
+        try:
+            theme = form['theme'].value
+        except KeyError:
+            theme = cfg.get('default_theme', 'html')
+        baseurl = cfg.get('base_url', '')
+        trigger = cfg.get('tags_trigger', 'tag')
 
-
-def cb_story(args):
-    # adds tags to the entry properties
-    request = args["request"]
-    entry = args["entry"]
-    config = request.get_configuration()
-
-    sep = config.get("tags_separator", ",")
-    tags = sorted([t.strip() for t in entry.get("tags", "").split(sep)])
-    entry["tags_raw"] = tags
-
-    form = request.get_form()
-    try:
-        theme = form["theme"].value
-    except KeyError:
-        theme = config.get("default_theme", "html")
-    baseurl = config.get("base_url", "")
-    trigger = config.get("tags_trigger", "tag")
-    template = config.get("tags_item", '<a href="%(tagurl)s">%(tag)s</a>')
-
-    tags = [template % {"base_url": baseurl,
-                        "theme": theme,
-                        "tag": tag,
-                        "tagurl": "/".join([baseurl, trigger, tag])}
+        return [
+            (tag,
+             '/'.join([baseurl.rstrip('/'), trigger, tag]) + '.' + theme)
             for tag in tags]
-    entry["tags"] = ", ".join(tags)
+
+    def entry_tags_span(self, entry):
+        """Returns span version of entry tags"""
+        start_t = '<span class="entryTags">'
+        item_t = ' <a class="tag" href="{0}">{1}</a> '
+        finish_t = '</span>'
+
+        output = [start_t]
+        for tag, tag_url in self.entry_tags(entry):
+            output.append(item_t.format(tag_url, tag))
+        output.append(finish_t)
+        return '\n'.join(output)
+
+
+def cb_context_processor(args):
+    context = args['context']
+    request = args['request']
+    context['tags'] = TagManager(request)
     return args
 
 
