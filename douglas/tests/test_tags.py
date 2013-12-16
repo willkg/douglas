@@ -30,13 +30,15 @@ class TagsTest(PluginTest):
         tm.all_tags_div()
         tm.all_tags_cloud()
 
-        # self.entry has no tags metadata
-        tm.entry_tags(self.entry)
-        tm.entry_tags_span(self.entry)
+        entry = self.generate_entry_list(self.request, 1)[0]
 
-        self.entry['tags'] = 'blog,kids'
-        tm.entry_tags(self.entry)
-        tm.entry_tags_span(self.entry)
+        # self.entry has no tags metadata
+        tm.entry_tags(entry)
+        tm.entry_tags_span(entry)
+
+        entry['tags'] = 'blog,kids'
+        tm.entry_tags(entry)
+        tm.entry_tags_span(entry)
 
     def test_tag_cloud_no_tags(self):
         tm = tags.TagManager(self.request)

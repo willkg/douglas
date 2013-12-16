@@ -196,30 +196,11 @@ class PluginTest(unittest.TestCase):
         self.http = self.request.get_http()
 
         # set up entries and data dict
-        self.entry_name = 'test_entry'
-        entry_properties = {'absolute_path': '.',
-                            'fn': self.entry_name}
-        self.entry = entries.base.generate_entry(
-            self.request, entry_properties, {}, gmtime)
-        self.entry_list = [self.entry]
-        self.data = {'entry_list': self.entry_list,
-                     'bl_type': 'entry',
-                     }
+        self.data = {
+            'entry_list': self.generate_entry_list(self.request, 1),
+            'bl_type': 'entry',
+        }
         self.request._data = self.data
-
-        # set up renderer and templates
-        self.renderer = Renderer(self.request)
-        self.renderer.set_content(self.entry_list)
-        templates = ('content_type', 'head', 'story', 'foot', 'date_head',
-                     'date_foot')
-        self.renderer.theme = dict([(t, t) for t in templates])
-
-        # populate args dict
-        self.args = {'request': self.request,
-                     'renderer': self.renderer,
-                     'entry': self.entry,
-                     'template': 'template starts:',
-                     }
 
         # this stores the callbacks that have been injected. it maps
         # callback names to the injected methods to call. any
@@ -237,6 +218,14 @@ class PluginTest(unittest.TestCase):
                 return orig_run_callback(name, args, **kwargs)
 
         tools.run_callback = intercept_callback
+
+    def generate_entry_list(self, req, num=1):
+        gmtime = time.gmtime(self.timestamp)
+        entry_list = []
+        for i in range(num):
+            entry_list.append(entries.base.generate_entry(
+                req, {'fn': 'test_entry{0}'.format(i)}, {}, gmtime))
+        return entry_list
 
     def tearDown(self):
         """Subclasses should call this in their tearDown() methods."""

@@ -1,15 +1,7 @@
 """Summary
 =======
 
-Plugin for paging long index pages.
-
-douglas uses the ``num_entries`` configuration variable to prevent
-more than ``num_entries`` being rendered by cutting the list down to
-``num_entries`` entries.  So if your ``num_entries`` is set to 20, you
-will only see the first 20 entries rendered.
-
-The paginate plugin overrides this functionality and allows for
-paging.
+Plugin for breaking up long index pages with many entries into pages.
 
 
 Install
@@ -26,12 +18,34 @@ This plugin comes with douglas.  To install, do the following:
 
 2. (optional) Add some configuration to your ``config.py`` file.
 
-3. Add the following blurb where you want page navigation to your
-   entry_list template::
 
-       <p>
-         {{ page_navigation|safe }}
-       </p>
+Usage
+=====
+
+Add the following blurb where you want page navigation to your
+``entry_list`` template::
+
+    {{ pager.as_list()|safe }}
+
+which generates HTML like this::
+
+    [1] 2 3 4 5 6 7 8 9 ... >>
+
+Or::
+
+    {{ pager.as_span()|safe }}
+
+which generates HTMl like this::
+
+    Page 1 of 4 >>
+
+You can also do your own pagination. The ``pager`` instance exposes
+the following helpful bits:
+
+* ``number`` - the page number being shown
+* ``has_next()`` - True if there's a next page
+* ``has_previous()`` - True if there's a previous page
+* ``link(pageno)`` - Builds the url for the specified page
 
 
 Configuration variables
@@ -49,24 +63,6 @@ Configuration variables
    Defaults to "&gt;&gt;".
 
    This is the text for the "next page" link.
-
-
-``paginate_linkstyle``
-
-   Defaults to 1.
-
-   This allows you to change the link style of the paging.
-
-   Style 0::
-
-       [1] 2 3 4 5 6 7 8 9 ... >>
-
-   Style 1::
-
-      Page 1 of 4 >>
-
-   If you want a style different than that, you'll have to copy the
-   plugin and implement your own style.
 
 
 Note about compiling
@@ -109,49 +105,74 @@ def verify_installation(cfg):
     return True
 
 
-class PageDisplay:
-    def __init__(self, url_template, url_template_n, current_page, max_pages,
+class Paginator(object):
+    def __init__(self, url_template, url_template_n, number, max_pages,
                  count_from, previous_text, next_text, linkstyle):
         self.url_template = url_template
         self.url_template_n = url_template_n
-        self.current_page = current_page
         self.max_pages = max_pages
         self.count_from = count_from
         self.previous_text = previous_text
         self.next_text = next_text
         self.linkstyle = linkstyle
 
-    def __str__(self):
-        # FIXME - turn this into unicode
-        output = []
+        self.number = number  # the 1-based index of this page
+
+    def url_for(self, pageno):
+        if pageno == 1:
+            return self.url_template
+        else:
+            return self.url_template_n % pageno
+
+    def has_previous(self):
+        return self.number != self.count_from
+
+    def has_next(self):
+        return self.number < self.max_pages - 1
+
+    def as_list(self):
+        output = [u'<ul class="paginate">']
         # prev
-        if self.current_page != self.count_from:
-            if self.current_page - 1 == 1:
-                prev_url = self.url_template
-            else:
-                prev_url = self.url_template_n % (self.current_page - 1)
+        if self.number != self.count_from:
+            prev_url = self.url_for(self.number - 1)
             output.append('<a href="%s">%s</a>&nbsp;' %
                           (prev_url, self.previous_text))
 
         # pages
-        if self.linkstyle == 0:
-            for i in range(self.count_from, self.max_pages):
-                if i == self.current_page:
-                    output.append('[%d]' % i)
-                else:
-                    page_url = self.url_template_n % i
-                    output.append('<a href="%s">%d</a>' % (page_url, i))
-
-        elif self.linkstyle == 1:
-            output.append(' Page %s of %s ' %
-                          (self.current_page, self.max_pages - 1))
+        for i in range(self.count_from, self.max_pages):
+            if i == self.number:
+                output.append('[%d]' % i)
+            else:
+                page_url = self.url_for(i)
+                output.append('<a href="%s">%d</a>' % (page_url, i))
 
         # next
-        if self.current_page < self.max_pages - 1:
-            next_url = self.url_template_n % (self.current_page + 1)
+        if self.has_next():
+            next_url = self.url_for(self.number + 1)
             output.append('&nbsp;<a href="%s">%s</a>' %
                           (next_url, self.next_text))
 
+        return ' '.join(output)
+
+    def as_span(self):
+        output = [u'<span class="paginate">']
+        # prev
+        if self.number != self.count_from:
+            prev_url = self.url_for(self.number - 1)
+            output.append('<a href="%s">%s</a>&nbsp;' %
+                          (prev_url, self.previous_text))
+
+        # pages
+        output.append(' Page %s of %s ' %
+                      (self.number, self.max_pages - 1))
+
+        # next
+        if self.number < self.max_pages - 1:
+            next_url = self.url_for(self.number + 1)
+            output.append('&nbsp;<a href="%s">%s</a>' %
+                          (next_url, self.next_text))
+
+        output.append(u'</span>')
         return ' '.join(output)
 
 
@@ -244,7 +265,7 @@ def page(request, num_entries, entry_list):
 
     data['entry_list'] = entry_list[begin:end]
 
-    data['page_navigation'] = PageDisplay(
+    data['pager'] = Paginator(
         url_template, url_template_n, page, max_pages, count_from, previous_text,
         next_text, linkstyle)
 
