@@ -14,7 +14,17 @@ Douglas is a file-based blog system written in Python with the following feature
 * Jinja renderer
 * basic set of built-in plugins
 
-Douglas is based on `Pyblosxom <http://pyblosxom.github.io>`_.
+Douglas is a rewrite of `Pyblosxom <http://pyblosxom.github.io>`_.
+
+
+Project
+=======
+
+:Code:    https://github.com/willkg/douglas
+:License: MIT
+:Issues:  https://github.com/willkg/douglas/issues
+:Docs:    https://douglas.readthedocs.org/
+:Status:  **Extreme Alpha**
 
 
 Requirements
