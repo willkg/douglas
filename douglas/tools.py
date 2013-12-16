@@ -627,11 +627,12 @@ def render_url(cdict, pathinfo, querystring=""):
         'REQUEST_METHOD': 'GET',
         'REQUEST_URI': request_uri,
         'SCRIPT_NAME': '',
+        'wsgi.url_scheme': 'http',
         'wsgi.errors': sys.stderr,
         'wsgi.input': None
     }
-    data = {'COMPILING': 1}
-    p = Douglas(cdict, env, data)
+
+    p = Douglas(cdict, env, {'COMPILING': 1})
     p.run(compiling=True)
     return p.get_response()
 

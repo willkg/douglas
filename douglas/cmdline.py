@@ -89,7 +89,7 @@ def generate_handler(doug, cfg, host_port):
     """Creates a closure so our DouglasHTTPRequestHandler has what it needs"""
     base_url = cfg.get('base_url', '/')
     base_path = urlparse(base_url).path.lstrip('/')
-    compiled_dir = cfg['compiled_dir']
+    compiledir = cfg['compiledir']
     default_theme = cfg.get('default_theme', 'html')
     serving_base_url = 'http://{0}/{1}'.format(host_port, base_path)
 
@@ -106,7 +106,7 @@ def generate_handler(doug, cfg, host_port):
                 newpath = newpath[len(base_path):]
 
             newpath = newpath.lstrip('/')
-            newpath = os.path.join(compiled_dir, newpath)
+            newpath = os.path.join(compiledir, newpath)
 
             # If the path doesn't exist, try the path with the
             # default_theme tacked on.
@@ -132,6 +132,10 @@ def generate_handler(doug, cfg, host_port):
 
             # Re-render this url, so it's up-to-date.
             url = self.path[len(base_path)+1:]
+            if not url:
+                url = '/'
+            if url.endswith('/'):
+                url = url + 'index.' + cfg.get('default_theme', 'html')
             print 're-render {0}'.format(url)
             render_url_statically(dict(cfg), url, '')
 
@@ -145,7 +149,8 @@ def generate_handler(doug, cfg, host_port):
             """Copies data over and replaces base_url for html files"""
             if self._type == 'text/html':
                 data = source.read()
-                data = data.replace(base_url, serving_base_url)
+                if base_url.startswith('http'):
+                    data = data.replace(base_url, serving_base_url)
                 outputfile.write(data)
             else:
                 SimpleHTTPRequestHandler.copyfile(self, source, outputfile)
