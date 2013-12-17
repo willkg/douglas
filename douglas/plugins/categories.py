@@ -97,12 +97,7 @@ class CategoryManager(object):
         end_t = '</ul></li>'
         finish_t = '</ul>'
 
-        form = self.request.get_form()
-
-        if 'theme' in form:
-            theme = form['theme'].value
-        else:
-            theme = config.get('default_theme', 'html')
+        theme = self.request.get_theme()
 
         categorydata = self.categorydata
 

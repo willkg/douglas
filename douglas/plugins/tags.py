@@ -392,14 +392,8 @@ class TagManager(object):
 
     def all_tags(self):
         """Returns list of (tag, tag_url, count) tuples"""
-        req = self.request
-        cfg = req.get_configuration()
-
-        form = req.get_form()
-        try:
-            theme = form['theme'].value
-        except KeyError:
-            theme = cfg.get('default_theme', 'html')
+        theme = self.request.get_theme()
+        cfg = self.request.get_configuration()
         baseurl = cfg.get('base_url', '')
         trigger = cfg.get('tags_trigger', 'tag')
 
@@ -464,17 +458,11 @@ class TagManager(object):
 
     def entry_tags(self, entry):
         """Returns list of (tag, tag_url) tuples for this entry"""
-        req = self.request
-        cfg = req.get_configuration()
+        cfg = self.request.get_configuration()
 
         sep = cfg.get('tags_seperator', ',')
         tags = sorted([t.strip() for t in entry.get('tags', '').split(sep)])
-
-        form = req.get_form()
-        try:
-            theme = form['theme'].value
-        except KeyError:
-            theme = cfg.get('default_theme', 'html')
+        theme = self.request.get_theme()
         baseurl = cfg.get('base_url', '')
         trigger = cfg.get('tags_trigger', 'tag')
 

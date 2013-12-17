@@ -192,7 +192,7 @@ def cb_story(args):
     # otherwise we replace the breakpoint with the template
     base_url = config["base_url"]
     file_path = entry["file_path"]
-    theme = config.get("default_theme", "html")
+    theme = request.get_theme()
     url = '%s/%s.%s' % (base_url, file_path, theme)
 
     link = (template % {"url": url,

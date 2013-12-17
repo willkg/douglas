@@ -581,6 +581,13 @@ class Request(object):
             self._form = self._getform()
         return self._form
 
+    def get_theme(self):
+        """Returns the user-requested theme."""
+        form = self.get_form()
+        if 'theme' in form:
+            return form['theme'].value
+        return self.get_configuration().get('default_theme', 'html')
+
     def get_configuration(self):
         """Returns the *actual* configuration dict.  The configuration
         dict holds values that the user sets in their ``config.py``
@@ -1037,14 +1044,7 @@ def blosxom_process_path_info(args):
     pi_yr = pi_mo = pi_da = ''
     root_datadir = config['datadir']
     extensions = config['extensions'].keys()
-
-    # figure out which theme to use.  the theme is determined by
-    # looking at the "theme" post-data variable, the "theme" query
-    # string variable, the "default_theme" setting in the config.py
-    # file, or "html"
-    theme = config.get('default_theme', 'html')
-    if 'theme' in form:
-        theme = form['theme'].value
+    theme = request.get_theme()
 
     # first we check to see if this is a request for an index and we
     # can pluck the extension (which is certainly a theme) right
