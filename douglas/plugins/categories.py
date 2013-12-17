@@ -1,5 +1,4 @@
-"""
-Summary
+"""Summary
 =======
 
 Walks through your blog root figuring out all the categories you have
@@ -16,215 +15,147 @@ This plugin comes with douglas.  To install, do the following:
 1. Add ``douglas.plugins.pycategories`` to the ``load_plugins`` list
    in your ``config.py`` file.
 
-2. Add ``$(categorylinks)`` to your head and/or foot templates.
-
 
 Configuration
 =============
 
-You can format the output by setting ``category_begin``,
-``category_item``, and ``category_end`` properties.
-
-Categories exist in a hierarchy.  ``category_start`` starts the
-category listing and is only used at the very beginning.  The
-``category_begin`` property begins a new category group and the
-``category_end`` property ends that category group.  The
-``category_item`` property is the template for each category item.
-Then after all the categories are printed, ``category_finish`` ends
-the category listing.
-
-For example, the following properties will use ``<ul>`` to open a
-category, ``</ul>`` to close a category and ``<li>`` for each item::
-
-    py["category_start"] = "<ul>"
-    py["category_begin"] = "<ul>"
-    py["category_item"] = (
-        r'<li><a href="%(base_url)s/%(category_urlencoded)sindex">'
-        r'%(category)s</a></li>')
-    py["category_end"] = "</ul>"
-    py["category_finish"] = "</ul>"
+There is no configuration.
 
 
-Another example, the following properties don't have a begin or an end
-but instead use indentation for links and displays the number of
-entries in that category::
+Usage
+=====
 
-    py["category_start"] = ""
-    py["category_begin"] = ""
-    py["category_item"] = (
-        r'%(indent)s<a href="%(base_url)s/%(category_urlencoded)sindex">'
-        r'%(category)s</a> (%(count)d)<br />')
-    py["category_end"] = ""
-    py["category_finish"] = ""
+Categories plugin provides an HTML version of the categories in a list
+form. You can use it in your template like this::
 
-There are no variables available in the ``category_begin`` or
-``category_end`` templates.
+    {{ categories.as_list()|safe }}
 
-Available variables in the category_item template:
 
-=======================  ==========================  ====================
-variable                 example                     datatype
-=======================  ==========================  ====================
-base_url                 http://joe.com/blog/        string
-fullcategory_urlencoded  'dev/douglas/status/'       string
-fullcategory             'dev/douglas/status/'       string (urlencoded)
-category                 'status/'                   string
-category_urlencoded      'status/'                   string (urlencoed)
-theme                    'html'                      string
-count                    70                          int
-indent                   '&nbsp;&nbsp;&nbsp;&nbsp;'  string
-=======================  ==========================  ====================
+Alternatively, you can build the categories HTML yourself::
+
+    {% for cat, count in categories.categorydata %}
+        ....
+    {% endfor %}
+
 """
 
 __description__ = "Builds a list of categories."
 __category__ = "category"
 __license__ = "MIT"
 
-
-from douglas import tools
-from douglas.memcache import memcache_decorator
-from douglas.tools import pwrap
 import os
 
-
-DEFAULT_START = r'<ul class="categorygroup">'
-DEFAULT_BEGIN = r'<li><ul class="categorygroup">'
-DEFAULT_ITEM = (
-    r'<li><a href="%(base_url)s/%(fullcategory_urlencoded)sindex.%(theme)s">'
-    r'%(category)s</a> (%(count)d)</li>')
-DEFAULT_END = "</ul></li>"
-DEFAULT_FINISH = "</ul>"
+from douglas import tools
 
 
-def verify_installation(cfg):
-    if not "category_item" in cfg:
-        pwrap(
-            "missing optional config property 'category_item' which allows "
-            "you to specify how the category hierarchy is rendered.  see"
-            "the documentation at the top of the pycategories plugin code "
-            "file for more details.")
-    return True
+def parents(category):
+    category = [cat for cat in category.split('/') if cat]
+    for i in range(len(category) + 1):
+        yield '/'.join(category[:i])
 
 
-class PyblCategories:
+class CategoryManager(object):
     def __init__(self, request):
-        self._request = request
-        self._categories = None
+        self.request = request
+        self._categorydata = None
 
-    @memcache_decorator('pycategories', True)
-    def __str__(self):
-        if self._categories == None:
-            self.gen_categories()
-        return self._categories
 
-    def gen_categories(self):
-        config = self._request.get_configuration()
-        root = config["datadir"]
+    @property
+    def categorydata(self):
+        if self._categorydata is None:
+            config = self.request.get_configuration()
+            root = config["datadir"]
 
-        start_t = config.get("category_start", DEFAULT_START)
-        begin_t = config.get("category_begin", DEFAULT_BEGIN)
-        item_t = config.get("category_item", DEFAULT_ITEM)
-        end_t = config.get("category_end", DEFAULT_END)
-        finish_t = config.get("category_finish", DEFAULT_FINISH)
+            # Build the list of all entries in the datadir
+            entry_list = tools.get_entries(config, root)
 
-        self._baseurl = config.get("base_url", "")
+            # Peel off the root dir from the list of entries
+            entry_list = [mem[len(root) + 1:] for mem in entry_list]
 
-        form = self._request.get_form()
+            # Map categories to counts.
+            category_map = {}
+            for mem in entry_list:
+                mem = os.path.dirname(mem)
+                for par in parents(mem):
+                    category_map[par] = category_map.get(par, 0) + 1
+
+            self._categorydata = sorted(category_map.items())
+        return self._categorydata
+
+    def as_list(self):
+        config = self.request.get_configuration()
+        baseurl = config.get('base_url', '')
+
+        start_t = '<ul class="categorygroup">'
+        begin_t = '<li><ul class="categorygroup">'
+        item_t = (
+            '<li>'
+            '<a href="%(base_url)s/%(fullcategory)sindex.%(theme)s">'
+            '%(subcategory)s'
+            '</a>'
+            '(%(count)d)</li>')
+        end_t = '</ul></li>'
+        finish_t = '</ul>'
+
+        form = self.request.get_form()
 
         if 'theme' in form:
             theme = form['theme'].value
         else:
             theme = config.get('default_theme', 'html')
 
-        # build the list of all entries in the datadir
-        elist = tools.get_entries(config, root)
-
-        # peel off the root dir from the list of entries
-        elist = [mem[len(root) + 1:] for mem in elist]
-
-        # go through the list of entries and build a map that
-        # maintains a count of how many entries are in each category
-        elistmap = {}
-        for mem in elist:
-            mem = os.path.dirname(mem)
-            elistmap[mem] = 1 + elistmap.get(mem, 0)
-        self._elistmap = elistmap
-
-        # go through the elistmap keys (which is the list of
-        # categories) and for each piece in the key (i.e. the key
-        # could be "dev/douglas/releases" and the pieces would be
-        # "dev", "douglas", and "releases") we build keys for the
-        # category list map (i.e. "dev", "dev/douglas",
-        # "dev/douglas/releases")
-        clistmap = {}
-        for mem in elistmap.keys():
-            mem = mem.split(os.sep)
-            for index in range(len(mem) + 1):
-                p = os.sep.join(mem[0:index])
-                clistmap[p] = 0
-
-        # then we take the category list from the clistmap and sort it
-        # alphabetically
-        clist = sorted(clistmap.keys())
+        categorydata = self.categorydata
 
         output = []
         indent = 0
 
         output.append(start_t)
-        # then we generate each item in the list
-        for item in clist:
-            itemlist = item.split(os.sep)
 
-            num = 0
-            for key in self._elistmap.keys():
-                if item == '' or key == item or key.startswith(item + os.sep):
-                    num = num + self._elistmap[key]
+        # Generate each item in the list
+        for name, count in categorydata:
+            namelist = name.split(os.sep)
 
-            if not item:
+            if not name:
                 tab = ""
             else:
-                tab = len(itemlist) * "&nbsp;&nbsp;"
+                tab = len(namelist) * "&nbsp;&nbsp;"
 
-            if itemlist != ['']:
-                if indent > len(itemlist):
-                    for i in range(indent - len(itemlist)):
+            if namelist != ['']:
+                if indent > len(namelist):
+                    for i in range(indent - len(namelist)):
                         output.append(end_t)
 
-                elif indent < len(itemlist):
-                    for i in range(len(itemlist) - indent):
+                elif indent < len(namelist):
+                    for i in range(len(namelist) - indent):
                         output.append(begin_t)
 
-            # now we build the dict with the values for substitution
-            d = {"base_url": self._baseurl,
-                 "fullcategory": item + "/",
-                 "category": itemlist[-1] + "/",
-                 "theme": theme,
-                 "count": num,
-                 "indent": tab}
+            # Build the dict with the values for substitution
+            d = {'base_url': baseurl,
+                 'fullcategory': tools.urlencode_text(name + '/'),
+                 'subcategory': tools.urlencode_text(namelist[-1] + '/'),
+                 'theme': theme,
+                 'count': count,
+                 'indent': tab}
 
-            # this prevents a double / in the root category url
-            if item == "":
-                d["fullcategory"] = item
+            # This prevents a double / in the root category url
+            if name == '':
+                d['fullcategory'] = name
 
-            # this adds urlencoded versions
-            d["fullcategory_urlencoded"] = (
-                tools.urlencode_text(d["fullcategory"]))
-            d["category_urlencoded"] = tools.urlencode_text(d["category"])
-
-            # and we toss it in the thing
+            # Toss it in the thing
             output.append(item_t % d)
 
-            if itemlist != ['']:
-                indent = len(itemlist)
+            if namelist != ['']:
+                indent = len(namelist)
 
         output.append(end_t * indent)
         output.append(finish_t)
 
         # then we join the list and that's the final string
-        self._categories = "\n".join(output)
+        return '\n'.join(output)
 
 
-def cb_prepare(args):
-    request = args["request"]
-    data = request.get_data()
-    data["categorylinks"] = PyblCategories(request)
+def cb_context_processor(args):
+    context = args['context']
+    request = args['request']
+    context['categories'] = CategoryManager(request)
+    return args
