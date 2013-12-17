@@ -1,5 +1,4 @@
-from douglas import tools
-from douglas.app import blosxom_process_path_info, initialize
+from douglas.app import blosxom_process_path_info
 from douglas.tests import UnitTestBase
 
 

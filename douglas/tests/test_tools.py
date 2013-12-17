@@ -135,10 +135,7 @@ class Testimportname(UnitTestBase):
         return m
 
     def test_goodimport(self):
-        import string
         self.eq_(tools.importname("", "string"), string)
-
-        import os.path
         self.eq_(tools.importname("os", "path"), os.path)
 
     def test_badimport(self):

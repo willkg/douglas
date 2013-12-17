@@ -1,5 +1,16 @@
 """
-Prevents blog entries published in the future from showing up on the blog.
+Summary
+=======
+
+Prevents blog entries published in the future from showing up on
+the blog.
+
+
+Install
+=======
+
+Add ``douglas.plugins.ignore_future`` to the ``load_plugins`` list in
+your ``config.py`` file.
 
 """
 

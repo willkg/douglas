@@ -60,6 +60,7 @@ control over the rendered HTML::
 
    If you're not seeing headings that you think should be there, try
    changing the ``reST_initial_header_level`` property to 0.
+
 """
 
 __description__ = "restructured text support for blog entries"
@@ -91,6 +92,7 @@ def cb_preformat(args):
     if args.get("parser", None) == PREFORMATTER_ID:
         return parse(''.join(args['story']), args['request'])
 
+
 @memcache_decorator('rst_parser')
 def _parse(initial_header_level, transform_doctitle, story):
     parts = publish_parts(
@@ -103,12 +105,14 @@ def _parse(initial_header_level, transform_doctitle, story):
             })
     return parts['body']
 
+
 def parse(story, request):
     config = request.getConfiguration()
     initial_header_level = config.get('reST_initial_header_level', 1)
     transform_doctitle = config.get('reST_transform_doctitle', 1)
 
     return _parse(initial_header_level, transform_doctitle, story)
+
 
 def readfile(filename, request):
     entry_data = {}

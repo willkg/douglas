@@ -1,4 +1,7 @@
 """
+Summary
+=======
+
 This takes a #published date/time stamp in the entry and returns
 that as the mtime.
 
@@ -10,15 +13,24 @@ Example entry::
      This is my first post!
    </p>
 
+
 returns an mtime of 01-01-2008 at 12:20:22.
+
+
+Install
+=======
+
+Add ``douglas.plugins.published_date`` to the ``load_plugins`` list of
+your ``config.py`` file.
+
 """
 
 __description__ = "Maintain published date in file metadata."
 __category__ = "metadata"
 __license__ = 'MIT'
 
-import time
 import stat
+import time
 
 from douglas.memcache import memcache_decorator
 

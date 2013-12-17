@@ -689,6 +689,7 @@ class Response(object):
         >>> resp.set_status("404 Not Found")
 
         :param status: the status string.
+
         """
         self.status = status
 
@@ -709,6 +710,7 @@ class Response(object):
 
         :raises ValueError: This happens when the parameters are
                             not correct.
+
         """
         key = key.strip()
         if key.find(' ') != -1 or key.find(':') != -1:

@@ -1,6 +1,6 @@
 import os
 
-from nose.tools import eq_, ok_
+from nose.tools import eq_
 
 from douglas.plugins import categories
 from douglas.tests import PluginTest
