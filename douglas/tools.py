@@ -1,7 +1,10 @@
+import logging
 import os
 import os.path
+import random
 import re
 import stat
+import string
 import sys
 import textwrap
 import time
@@ -11,8 +14,9 @@ import urllib
 from douglas import plugin_utils
 
 
-MONTHS = ['01', '02', '03', '04', '05', '06',
-          '07', '08', '09', '10', '11', '12']
+MONTHS = [
+    '01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'
+]
 
 
 def pwrap(s):
@@ -297,13 +301,14 @@ def _walk_internal(root, recurse, pattern, ignorere, return_folders):
 
         # recursively scan other folders, appending results
         if (recurse == 0) or (recurse > 1):
-            if name[0] != "." and os.path.isdir(fullname) and \
-                    not os.path.islink(fullname) and \
-                    (not ignorere or not ignorere.match(fullname)):
-                result = result + \
-                         _walk_internal(fullname,
-                                        (recurse > 1 and [recurse - 1] or [0])[0],
-                                        pattern, ignorere, return_folders)
+            if ((name[0] != "." and os.path.isdir(fullname)
+                 and not os.path.islink(fullname)
+                 and (not ignorere or not ignorere.match(fullname)))):
+                result = (
+                    result +
+                    _walk_internal(fullname,
+                                   (recurse > 1 and [recurse - 1] or [0])[0],
+                                   pattern, ignorere, return_folders))
 
     return result
 
@@ -403,12 +408,12 @@ def importname(modulename, name):
             module = getattr(module, c)
         return module
 
-    except ImportError, ie:
-        logger.error('Module %s in package %s won\'t import: %s' % \
+    except ImportError as ie:
+        logger.error('Module %s in package %s won\'t import: %s' %
                      (repr(modulename), repr(name), ie))
 
-    except StandardError, e:
-        logger.error('Module %s not in in package %s: %s' % \
+    except StandardError as e:
+        logger.error('Module %s not in in package %s: %s' %
                      (repr(modulename), repr(name), e))
 
     return None
@@ -426,7 +431,6 @@ def generate_rand_str(minlen=5, maxlen=10):
 
     :returns: generated string
     """
-    import random, string
     chars = string.letters + string.digits
     randstr = []
     randstr_size = random.randint(minlen, maxlen)
@@ -637,12 +641,6 @@ def render_url(cdict, pathinfo, querystring=""):
     return p.get_response()
 
 
-#******************************
-# Logging
-#******************************
-
-import logging
-
 LEVELS = {
     'critical': logging.CRITICAL,
     'error': logging.ERROR,
@@ -660,4 +658,5 @@ def setup_logging(cfg):
         # If no log file is set up, set to logging.ERROR and stderr.
         logging.basicConfig(level=level, stream=sys.stderr)
     else:
-        logging.basicConfig(level=level, filename=cfg['log_file'], filemode='a')
+        logging.basicConfig(level=level, filename=cfg['log_file'],
+                            filemode='a')
