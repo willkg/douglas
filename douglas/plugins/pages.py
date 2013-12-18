@@ -184,7 +184,7 @@ def eval_python_blocks(req, body):
 
                 try:
                     exec codeblock in localsdict, globalsdict
-                except Exception, e:
+                except Exception as e:
                     print "ERROR in processing: %s" % e
 
                 output = sys.stdout.getvalue() + sys.stderr.getvalue()

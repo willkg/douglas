@@ -76,47 +76,47 @@ class CrashHandler:
             http_environ += "{0}: {1}\n".format(_e(repr(key)), _e(repr(val)))
 
         output.write("""
-<html>
-<head>
-<title>HTTP 500: Oops!</title>
-</head>
-<body>
-<h1>HTTP 500: GAH!</h1>
-<p>
-A problem has occurred while Douglas was rendering
-this page.
-</p>
-<p>
-If this is your blog and you've just upgraded Douglas,
-check the documentation for changes you need to make to your
-config.py, douglas.cgi, blog.ini, plugins, and theme
-files.
-</p>
-<p>
-Here is some useful information to track down the root cause
-of the problem:
-</p>
-<div style="border: 1px solid black; padding: 10px;">
+        <html>
+        <head>
+        <title>HTTP 500: Oops!</title>
+        </head>
+        <body>
+        <h1>HTTP 500: GAH!</h1>
+        <p>
+        A problem has occurred while Douglas was rendering
+        this page.
+        </p>
+        <p>
+        If this is your blog and you've just upgraded Douglas,
+        check the documentation for changes you need to make to your
+        config.py, douglas.cgi, blog.ini, plugins, and theme
+        files.
+        </p>
+        <p>
+        Here is some useful information to track down the root cause
+        of the problem:
+        </p>
+        <div style="border: 1px solid black; padding: 10px;">
 
-<p>Douglas version: {version}</p>
-<p>Python version: {python_version}</p>
-<p>Error traceback:</p>
-<pre>
-{traceback}
-</pre>
+        <p>Douglas version: {version}</p>
+        <p>Python version: {python_version}</p>
+        <p>Error traceback:</p>
+        <pre>
+        {traceback}
+        </pre>
 
-<p>HTTP environment:</p>
-<pre>
-{http_environ}
-</pre>
-</div>
-</body>
-</html>
-""".format(
-        version=_e(version),
-        python_version=_e(sys.version),
-        traceback=tb,
-        http_environ=http_environ))
+        <p>HTTP environment:</p>
+        <pre>
+        {http_environ}
+        </pre>
+        </div>
+        </body>
+        </html>
+        """.format(
+            version=_e(version),
+            python_version=_e(sys.version),
+            traceback=tb,
+            http_environ=http_environ))
 
         headers["Content-Length"] = str(output.len)
         return Response("500 Server Error", headers, output)

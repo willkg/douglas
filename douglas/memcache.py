@@ -37,9 +37,11 @@ def memcache_decorator(scope, instance=False):
 
             try:
                 if instance:
-                    hash_key = hash((args[1:], frozenset(sorted(kwargs.items()))))
+                    mem = args[1:]
                 else:
-                    hash_key = hash((args, frozenset(sorted(kwargs.items()))))
+                    mem = args
+
+                hash_key = hash((mem, frozenset(sorted(kwargs.items()))))
             except TypeError:
                 print repr((args, kwargs))
                 hash_key = None

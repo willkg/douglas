@@ -56,7 +56,8 @@ class Douglas(object):
             if 'SCRIPT_NAME' in pyhttp:
                 # allow http and https
                 config['base_url'] = '{0}://{1}{2}'.format(
-                    pyhttp['wsgi.url_scheme'], pyhttp['HTTP_HOST'], pyhttp['SCRIPT_NAME'])
+                    pyhttp['wsgi.url_scheme'], pyhttp['HTTP_HOST'],
+                    pyhttp['SCRIPT_NAME'])
             else:
                 config['base_url'] = ''
 
@@ -102,7 +103,7 @@ class Douglas(object):
         # Buffer the input stream in a StringIO instance if dynamic
         # rendering is used.  This is done to have a known/consistent
         # way of accessing incomming data.
-        if compiling == False:
+        if not compiling:
             self.get_request().buffer_input_stream()
 
         # Run the start callback
@@ -110,9 +111,9 @@ class Douglas(object):
 
         # Allow anyone else to handle the request at this point
         handled = tools.run_callback("handle",
-                        {'request': self._request},
-                        mappingfunc=lambda x,y:x,
-                        donefunc=lambda x:x)
+                                     {'request': self._request},
+                                     mappingfunc=lambda x, y: x,
+                                     donefunc=lambda x: x)
 
         if not handled == 1:
             blosxom_handler(self._request)
@@ -122,7 +123,7 @@ class Douglas(object):
 
         # We're done, clean up.  Only call this if we're not in
         # compiling mode.
-        if compiling == False:
+        if not compiling:
             self.cleanup()
 
     def run_render_one(self, url, headers):
@@ -213,7 +214,7 @@ class Douglas(object):
             mem = mem[len(datadir):mem.rfind('.')]
 
             # This is the compiled file filename.
-            fn = os.path.normpath(compiledir  + mem)
+            fn = os.path.normpath(compiledir + mem)
 
             if incremental:
                 # If we're incrementally rendering, we check the mtime
@@ -334,8 +335,8 @@ def initialize(cfg):
     extensions = tools.run_callback(
         "entryparser",
         {'txt': blosxom_entry_parser},
-        mappingfunc=lambda x,y:y,
-        defaultfunc=lambda x:x)
+        mappingfunc=lambda x, y: y,
+        defaultfunc=lambda x: x)
 
     # go through the config.py and override entryparser extensions
     for ext, parser_module in cfg.get('entryparsers', {}).items():
@@ -365,7 +366,7 @@ class DouglasWSGIApp:
         self.environ = environ
         self.start_response = start_response
 
-        if configini == None:
+        if configini is None:
             configini = {}
 
         _config = tools.convert_configini_values(configini)
@@ -488,7 +489,7 @@ class Request(object):
 
         # this holds run-time data which gets created and transformed
         # by douglas during execution
-        if data == None:
+        if data is None:
             self._data = dict()
         else:
             self._data = data
@@ -577,7 +578,7 @@ class Request(object):
 
         :returns: a ``cgi.FieldStorage`` instance.
         """
-        if self._form == None:
+        if self._form is None:
             self._form = self._getform()
         return self._form
 
@@ -644,7 +645,7 @@ class Request(object):
         if name == "http":
             return self._http
 
-        raise AttributeError, name
+        raise AttributeError(name)
 
     def __repr__(self):
         return "Request"
@@ -721,7 +722,7 @@ class Response(object):
         """
         key = key.strip()
         if key.find(' ') != -1 or key.find(':') != -1:
-            raise ValueError, 'There should be no spaces in header keys'
+            raise ValueError('There should be no spaces in header keys')
         value = value.strip()
         if key.lower() == "status":
             self.set_status(str(value))
@@ -745,7 +746,7 @@ class Response(object):
         """
         out.write("Status: %s\n" % self.status)
         out.write('\n'.join(['%s: %s' % (hkey, self.headers[hkey])
-                for hkey in self.headers.keys()]))
+                             for hkey in self.headers.keys()]))
         out.write('\n\n')
         self._headers_sent = True
 
@@ -790,8 +791,8 @@ def blosxom_handler(request):
     # downstream processing.
     rend = tools.run_callback('renderer',
                               {'request': request},
-                              donefunc = lambda x: x != None,
-                              defaultfunc = lambda x: None)
+                              donefunc=lambda x: x is not None,
+                              defaultfunc=lambda x: None)
 
     if not rend:
         # get the renderer we want to use
@@ -812,14 +813,14 @@ def blosxom_handler(request):
     # this is
     tools.run_callback('pathinfo',
                        {'request': request},
-                       donefunc=lambda x:x != None,
+                       donefunc=lambda x: x is not None,
                        defaultfunc=blosxom_process_path_info)
 
     # call the filelist callback to generate a list of entries
     data['entry_list'] = tools.run_callback(
         'filelist',
         {'request': request},
-        donefunc=lambda x:x != None,
+        donefunc=lambda x: x is not None,
         defaultfunc=blosxom_file_list_handler)
 
     # figure out the blog-level mtime which is the mtime of the head
@@ -920,13 +921,13 @@ def blosxom_entry_parser(filename, request):
     entry_data['body'] = tools.run_callback(
         'preformat',
         args,
-        donefunc=lambda x: x != None,
+        donefunc=lambda x: x is not None,
         defaultfunc=lambda x: ''.join(x['story']))
 
     # call the postformat callbacks
     tools.run_callback('postformat',
-                      {'request': request,
-                       'entry_data': entry_data})
+                       {'request': request,
+                        'entry_data': entry_data})
 
     return entry_data
 
@@ -962,20 +963,21 @@ def blosxom_file_list_handler(args):
         datestr = "%s%s%s" % (data["pi_yr"],
                               data.get("pi_mo", ""),
                               data.get("pi_da", ""))
-        entrylist = [x for x in entrylist
-                     if time.strftime("%Y%m%d%H%M%S", x["timetuple"]).startswith(datestr)]
-
+        entrylist = [
+            x for x in entrylist
+            if (time.strftime("%Y%m%d%H%M%S", x["timetuple"])
+                .startswith(datestr))]
 
     args = {"request": request, "entry_list": entrylist}
     entrylist = tools.run_callback("sortlist",
                                    args,
-                                   donefunc=lambda x: x != None,
+                                   donefunc=lambda x: x is not None,
                                    defaultfunc=blosxom_sort_list_handler)
 
     args = {"request": request, "entry_list": entrylist}
     entrylist = tools.run_callback("truncatelist",
                                    args,
-                                   donefunc=lambda x: x != None,
+                                   donefunc=lambda x: x is not None,
                                    defaultfunc=blosxom_truncate_list_handler)
 
     return entrylist
@@ -1066,7 +1068,8 @@ def blosxom_process_path_info(args):
         root_datadir = absolute_path
         bl_type = 'entry_list'
 
-    elif absolute_path.endswith("/index") and os.path.isdir(absolute_path[:-6]):
+    elif (absolute_path.endswith("/index")
+          and os.path.isdir(absolute_path[:-6])):
         # this is an absolute path with /index at the end of it
         root_datadir = absolute_path[:-6]
         bl_type = 'entry_list'
@@ -1103,7 +1106,8 @@ def blosxom_process_path_info(args):
             # (or something like that) so we pluck off the categories
             # here.
             while (path_info
-                   and not (len(path_info[0]) == 4 and path_info[0].isdigit())):
+                   and not (len(path_info[0]) == 4
+                            and path_info[0].isdigit())):
                 pi_bl = os.path.join(pi_bl, path_info.pop(0))
 
             # handle the case where we do in fact have a category
