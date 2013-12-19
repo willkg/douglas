@@ -21,6 +21,28 @@ This plugin comes with douglas.  To install, do the following:
    http://docutils.sourceforge.net/
 
 
+Configuration
+=============
+
+There's two optional configuration parameter you can for additional
+control over the rendered HTML::
+
+   # To set the starting level for the rendered heading elements.
+   # 1 is the default.
+   py['reST_initial_header_level'] = 1
+
+   # Enable or disable the promotion of a lone top-level section title to
+   # document title (and subsequent section title to document subtitle
+   # promotion); enabled by default.
+   py['reST_transform_doctitle'] = 1
+
+
+.. Note::
+
+   If you're not seeing headings that you think should be there, try
+   changing the ``reST_initial_header_level`` property to 0.
+
+
 Usage
 =====
 
@@ -47,9 +69,13 @@ at the point where the summary should end. For example::
 
     .. break::
 
-    Secon part of my blog entry after the fold.
+    Second part of my blog entry after the fold.
 
-In your templates, you can show just the summary like this::
+Some entries don't have a summary attribute, so if you're going to
+show the summary, you need to make sure it's defined first.
+
+For example, in your entry_list template, you could show the summary
+like this::
 
     {% if entry.summary is defined %}
       {{ entry.summary|safe }}
@@ -57,28 +83,6 @@ In your templates, you can show just the summary like this::
     {% else %}
       {{ entry.body|safe }}
     {% endif %}
-
-
-Configuration
-=============
-
-There's two optional configuration parameter you can for additional
-control over the rendered HTML::
-
-   # To set the starting level for the rendered heading elements.
-   # 1 is the default.
-   py['reST_initial_header_level'] = 1
-
-   # Enable or disable the promotion of a lone top-level section title to
-   # document title (and subsequent section title to document subtitle
-   # promotion); enabled by default.
-   py['reST_transform_doctitle'] = 1
-
-
-.. Note::
-
-   If you're not seeing headings that you think should be there, try
-   changing the ``reST_initial_header_level`` property to 0.
 
 """
 
@@ -177,8 +181,7 @@ def readfile(filename, request):
 
     if len(body) > 1:
         entry_data['summary'] = body[0]
-    else:
-        entry_data['summary'] = ''
+
     entry_data['body'] = ''.join(body)
 
     # Call the postformat callbacks
