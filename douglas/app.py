@@ -1040,8 +1040,6 @@ def blosxom_process_path_info(args):
     data = request.get_data()
     pyhttp = request.get_http()
 
-    form = request.get_form()
-
     path_info = pi_bl = pyhttp.get('PATH_INFO', '')
     pi_yr = pi_mo = pi_da = ''
     root_datadir = config['datadir']
