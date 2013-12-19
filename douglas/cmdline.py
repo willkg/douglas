@@ -149,6 +149,7 @@ def generate_handler(doug, cfg, host_port):
             """Copies data over and replaces base_url for html files"""
             if self._type == 'text/html':
                 data = source.read()
+                # FIXME - this is broken for too many edge cases
                 if base_url.startswith('http'):
                     data = data.replace(base_url, serving_base_url)
                 outputfile.write(data)
