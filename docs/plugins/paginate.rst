@@ -12,15 +12,7 @@
 Summary
 =======
 
-Plugin for paging long index pages.
-
-douglas uses the ``num_entries`` configuration variable to prevent
-more than ``num_entries`` being rendered by cutting the list down to
-``num_entries`` entries.  So if your ``num_entries`` is set to 20, you
-will only see the first 20 entries rendered.
-
-The paginate plugin overrides this functionality and allows for
-paging.
+Plugin for breaking up long index pages with many entries into pages.
 
 
 Install
@@ -37,12 +29,34 @@ This plugin comes with douglas.  To install, do the following:
 
 2. (optional) Add some configuration to your ``config.py`` file.
 
-3. Add the following blurb where you want page navigation to your
-   entry_list template::
 
-       <p>
-         {{ page_navigation|safe }}
-       </p>
+Usage
+=====
+
+Add the following blurb where you want page navigation to your
+``entry_list`` template::
+
+    {{ pager.as_list()|safe }}
+
+which generates HTML like this::
+
+    [1] 2 3 4 5 6 7 8 9 ... >>
+
+Or::
+
+    {{ pager.as_span()|safe }}
+
+which generates HTMl like this::
+
+    Page 1 of 4 >>
+
+You can also do your own pagination. The ``pager`` instance exposes
+the following helpful bits:
+
+* ``number`` - the page number being shown
+* ``has_next()`` - True if there's a next page
+* ``has_previous()`` - True if there's a previous page
+* ``link(pageno)`` - Builds the url for the specified page
 
 
 Configuration variables
@@ -60,24 +74,6 @@ Configuration variables
    Defaults to "&gt;&gt;".
 
    This is the text for the "next page" link.
-
-
-``paginate_linkstyle``
-
-   Defaults to 1.
-
-   This allows you to change the link style of the paging.
-
-   Style 0::
-
-       [1] 2 3 4 5 6 7 8 9 ... >>
-
-   Style 1::
-
-      Page 1 of 4 >>
-
-   If you want a style different than that, you'll have to copy the
-   plugin and implement your own style.
 
 
 Note about compiling

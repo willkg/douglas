@@ -50,6 +50,25 @@ Additionally, you can do this on an entry-by-entry basis by adding a
    My main story...
 
 
+Additionally, blog entries can have a summary. Insert a break directive
+at the point where the summary should end. For example::
+
+    First part of my blog entry....
+
+    .. break::
+
+    Secon part of my blog entry after the fold.
+
+In your templates, you can show just the summary like this::
+
+    {% if entry.summary is defined %}
+      {{ entry.summary|safe }}
+      <p><a href="{{ entry.url }}">Read more...</a></p>
+    {% else %}
+      {{ entry.body|safe }}
+    {% endif %}
+
+
 Configuration
 =============
 

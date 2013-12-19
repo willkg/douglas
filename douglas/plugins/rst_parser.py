@@ -49,6 +49,15 @@ at the point where the summary should end. For example::
 
     Secon part of my blog entry after the fold.
 
+In your templates, you can show just the summary like this::
+
+    {% if entry.summary is defined %}
+      {{ entry.summary|safe }}
+      <p><a href="{{ entry.url }}">Read more...</a></p>
+    {% else %}
+      {{ entry.body|safe }}
+    {% endif %}
+
 
 Configuration
 =============

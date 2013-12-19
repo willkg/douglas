@@ -9,6 +9,9 @@
  published_date - Maintain published date in file met... 
 =========================================================
 
+Summary
+=======
+
 This takes a #published date/time stamp in the entry and returns
 that as the mtime.
 
@@ -20,7 +23,15 @@ Example entry::
      This is my first post!
    </p>
 
+
 returns an mtime of 01-01-2008 at 12:20:22.
+
+
+Install
+=======
+
+Add ``douglas.plugins.published_date`` to the ``load_plugins`` list of
+your ``config.py`` file.
 
 
 License

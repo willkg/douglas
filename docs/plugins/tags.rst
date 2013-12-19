@@ -12,16 +12,12 @@
 Summary
 =======
 
-This is a tags plugin.  It uses douglas's command line abilities to
-split generation of tags index data from display of tags index data.
+This plugin allows you to specify the tags your entry has in the
+metadata of the entry.  It adds a new command to douglas-cmd to index
+all the tags data and store it in a file.
 
-It creates a ``$(tagslist)`` variable for head and foot templates
-which lists all the tags.
-
-It creates a ``$(tags)`` variable for story templates which lists tags
-for the story.
-
-It creates a ``$(tagcloud)`` variable for the tag cloud.
+It creates a ``TagManager`` instance in the Jinja2 environment which
+you can use to iterate through and display tags data.
 
 
 Install
@@ -101,86 +97,42 @@ how tag metadata is formatted, and how tag lists triggered.
     Defaults to True.
 
 
-In the head and foot templates, you can list all the tags with the
-``$(tagslist)`` variable.  The templates for this listing use the
-following three config properties:
+Usage in templates
+==================
 
-``tags_list_start``
+The ``TagManager`` has the following methods:
 
-    Printed before the list.  Defaults to ``<p>``.
+``all_tags()``
+    Returns a list of (tag, tag_url, count) tuples.
 
-``tags_list_item``
+    You can iterate over this to render tag data for all the tags
+    on your blog.
 
-    Used for each tag in the list.  There are a bunch of variables you can
-    use:
+``all_tags_div()``
+    Generates HTML for a div of class ``allTags`` with ``a`` tags of
+    class ``tag`` in it--one for each tag.
 
-    * ``base_url`` - the baseurl for your blog
-    * ``theme`` - the default theme or theme currently showing
-    * ``tag`` - the tag name
-    * ``count`` - the number of items that are tagged with this tag
-    * ``tagurl`` - url composed of baseurl, trigger, and tag
+``all_tags_cloud()``
+    Generates HTML for a div of class ``allTagsCloud`` with ``a`` tags
+    of class ``tag`` in it--one for each tag. The ``a`` tags also have
+    one of ``biggestTag``, ``bigTag``, ``mediumTag``, ``smallTag``, or
+    ``smallestTag`` depending on how "big" the tag should show up in
+    the cloud.
 
-    Defaults to ``<a href="%(tagurl)s">%(tag)s</a>``.
+``entry_tags(entry)``
+    Returns a list of (tag, tag_url) tuples for tags for the specified
+    entry.
 
-``tags_list_finish``
-
-    Printed after the list.  Defaults to ``</p>``.
-
-
-In the head and foot templates, you can also add a tag cloud with the
-``$(tagcloud)`` variable.  The templates for the cloud use the
-following three config properties:
-
-``tags_cloud_start``
-
-    Printed before the cloud.  Defaults to ``<p>``.
-
-``tags_cloud_item``
-
-    Used for each tag in the cloud list.  There are a bunch of
-    variables you can use:
-
-    * ``base_url`` - the baseurl for your blog
-    * ``theme`` - the default theme or theme currently showing
-    * ``tag`` - the tag name
-    * ``count`` - the number of items that are tagged with this tag
-    * ``class`` - biggestTag, bigTag, mediumTag, smallTag or smallestTag--the
-      css class for this tag representing the frequency the tag is used
-    * ``tagurl`` - url composed of baseurl, trigger, and tag
-
-    Defaults to ``<a href="%(tagurl)s">%(tag)s</a>``.
-
-``tags_cloud_finish``
-
-    Printed after the cloud.  Defaults to ``</p>``.
-
-You'll also want to add CSS classes for the size classes to your CSS.
-For example, you could add this::
-
-   .biggestTag { font-size: 16pt; }
-   .bigTag { font-size: 14pt }
-   .mediumTag { font-size: 12pt }
-   .smallTag { font-size: 10pt ]
-   .smallestTag { font-size: 8pt ]
+``entry_tags_span(entry)``
+    Generates HTML for a span of class ``entryTags`` with ``a`` tags
+    of class ``tag`` in it--one for each tag.
 
 
-You can list the tags for a given entry in the story template with the
-``$(tags)`` variable.  The tag items in the story are formatted with one
-configuration property:
+.. Note::
 
-``tags_item``
-
-    This is the template for a single tag for an entry.  It can use the
-    following bits:
-
-    * ``base_url`` - the baseurl for this blog
-    * ``theme`` - the default theme or theme currently being viewed
-    * ``tag`` - the tag
-    * ``tagurl`` - url composed of baseurl, trigger and tag
-
-    Defaults to ``<a href="%(tagurl)s">%(tag)s</a>``.
-
-    Tags are joined together with ``,``.
+   If you use functions that generate HTML in a Jinja2 template, you
+   need to run them through the ``|safe`` filter. Otherwise the HTML
+   will be escaped.
 
 
 Creating the tags index file

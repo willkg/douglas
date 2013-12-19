@@ -26,64 +26,27 @@ This plugin comes with douglas.  To install, do the following:
 1. Add ``douglas.plugins.pycategories`` to the ``load_plugins`` list
    in your ``config.py`` file.
 
-2. Add ``$(categorylinks)`` to your head and/or foot templates.
-
 
 Configuration
 =============
 
-You can format the output by setting ``category_begin``,
-``category_item``, and ``category_end`` properties.
-
-Categories exist in a hierarchy.  ``category_start`` starts the
-category listing and is only used at the very beginning.  The
-``category_begin`` property begins a new category group and the
-``category_end`` property ends that category group.  The
-``category_item`` property is the template for each category item.
-Then after all the categories are printed, ``category_finish`` ends
-the category listing.
-
-For example, the following properties will use ``<ul>`` to open a
-category, ``</ul>`` to close a category and ``<li>`` for each item::
-
-    py["category_start"] = "<ul>"
-    py["category_begin"] = "<ul>"
-    py["category_item"] = (
-        r'<li><a href="%(base_url)s/%(category_urlencoded)sindex">'
-        r'%(category)s</a></li>')
-    py["category_end"] = "</ul>"
-    py["category_finish"] = "</ul>"
+There is no configuration.
 
 
-Another example, the following properties don't have a begin or an end
-but instead use indentation for links and displays the number of
-entries in that category::
+Usage
+=====
 
-    py["category_start"] = ""
-    py["category_begin"] = ""
-    py["category_item"] = (
-        r'%(indent)s<a href="%(base_url)s/%(category_urlencoded)sindex">'
-        r'%(category)s</a> (%(count)d)<br />')
-    py["category_end"] = ""
-    py["category_finish"] = ""
+Categories plugin provides an HTML version of the categories in a list
+form. You can use it in your template like this::
 
-There are no variables available in the ``category_begin`` or
-``category_end`` templates.
+    {{ categories.as_list()|safe }}
 
-Available variables in the category_item template:
 
-=======================  ==========================  ====================
-variable                 example                     datatype
-=======================  ==========================  ====================
-base_url                 http://joe.com/blog/        string
-fullcategory_urlencoded  'dev/douglas/status/'       string
-fullcategory             'dev/douglas/status/'       string (urlencoded)
-category                 'status/'                   string
-category_urlencoded      'status/'                   string (urlencoed)
-theme                    'html'                      string
-count                    70                          int
-indent                   '&nbsp;&nbsp;&nbsp;&nbsp;'  string
-=======================  ==========================  ====================
+Alternatively, you can build the categories HTML yourself::
+
+    {% for cat, count in categories.categorydata %}
+        ....
+    {% endfor %}
 
 
 License
