@@ -36,6 +36,11 @@ BLOGDIR = "%(basedir)s"
 # Blog configuration
 # ==================
 
+# What should this blog use as its base url?
+# You can make this "/", but parts of Douglas won't work very well with
+# that. This should end in a "/"
+py["base_url"] = "http://example.com/weblog/"
+
 # What is the title of this blog?
 py["blog_title"] = "Another douglas blog"
 
@@ -141,9 +146,6 @@ py["load_plugins"] = [
 # ======================
 # Optional Configuration
 # ======================
-
-# What should this blog use as its base url?
-#py["base_url"] = "http://www.example.com/weblog"
 
 # Default parser/preformatter. Defaults to plain (does nothing)
 #py["parser"] = "plain"
