@@ -131,7 +131,7 @@ def generate_handler(doug, cfg, host_port):
                 return
 
             # Re-render this url, so it's up-to-date.
-            url = self.path[len(base_path)+1:]
+            url = self.path[len(base_path):]
             if not url:
                 url = '/'
             if url.endswith('/'):

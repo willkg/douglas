@@ -3,9 +3,8 @@ Summary
 =======
 
 Walks through your blog root figuring out all the available years for
-the archives list.  It stores the years with links to year summaries
-in the variable ``$(archivelinks)``.  You should put this variable in
-either your head or foot template.
+the archives list.  Handles year-based indexes.  Builds a list of years
+your blog has entries for which you can use in your template.
 
 
 Install
@@ -16,51 +15,19 @@ This plugin comes with Douglas.  To install, do the following:
 1. Add ``douglas.plugins.yeararchives`` to the ``load_plugins`` list
    in your ``config.py`` file.
 
-2. Add ``$(archivelinks)`` to your head and/or foot templates.
-
-3. Configure as documented below.
-
 
 Usage
 =====
 
-When the user clicks on one of the year links
-(e.g. ``http://base_url/2004/``), then yeararchives will display a
-summary page for that year.  The summary is generated using the
-``yearsummarystory`` template for each month in the year.
+Add::
 
-My ``yearsummarystory`` template looks like this::
+    {{ yeararchives.as_list()|safe }}
 
-   <div class="blosxomEntry">
-   <span class="blosxomTitle">$title</span>
-   <div class="blosxomBody">
-   <table>
-   $body
-   </table>
-   </div>
-   </div>
+to the appropriate place in your template.
 
-
-The ``$(archivelinks)`` link can be configured with the
-``archive_template`` config variable.  It uses the Python string
-formatting syntax.
-
-Example::
-
-    py['archive_template'] = (
-        '<a href="%(base_url)s/%(Y)s/index.%(f)s">'
-        '%(Y)s</a><br />')
-
-The vars available with typical example values are::
-
-    Y      4-digit year   ex: '1978'
-    y      2-digit year   ex: '78'
-    f      the theme    ex: 'html'
-
-.. Note::
-
-   The ``archive_template`` variable value is formatted using Python
-   string formatting rules--not Douglas template rules!
+When the user clicks on one of the year links (e.g.
+``http://example.com/2004/``), then yeararchives will display a
+summary page for that year.
 
 """
 
@@ -69,80 +36,57 @@ __category__ = "archives"
 __license__ = "MIT"
 
 
-from douglas import tools, entries
-from douglas.memcache import memcache_decorator
-from douglas.tools import pwrap
+import re
 import time
 
-
-def verify_installation(cfg):
-    if not 'archive_template' in cfg:
-        pwrap(
-            "missing optional config property 'archive_template' which "
-            "allows you to specify how the archive links are created.  "
-            "refer to yeararchives plugin documentation for more details.")
-
-    return True
+from douglas import tools
+from douglas.app import blosxom_truncate_list_handler
+from douglas.entries.base import EntryBase
+from douglas.entries.fileentry import FileEntry
 
 
-class YearArchives:
+class YearArchivesManager(object):
     def __init__(self, request):
-        self._request = request
-        self._archives = None
-        self._items = None
+        self.request = request
+        self._entries = None
 
-    @memcache_decorator('yeararchives', True)
-    def __str__(self):
-        if self._archives == None:
-            self.gen_linear_archive()
-        return self._archives
+    @property
+    def entries(self):
+        """List of (year, entry) tuples"""
+        if self._entries is None:
+            cfg = self.request.get_configuration()
+            entry_list = tools.get_entries(cfg, cfg['datadir'])
+            self._entries = []
+            for mem in entry_list:
+                timetuple = tools.filestat(self.request, mem)
+                self._entries.append(
+                    (time.strftime('%Y', timetuple),
+                     time.strftime('%Y-%m', timetuple),
+                     time.strftime('%Y-%m-d', timetuple),
+                     mem))
 
-    def gen_linear_archive(self):
-        config = self._request.get_configuration()
-        data = self._request.get_data()
-        root = config["datadir"]
+        return self._entries
 
-        archives = {}
-        archive_list = tools.get_entries(config, root)
-        items = []
+    def as_list(self):
+        config = self.request.get_configuration()
+        data = self.request.get_data()
 
-        fulldict = {}
-        fulldict.update(config)
-        fulldict.update(data)
+        item_t = '<li><a href="{baseurl}/{year}/index.{theme}">{year}</a></li>'
+        theme = data.get('theme', config.get('default_theme', 'html'))
 
-        theme = data.get(
-            "theme", config.get("default_theme", "html"))
+        years = set([mem[0] for mem in self.entries])
 
-        template = config.get(
-            'archive_template',
-            '<a href="%(base_url)s/%(Y)s/index.%(f)s">%(Y)s</a><br />')
+        output = []
+        output.append('<ul class="yearArchives">')
 
-        for mem in archive_list:
-            timetuple = tools.filestat(self._request, mem)
+        for year in sorted(years):
+            output.append(item_t.format(
+                baseurl=config.get('base_url', ''),
+                year=year,
+                theme=theme))
+        output.append('</ul>')
 
-            timedict = {}
-            for x in ["m", "Y", "y", "d"]:
-                timedict[x] = time.strftime("%" + x, timetuple)
-
-            fulldict.update(timedict)
-            fulldict["f"] = theme
-            year = fulldict["Y"]
-
-            if not year in archives:
-                archives[year] = template % fulldict
-            items.append(
-                ["%(Y)s-%(m)s" % fulldict,
-                 "%(Y)s-%(m)s-%(d)s" % fulldict,
-                 time.mktime(timetuple),
-                 mem])
-
-        arc_keys = sorted(archives.keys(), reverse=True)
-
-        result = []
-        for key in arc_keys:
-            result.append(archives[key])
-        self._archives = '\n'.join(result)
-        self._items = items
+        return '\n'.join(output)
 
 
 def new_entry(request, yearmonth, body):
@@ -151,7 +95,7 @@ def new_entry(request, yearmonth, body):
     creates a timestamp so that conditionalhttp can handle it without
     getting all fussy.
     """
-    entry = entries.base.EntryBase(request)
+    entry = EntryBase(request)
 
     entry['title'] = yearmonth
     entry['filename'] = yearmonth + "/summary"
@@ -170,13 +114,11 @@ def new_entry(request, yearmonth, body):
     return entry
 
 
-INIT_KEY = "yeararchives_initiated"
-
-
-def cb_prepare(args):
-    request = args["request"]
-    data = request.get_data()
-    data["archivelinks"] = YearArchives(request)
+def cb_context_processor(args):
+    context = args['context']
+    request = args['request']
+    context['yeararchives'] = YearArchivesManager(request)
+    return args
 
 
 def parse_path_info(path):
@@ -189,95 +131,92 @@ def parse_path_info(path):
     - /2003/index
     - /2003/index.theme
     """
-    path = path.split("/")
-    path = [m for m in path if m]
-    if not path:
+    match = re.match(r'^/(\d{4})(/index.*)?', path)
+    if not match:
         return
 
-    year = path[0]
-    if not year.isdigit() or not len(year) == 4:
-        return
+    year, index_theme = match.groups()
 
-    if len(path) == 1:
-        return (year, None)
+    # If there's no "index.foo" part, then we don't know the theme, so
+    # return None for the theme.
+    if index_theme and '.' in index_theme:
+        return (year, index_theme.split('.', 1)[1])
 
-    if len(path) == 2 and path[1].startswith("index"):
-        theme = None
-        if "." in path[1]:
-            theme = path[1].split(".", 1)[1]
-        return (year, theme)
-
-    return
+    return (year, None)
 
 
+# FIXME - probably want to switch the template
 def cb_filelist(args):
-    request = args["request"]
+    request = args['request']
     pyhttp = request.get_http()
     data = request.get_data()
-    config = request.get_configuration()
-    baseurl = config.get("base_url", "")
+    cfg = request.get_configuration()
+    baseurl = cfg.get('base_url', '')
 
-    path = pyhttp["PATH_INFO"]
+    path = pyhttp['PATH_INFO']
 
     ret = parse_path_info(path)
     if ret == None:
         return
 
-    # note: returned theme is None if there is no .theme appendix
+    # Note: returned theme is None if there is no .theme appendix
     year, theme = ret
 
-    data[INIT_KEY] = 1
-
-    # get all the entries
-    wa = YearArchives(request)
-    wa.gen_linear_archive()
-    items = wa._items
-
-    # peel off the items for this year
-    items = sorted([m for m in items if m[0].startswith(year)], reverse=True)
+    # Get all the entries for this year
+    yeararchives = YearArchivesManager(request)
+    items = sorted([mem for mem in yeararchives.entries
+                    if mem[0] == year], reverse=True)
 
     # Set and use current (or default) theme for permalinks
     if not theme:
-        theme = data.get(
-            "theme", config.get("default_theme", "html"))
+        theme = data.get('theme', cfg.get('default_theme', 'html'))
 
-    data["theme"] = theme
+    data['theme'] = theme
 
-    l = ("(%(path)s) <a href=\"" + baseurl +
-         "/%(file_path)s." + theme + "\">%(title)s</a><br>")
+    item_t = '({path}) <a href="{baseurl}/{file_path}.{theme}">{title}</a><br>'
     e = "<tr>\n<td valign=\"top\" align=\"left\">%s</td>\n<td>%s</td></tr>\n"
-    d = ""
-    m = ""
+
+    current_month = items[0][1]
+    current_day = items[0][2]
 
     day = []
     month = []
     entrylist = []
 
     for mem in items:
-        if not m:
-            m = mem[0]
-        if not d:
-            d = mem[1]
-
-        if m != mem[0]:
-            month.append(e % (d, "\n".join(day)))
-            entrylist.append(new_entry(request, m, "\n".join(month)))
-            m = mem[0]
-            d = mem[1]
+        if current_month != mem[1]:
+            month.append(e % (current_day, '\n'.join(day)))
+            entrylist.append(
+                new_entry(
+                    request,
+                    current_month,
+                    '<table>' + '\n'.join(month) + '</table>'))
+            current_month = mem[1]
+            current_day = mem[2]
             day = []
             month = []
 
-        elif d != mem[1]:
-            month.append(e % (d, "\n".join(day)))
-            d = mem[1]
+        elif current_day != mem[2]:
+            month.append(e % (current_day, '\n'.join(day)))
+            current_day = mem[2]
             day = []
-        entry = entries.fileentry.FileEntry(
-            request, mem[3], config['datadir'])
-        day.append(l % entry)
+
+        entry = FileEntry(request, mem[3], cfg['datadir'])
+        entry.update({
+            'baseurl': baseurl,
+            'theme': theme
+        })
+
+        day.append(item_t.format(**entry))
 
     if day:
-        month.append(e % (d, "\n".join(day)))
+        month.append(e % (current_day, '\n'.join(day)))
+
     if month:
-        entrylist.append(new_entry(request, m, "\n".join(month)))
+        entrylist.append(
+            new_entry(
+                request,
+                current_month,
+                '<table>' + '\n'.join(month) + '</table>'))
 
     return entrylist
