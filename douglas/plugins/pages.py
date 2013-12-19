@@ -234,30 +234,21 @@ def cb_filelist(args):
     data['bl_type'] = 'page'
     pagesdir = config['pagesdir']
 
-    pagesdir = pagesdir.replace('/', os.sep)
-    if not pagesdir[-1] == os.sep:
+    if not pagesdir.endswith(os.sep):
         pagesdir = pagesdir + os.sep
 
     pathinfo = pyhttp.get('PATH_INFO', '')
     path, ext = os.path.splitext(pathinfo)
-    if pathinfo == '/' or path == '/index':
+    if pathinfo in ('/', '/index'):
         page_name = 'frontpage'
     else:
-        page_name = pyhttp['PATH_INFO'][len('/' + TRIGGER) + 1:]
+        page_name = pathinfo[len('/' + TRIGGER) + 1:]
+
+    # FIXME - do better job of sanitizing here
+    page_name = page_name.replace('\\', '').replace('/', '')
 
     if not page_name:
         return
-
-    # FIXME - need to do a better job of sanitizing
-    page_name = page_name.replace(os.sep, '/')
-
-    if not page_name:
-        return
-
-    if page_name[-1] == os.sep:
-        page_name = page_name[:-1]
-    if page_name.find('/') > 0:
-        page_name = page_name[page_name.rfind('/'):]
 
     # if the page has a theme, we use that.  otherwise
     # we default to the default theme.
@@ -277,21 +268,13 @@ def cb_filelist(args):
         return []
 
     fe = FileEntry(req, filename, pagesdir)
-    # now we evaluate python code blocks
-    body = fe['body']
-    body = eval_python_blocks(req, body)
-    body = ('<!-- PAGES PAGE START -->\n\n' +
-            body +
-            '<!-- PAGES PAGE END -->\n')
-    fe['body'] = body
 
-    fe['absolute_path'] = TRIGGER
-    fe['fn'] = page_name
-    fe['file_path'] = TRIGGER + '/' + page_name
-    fe['template_name'] = 'pages'
-
-    data['blog_title_with_path'] = (
-        config.get('blog_title', '') + ' : ' + fe.get('title', ''))
+    fe.update({
+        'body': eval_python_blocks(req, fe['body']),
+        'absolute_path': TRIGGER,
+        'fn': page_name,
+        'file_path': TRIGGER + '/' + page_name,
+    })
 
     data['bl_type'] = 'page'
 
