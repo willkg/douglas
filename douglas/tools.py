@@ -120,6 +120,27 @@ def convert_configini_values(configini):
     return config
 
 
+def parse_entry_file(filename):
+    """Parses a a Douglas-structured entry file"""
+    entry_data = {}
+    with open(filename, 'r') as fp:
+        lines = fp.readlines()
+
+    if not lines:
+        return {'title': '', 'body': ''}
+
+    entry_data['title'] = lines.pop(0).strip()
+
+    while lines and lines[0].startswith('#'):
+        meta = lines.pop(0)
+        match = re.match(r'^#([^\s]+)( [^$]+)?$', meta)
+        key, val = match.groups()
+        entry_data[key.strip()] = val.strip() if (val and val.strip()) else '1'
+
+    entry_data['body'] = ''.join(lines)
+    return entry_data
+
+
 def escape_text(s):
     """Takes in a string and converts:
 

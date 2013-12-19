@@ -1,5 +1,4 @@
-"""
-Summary
+"""Summary
 =======
 
 A reStructuredText entry formatter for douglas.  reStructuredText is
@@ -33,8 +32,8 @@ control over the rendered HTML::
 
    # Enable or disable the promotion of a lone top-level section title to
    # document title (and subsequent section title to document subtitle
-   # promotion); enabled by default.
-   py['reST_transform_doctitle'] = 1
+   # promotion); disabled by default.
+   py['reST_transform_doctitle'] = 0
 
 
 .. Note::
@@ -47,23 +46,10 @@ Usage
 =====
 
 Blog entries with a ``.rst`` extension will be parsed as
-restructuredText.
+reStructuredText.
 
-You can also configure this as your default preformatter for ``.txt``
-files by configuring it in your config file as follows::
-
-   py['parser'] = 'reST'
-
-Additionally, you can do this on an entry-by-entry basis by adding a
-``#parser reST`` line in the metadata section.  For example::
-
-   My Little Blog Entry
-   #parser reST
-   My main story...
-
-
-Additionally, blog entries can have a summary. Insert a break directive
-at the point where the summary should end. For example::
+Blog entries can have a summary. Insert a break directive at the point
+where the summary should end. For example::
 
     First part of my blog entry....
 
@@ -99,37 +85,26 @@ from douglas import tools
 from douglas.memcache import memcache_decorator
 
 
-PREFORMATTER_ID = 'reST'
 FILE_EXT = 'rst'
-READMORE_BREAKPOINT = 'BREAKLIKEYOUMEANIT!'
 
 
-class Break(Directive):
-    """
-    Transform a break directive (".. break::") into the text that the
-    Pyblosxom readmore plugin looks for.  This allows blog entries to
-    have a "summary" section for long blog entries.
+# READMORE_BREAKPOINT = 'BREAKLIKEYOUMEANIT!'
+# class Break(Directive):
+#     """
+#     Transform a break directive (".. break::") into the text that the
+#     Pyblosxom readmore plugin looks for.  This allows blog entries to
+#     have a "summary" section for long blog entries.
 
-    """
-    required_arguments = 0
-    optional_arguments = 0
-    final_argument_whitespace = True
-    has_content = False
+#     """
+#     required_arguments = 0
+#     optional_arguments = 0
+#     final_argument_whitespace = True
+#     has_content = False
 
-    def run(self):
-        return [nodes.raw('', READMORE_BREAKPOINT + '\n', format='html')]
+#     def run(self):
+#         return [nodes.raw('', READMORE_BREAKPOINT + '\n', format='html')]
 
-directives.register_directive('break', Break)
-
-
-def cb_entryparser(args):
-    args[FILE_EXT] = readfile
-    return args
-
-
-def cb_preformat(args):
-    if args.get("parser", None) == PREFORMATTER_ID:
-        return parse(''.join(args['story']), args['request'])
+# directives.register_directive('break', Break)
 
 
 @memcache_decorator('rst_parser')
@@ -145,46 +120,27 @@ def _parse(initial_header_level, transform_doctitle, story):
     return parts['body']
 
 
-def parse(story, request):
-    config = request.getConfiguration()
-    initial_header_level = config.get('reST_initial_header_level', 1)
-    transform_doctitle = config.get('reST_transform_doctitle', 1)
+def parse(body, request):
+    cfg = request.get_configuration()
+    initial_header_level = cfg.get('reST_initial_header_level', 1)
+    transform_doctitle = cfg.get('reST_transform_doctitle', 0)
 
-    return _parse(initial_header_level, transform_doctitle, story)
+    return _parse(initial_header_level, transform_doctitle, body)
 
 
-def readfile(filename, request):
-    entry_data = {}
-    with open(filename, 'r') as fp:
-        lines = fp.readlines()
+def parse_rst_file(filename, request):
+    entry_data = tools.parse_entry_file(filename)
+    body = entry_data['body']
 
-    if len(lines) == 0:
-        return {'title': '', 'summary': '', 'body': ''}
+    if '.. break::' in body:
+        entry_data['body'] = parse(body.replace('.. break::', ''), request)
+        entry_data['summary'] = parse(body[:body.find('.. break::')], request)
+    else:
+        entry_data['body'] = parse(body, request)
 
-    title = lines.pop(0).strip()
-
-    # absorb meta data
-    while lines and lines[0].startswith("#"):
-        meta = lines.pop(0)
-        # remove the hash
-        meta = meta[1:].strip()
-        meta = meta.split(" ", 1)
-        # if there's no value, we append a 1
-        if len(meta) == 1:
-            meta.append("1")
-        entry_data[meta[0].strip()] = meta[1].strip()
-
-    body = parse(''.join(lines), request)
-    entry_data["title"] = title
-
-    body = body.split(READMORE_BREAKPOINT)
-
-    if len(body) > 1:
-        entry_data['summary'] = body[0]
-
-    entry_data['body'] = ''.join(body)
-
-    # Call the postformat callbacks
-    tools.run_callback('postformat', {'request': request,
-                                      'entry_data': entry_data})
     return entry_data
+
+
+def cb_entryparser(args):
+    args[FILE_EXT] = parse_rst_file
+    return args

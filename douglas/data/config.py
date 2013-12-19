@@ -147,10 +147,6 @@ py["load_plugins"] = [
 # Optional Configuration
 # ======================
 
-# Default parser/preformatter. Defaults to plain (does nothing)
-#py["parser"] = "plain"
-
-
 
 # Compiling
 # =========

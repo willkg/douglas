@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
-import string
 import os
 import os.path
+import string
+from textwrap import dedent
+
+from nose.tools import eq_
 
 from douglas import app, tools
 from douglas.tests import UnitTestBase
@@ -9,7 +12,47 @@ from douglas.tests import UnitTestBase
 
 req = app.Request({}, {}, {})
 
- 
+
+class Testparse_entry_file(UnitTestBase):
+    def create_file(self, fn, data):
+        os.makedirs(os.path.join(self.datadir, 'entries'))
+        fn = os.path.join(self.datadir, 'entries', fn)
+        with open(fn, 'w') as fp:
+            fp.write(data)
+
+        return fn
+
+    def test_empty(self):
+        fn = self.create_file('test1.txt', "")
+        data = tools.parse_entry_file(fn)
+        eq_(data, {'body': '', 'title': ''})
+
+    def test_title(self):
+        fn = self.create_file('test1.txt', "Only a title")
+        data = tools.parse_entry_file(fn)
+        eq_(data, {'body': '', 'title': 'Only a title'})
+
+    def test_title_body(self):
+        fn = self.create_file('test1.txt', "Only a title\nbody")
+        data = tools.parse_entry_file(fn)
+        eq_(data, {'body': 'body', 'title': 'Only a title'})
+
+    def test_metadata(self):
+        fn = self.create_file('test1.txt', dedent("""\
+        Only a title
+        #meta1
+        #meta2 val2
+        #meta3  val3
+        #meta4   """ + """
+        Body
+        Body
+        Body
+        """))
+        data = tools.parse_entry_file(fn)
+        eq_(data, {'title': 'Only a title', 'body': 'Body\nBody\nBody\n',
+                   'meta1': '1', 'meta2': 'val2', 'meta3': 'val3', 'meta4': '1'})
+
+
 class Testis_year(UnitTestBase):
     """tools.is_year"""
     def test_must_be_four_digits(self):

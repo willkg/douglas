@@ -878,58 +878,20 @@ def blosxom_handler(request):
 
 
 def blosxom_entry_parser(filename, request):
-    """Open up a ``.txt`` file and read its contents.  The first line
-    becomes the title of the entry.  The other lines are the body of
-    the entry.
+    """Parses a ``.txt`` entry file.
+
+    The first line becomes the title of the entry.  Lines after the
+    first line that start with ``#`` are metadata lines.  After the
+    metadata lines, the remaining lines are the body of the entry.
 
     :param filename: a filename to extract data and metadata from
     :param request: a standard request object
 
     :returns: dict containing parsed data and meta data with the
               particular file (and plugin)
+
     """
-    config = request.get_configuration()
-
-    entry_data = {}
-
-    with open(filename, 'r') as fp:
-        lines = fp.readlines()
-
-    # the file has nothing in it...  so we're going to return a blank
-    # entry data object.
-    if len(lines) == 0:
-        return {'title': '', 'body': ''}
-
-    # the first line is the title
-    entry_data['title'] = lines.pop(0).strip()
-
-    # absorb meta data lines which begin with a #
-    while lines and lines[0].startswith('#'):
-        meta = lines.pop(0)
-        # remove the hash
-        meta = meta[1:].strip()
-        meta = meta.split(' ', 1)
-        # if there's no value, we append a 1
-        if len(meta) == 1:
-            meta.append('1')
-        entry_data[meta[0].strip()] = meta[1].strip()
-
-    # call the preformat function
-    args = {'parser': entry_data.get('parser', config.get('parser', 'plain')),
-            'story': lines,
-            'request': request}
-    entry_data['body'] = tools.run_callback(
-        'preformat',
-        args,
-        donefunc=lambda x: x is not None,
-        defaultfunc=lambda x: ''.join(x['story']))
-
-    # call the postformat callbacks
-    tools.run_callback('postformat',
-                       {'request': request,
-                        'entry_data': entry_data})
-
-    return entry_data
+    return tools.parse_entry_file(filename)
 
 
 def blosxom_file_list_handler(args):
