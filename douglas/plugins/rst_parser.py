@@ -40,6 +40,16 @@ Additionally, you can do this on an entry-by-entry basis by adding a
    My main story...
 
 
+Additionally, blog entries can have a summary. Insert a break directive
+at the point where the summary should end. For example::
+
+    First part of my blog entry....
+
+    .. break::
+
+    Secon part of my blog entry after the fold.
+
+
 Configuration
 =============
 
@@ -68,7 +78,9 @@ __category__ = "text"
 __license__ = "MIT"
 
 
+from docutils import nodes
 from docutils.core import publish_parts
+from docutils.parsers.rst import directives, Directive
 
 from douglas import tools
 from douglas.memcache import memcache_decorator
@@ -76,11 +88,25 @@ from douglas.memcache import memcache_decorator
 
 PREFORMATTER_ID = 'reST'
 FILE_EXT = 'rst'
+READMORE_BREAKPOINT = 'BREAKLIKEYOUMEANIT!'
 
 
-def verify_installation(cfg):
-    # no configuration needed
-    return 1
+class Break(Directive):
+    """
+    Transform a break directive (".. break::") into the text that the
+    Pyblosxom readmore plugin looks for.  This allows blog entries to
+    have a "summary" section for long blog entries.
+
+    """
+    required_arguments = 0
+    optional_arguments = 0
+    final_argument_whitespace = True
+    has_content = False
+
+    def run(self):
+        return [nodes.raw('', READMORE_BREAKPOINT + '\n', format='html')]
+
+directives.register_directive('break', Break)
 
 
 def cb_entryparser(args):
@@ -120,7 +146,7 @@ def readfile(filename, request):
         lines = fp.readlines()
 
     if len(lines) == 0:
-        return {"title": "", "body": ""}
+        return {'title': '', 'summary': '', 'body': ''}
 
     title = lines.pop(0).strip()
 
@@ -137,7 +163,14 @@ def readfile(filename, request):
 
     body = parse(''.join(lines), request)
     entry_data["title"] = title
-    entry_data["body"] = body
+
+    body = body.split(READMORE_BREAKPOINT)
+
+    if len(body) > 1:
+        entry_data['summary'] = body[0]
+    else:
+        entry_data['summary'] = ''
+    entry_data['body'] = ''.join(body)
 
     # Call the postformat callbacks
     tools.run_callback('postformat', {'request': request,
