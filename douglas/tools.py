@@ -9,6 +9,7 @@ import sys
 import textwrap
 import time
 import urllib
+from urlparse import urlparse
 
 # douglas imports
 from douglas import plugin_utils
@@ -600,13 +601,13 @@ def render_url_statically(cfg, url, querystring):
         fp.write(response.read())
 
 
-def render_url(cdict, pathinfo, querystring=""):
+def render_url(cfg, pathinfo, querystring=""):
     """
     Takes a url and a querystring and renders the page that
     corresponds with that by creating a Request and a Douglas object
     and passing it through.  It then returns the resulting Response.
 
-    :param cdict: the config.py dict
+    :param cfg: the config.py dict
     :param pathinfo: the ``PATH_INFO`` string;
         example: ``/dev/douglas/firstpost.html``
     :param querystring: the querystring (if any); example: debug=yes
@@ -621,9 +622,11 @@ def render_url(cdict, pathinfo, querystring=""):
     else:
         request_uri = pathinfo
 
+    parts = urlparse(cfg.get('base_url', 'http://127.0.0.1:80/'))
+
     env = {
-        'HTTP_HOST': 'localhost',
-        'HTTP_REFERER': '',
+        'HTTP_HOST': parts.netloc or '127.0.0.1',
+        'HTTP_PORT': parts.port or '80',
         'HTTP_USER_AGENT': 'static renderer',
         'PATH_INFO': pathinfo,
         'QUERY_STRING': querystring,
@@ -636,7 +639,7 @@ def render_url(cdict, pathinfo, querystring=""):
         'wsgi.input': None
     }
 
-    p = Douglas(cdict, env, {'COMPILING': 1})
+    p = Douglas(cfg, env, {'COMPILING': 1})
     p.run(compiling=True)
     return p.get_response()
 
