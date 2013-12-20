@@ -1,0 +1,9 @@
+===============
+README - static
+===============
+
+This directory holds the static assets for your blog: CSS files, JavaScript
+files, images, etc.
+
+Note: If you have static assets that are related to a theme, those
+should go in``themes/<themename>/static/``. See ``themes/README`` for details.

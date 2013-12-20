@@ -5,3 +5,18 @@ README - themes
 The themes directory holds the themes your blog can be rendered in. By
 default this is the "html" and "rss" themes. These themes are rendered
 using Jinja2.
+
+Static assets for a theme go in the theme's "static/" directory. In
+order to avoid stomping on other static files, use the theme name as a
+namespace.
+
+For example::
+
+    themes/
+        html/
+            static/
+                html/
+                    sunflower.jpg
+                    style.css
+                    navigation.js
+                    right-arrow.png

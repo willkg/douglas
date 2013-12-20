@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # =================================================================
-# This is the config file for Douglas.  You should go through 
-# this file and fill in values for the various properties.  This 
+# This is the config file for Douglas.  You should go through
+# this file and fill in values for the various properties.  This
 # affects the behavior of your blog.
 #
 # This is a Python code file and as such must be written in
@@ -24,7 +24,7 @@ py = {}
 # If you did not install Douglas as a library (i.e. python setup.py install)
 # then uncomment this next line and point it to your Douglas installation
 # directory.
-# 
+#
 # Note, this should be the parent directory of the "Douglas" directory
 # (note the case--uppercase P lowercase b!).
 #py["codebase"] = "%(codedir)s"
@@ -93,6 +93,23 @@ py["num_entries"] = 10
 py["default_theme"] = "html"
 
 
+# Static files
+# ============
+
+# A blog uses CSS files, JS files, images and other static files that
+# aren't generated. These are called "static assets".
+#
+# What is the full url for your static assets? If you're using a CDN,
+# this should be a full url. If you're not using a CDN, then this is the
+# url path off of the base_url.
+py["static_url"] = '/static/'
+
+# What is the list of directories that hold static files? When compiling
+# your blog, these will be collected and placed
+py["static_files_dirs"] = [
+    os.path.join(BLOGDIR, "static")
+]
+
 # Logging configuration
 # =====================
 
@@ -122,7 +139,7 @@ py["plugin_dirs"] = [os.path.join(BLOGDIR, "plugins")]
 # Specify the plugins your blog uses here.  Plugins are specified
 # by Python module name.  Plugins that come with Douglas all
 # start with "douglas.plugins.<pluginname>".
-# 
+#
 # If you specify an empty list, then this will load no plugins.
 #
 # For example:
@@ -153,7 +170,7 @@ py["load_plugins"] = [
 
 # Planning to compile your blog to a static HTML site?  This is the
 # section for you!  For more details, see the documentation.
-# 
+#
 # What directory do you want your compiled site to go into?
 py["compiledir"] = os.path.join(BLOGDIR, "compiled_site")
 

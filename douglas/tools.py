@@ -4,6 +4,7 @@ import os
 import os.path
 import random
 import re
+import shutil
 import stat
 import string
 import sys
@@ -621,6 +622,16 @@ def render_url_statically(cfg, url, querystring):
     # Write just the response data to the file skipping the headers.
     with open(fn, 'w') as fp:
         fp.write(response.read())
+
+
+def copy_dir(src, dst, notifyfun):
+    for root, dirs, files in os.walk(src):
+        for name in dirs:
+            os.makedirs(os.path.join(root, name))
+
+        for name in files:
+            notifyfun(os.path.join(root, name))
+            shutil.copy2(os.path.join(root, name), os.path.join(dst, name))
 
 
 def url_rewrite(html, old_url, new_url):
