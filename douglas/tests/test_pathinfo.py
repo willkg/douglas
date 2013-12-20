@@ -11,7 +11,7 @@ class Testpathinfo(UnitTestBase):
         req = self.build_request(cfg=cfg, http=_http, data=data)
         blosxom_process_path_info(args={"request": req})
         # print repr(expected), repr(req.data)
-        self.cmpdict(expected, req.data)
+        self.dictsubset(expected, req.data)
  
     def test_root(self):
         entries = self.build_file_set([])

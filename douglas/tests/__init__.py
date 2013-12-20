@@ -15,6 +15,8 @@ import urllib
 import shutil
 import unittest
 
+from nose.tools import eq_
+
 from douglas import app, tools, entries
 
 
@@ -24,33 +26,33 @@ def req_():
 
 class UnitTestBase(unittest.TestCase):
     def setUp(self):
-        # set up datadir and config
         self.datadir = tempfile.mkdtemp(prefix='douglas_test_datadir')
 
     def tearDown(self):
         if self.datadir:
-            try:
-                shutil.rmtree(self.datadir)
-            except OSError:
-                pass
+            shutil.rmtree(self.datadir, ignore_errors=True)
 
-    def eq_(self, a, b, text=None):
-        self.assertEquals(a, b, text)
+    def create_file(self, file_path, data):
+        fn = os.path.join(self.datadir, file_path)
+        dir_ = os.path.dirname(fn)
+        if not os.path.exists(dir_):
+            os.makedirs(dir_)
+        with open(fn, 'w') as fp:
+            fp.write(data)
+        return fn
 
     def setup_files(self, files):
         os.makedirs(os.path.join(self.datadir, "entries"))
         for fn in sorted(files):
             d, f = os.path.split(fn)
 
-            try:
+            if not os.path.exists(d):
                 os.makedirs(d)
-            except OSError:
-                pass
 
             if f:
                 with open(fn, 'w') as fp:
                     fp.write('test file: {0}\n'.format(fn))
-            
+
     def build_file_set(self, filelist):
         return [os.path.join(self.datadir, "entries/%s" % fn)
                 for fn in filelist]
@@ -60,7 +62,7 @@ class UnitTestBase(unittest.TestCase):
         process_path_info uses:
         - req.pyhttp["PATH_INFO"]         - string
 
-        - req.config["default_theme"]   - string
+        - req.config["default_theme"]     - string
         - req.config["datadir"]           - string
         - req.config["blog_title"]        - string
         - req.config["base_url"]          - string
@@ -91,8 +93,15 @@ class UnitTestBase(unittest.TestCase):
             _http.update(http)
 
         return app.Request(_config, _http, _data)
-        
+
+    def dictsubset(self, expected, actual):
+        for key, val in expected.items():
+            eq_(actual[key], val)
+
+
+class TestTestInfrastructure(UnitTestBase):
     def test_setup_teardown(self):
+        """Test the setup/teardown for UnitTestBase"""
         fileset1 = self.build_file_set(["file.txt",
                                         "cata/file.txt",
                                         "cata/subcatb/file.txt"])
@@ -108,20 +117,11 @@ class UnitTestBase(unittest.TestCase):
         for mem in fileset1:
             assert not os.path.isfile(mem)
 
-    def cmpdict(self, expected, actual):
-        """expected <= actual
-        """
-        for mem in expected.keys():
-            if mem in actual:
-                self.assertEquals(expected[mem], actual[mem])
-            else:
-                assert False, "%s not in actual" % mem
-
 
 TIMESTAMP = time.mktime(time.strptime('Wed Dec 26 11:00:00 2007'))
 
 
-class FrozenTime:
+class FrozenTime(object):
     """Wraps the time module to provide a single, frozen timestamp.
 
     Allows for dependency injection."""
@@ -136,7 +136,7 @@ class FrozenTime:
             return getattr(time, attr)
 
 
-class PluginTest(unittest.TestCase):
+class PluginTest(UnitTestBase):
     """Base class for plugin unit tests. Subclass this to test
     plugins.
 
@@ -169,6 +169,8 @@ class PluginTest(unittest.TestCase):
         The plugin_module arg is the plugin module being tested. This
         is used to set the plugin_dir config variable.
         """
+        UnitTestBase.setUp(self)
+
         # freeze time
         self.timestamp = TIMESTAMP
         self.frozen_time = self.freeze_douglas_time(self.timestamp)
@@ -176,9 +178,6 @@ class PluginTest(unittest.TestCase):
         gmtime = time.gmtime(self.timestamp)
         self.timestamp_date = time.strftime('%a %d %b %Y', gmtime)
         self.timestamp_w3c = time.strftime('%Y-%m-%dT%H:%M:%SZ', gmtime)
-
-        # set up config, including datadir and plugin_dirs
-        self.datadir = tempfile.mkdtemp(prefix='douglas_test_datadir')
 
         plugin_file = os.path.dirname(plugin_module.__file__)
         self.config = {
@@ -225,14 +224,6 @@ class PluginTest(unittest.TestCase):
                 req, {'fn': 'test_entry{0}'.format(i)}, {}, gmtime))
         return entry_list
 
-    def tearDown(self):
-        """Subclasses should call this in their tearDown() methods."""
-        self.delete_datadir()
-
-    def delete_datadir(self):
-        """Deletes the datadir and its contents."""
-        self.remove_dir(self.datadir)
-
     def freeze_douglas_time(self, timestamp):
         """Injects a frozen time module into Douglas.
 
@@ -275,11 +266,3 @@ class PluginTest(unittest.TestCase):
         chain.
         """
         self.injected_callbacks[name] = callback
-
-    def remove_dir(self, dir):
-        """Recursively removes a directory and all files and
-        subdirectories.
-
-        If dir doesn't exist or is not a directory, does nothing.
-        """
-        shutil.rmtree(self.datadir, ignore_errors=True)

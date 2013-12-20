@@ -18,7 +18,7 @@ class Testentryparser(UnitTestBase):
 
         entry_dict = blosxom_entry_parser(filename, req)
 
-        self.cmpdict(output_dict, entry_dict)
+        self.dictsubset(output_dict, entry_dict)
 
     def test_basic_entry(self):
         req = self.build_request()

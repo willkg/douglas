@@ -2,6 +2,8 @@ import os
 import time
 import shutil
 
+from nose.tools import eq_
+
 from douglas import tools
 from douglas.tests import UnitTestBase
 
@@ -53,7 +55,7 @@ class TestBlogTest(BlogTest):
 
         try:
             self.setup_blog(TestBlogTest.blog)
-            self.eq_(1, 1)
+            eq_(1, 1)
         finally:
             self.cleanup_blog()
-            self.eq_(1, 1)
+            eq_(1, 1)

@@ -11,16 +11,8 @@ class TagsTest(PluginTest):
     def setUp(self):
         PluginTest.setUp(self, rst_parser)
 
-    def create_file(self, fn, data):
-        os.makedirs(os.path.join(self.datadir, 'entries'))
-        fn = os.path.join(self.datadir, 'entries', fn)
-        with open(fn, 'w') as fp:
-            fp.write(data)
-
-        return fn
-
     def test_parsing(self):
-        fn = self.create_file('blogpost.rst', dedent("""\
+        fn = self.create_file('entries/blogpost.rst', dedent("""\
         The Title
         #meta1 val1
         This is my blog post
@@ -38,7 +30,7 @@ class TagsTest(PluginTest):
              'meta1': 'val1'})
 
     def test_break(self):
-        fn = self.create_file('blogpost.rst', dedent("""\
+        fn = self.create_file('entries/blogpost.rst', dedent("""\
         The Title
         #meta1 val1
         first part
