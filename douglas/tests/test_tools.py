@@ -254,6 +254,17 @@ class Testconvert_configini_values(UnitTestBase):
             self.assertRaises(tools.ConfigSyntaxErrorException,
                               tools.convert_configini_values, mem)
 
-    # FIXME - test tools.walk
 
-    # FIXME - test filestat
+class Testurl_rewrite(UnitTestBase):
+    def test_basic(self):
+        eq_(tools.url_rewrite('', '', ''), '')
+        eq_(tools.url_rewrite(
+            '<a href="/">blah</a>',
+            '/',
+            'http://localhost:8000/'),
+            '<a href="http://localhost:8000/">blah</a>')
+        eq_(tools.url_rewrite(
+            '<img src="/foo.gif">',
+            '/',
+            'http://localhost:8000/'),
+            '<img src="http://localhost:8000/foo.gif">')

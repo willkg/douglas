@@ -20,7 +20,7 @@ from douglas import plugin_utils
 from douglas.app import Douglas, initialize
 from douglas.tools import (
     abort, run_callback, pwrap, pwrap_error, setup_logging,
-    render_url_statically)
+    render_url_statically, url_rewrite)
 
 
 USAGE = "%prog [options] [command] [command-options]"
@@ -149,9 +149,7 @@ def generate_handler(doug, cfg, host_port):
             """Copies data over and replaces base_url for html files"""
             if self._type == 'text/html':
                 data = source.read()
-                # FIXME - this is broken for too many edge cases
-                if base_url.startswith('http'):
-                    data = data.replace(base_url, serving_base_url)
+                data = url_rewrite(data, base_url, serving_base_url)
                 outputfile.write(data)
             else:
                 SimpleHTTPRequestHandler.copyfile(self, source, outputfile)

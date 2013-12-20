@@ -1,3 +1,4 @@
+import HTMLParser
 import logging
 import os
 import os.path
@@ -9,7 +10,7 @@ import sys
 import textwrap
 import time
 import urllib
-from urlparse import urlparse
+from urlparse import urlparse, urlsplit, urlunsplit
 
 # douglas imports
 from douglas import plugin_utils
@@ -622,6 +623,75 @@ def render_url_statically(cfg, url, querystring):
         fp.write(response.read())
 
 
+def url_rewrite(html, old_url, new_url):
+    out = []
+
+    class URLRewriter(HTMLParser.HTMLParser):
+        def __init__(self, old_url, new_url):
+            self.old_url_parts = urlsplit(old_url)
+            self.new_url_parts = urlsplit(new_url)
+            HTMLParser.HTMLParser.__init__(self)
+
+        def rewrite(self, url):
+            url_parts = urlsplit(url)
+
+            # Check to see if this is a url to rewrite. If not, skip it.
+            if ((url_parts.netloc != self.old_url_parts.netloc
+                 or not url_parts.path.startswith(self.old_url_parts.path))):
+                return url
+
+            # Rebuild the url using parts from the new_url_parts and
+            # the path from the url minus the old_url_path.
+            return urlunsplit(
+                (self.new_url_parts.scheme,
+                 self.new_url_parts.netloc,
+                 (self.new_url_parts.path +
+                  url_parts.path[len(self.old_url_parts.path):]),
+                 url_parts.query,
+                 url_parts.fragment))
+
+        def handle_starttag(self, tag, attrs, closed=False):
+            # We want to re
+            # We want to translate alt and title values, but that's
+            # it. So this gets a little goofy looking token-wise.
+
+            s = '<' + tag
+            for name, val in attrs:
+                s += ' '
+                s += name
+                s += '="'
+
+                if name in ['src', 'href']:
+                    s += self.rewrite(val)
+                elif val:
+                    s += val
+                s += '"'
+            if closed:
+                s += ' /'
+            s += '>'
+
+            if s:
+                out.append(s)
+
+        def handle_startendtag(self, tag, attrs):
+            self.handle_starttag(tag, attrs, closed=True)
+
+        def handle_endtag(self, tag):
+            out.append('</' + tag + '>')
+
+        def handle_data(self, data):
+            out.append(data)
+
+        def handle_charref(self, name):
+            out.append('&#' + name + ';')
+
+        def handle_entityref(self, name):
+            out.append('&' + name + ';')
+
+    URLRewriter(old_url, new_url).feed(html)
+    return ''.join(out)
+
+
 def render_url(cfg, pathinfo, querystring=""):
     """
     Takes a url and a querystring and renders the page that
@@ -643,11 +713,11 @@ def render_url(cfg, pathinfo, querystring=""):
     else:
         request_uri = pathinfo
 
-    parts = urlparse(cfg.get('base_url', 'http://127.0.0.1:80/'))
+    parts = urlparse(cfg.get('base_url', ''))
 
     env = {
-        'HTTP_HOST': parts.netloc or '127.0.0.1',
-        'HTTP_PORT': parts.port or '80',
+        'HTTP_HOST': parts.netloc,
+        'HTTP_PORT': parts.port,
         'HTTP_USER_AGENT': 'static renderer',
         'PATH_INFO': pathinfo,
         'QUERY_STRING': querystring,
