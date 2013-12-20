@@ -746,6 +746,29 @@ def render_url(cfg, pathinfo, querystring=""):
     return p.get_response()
 
 
+class URLRouter(object):
+    def __init__(self, *routes):
+        # A route is a (regex, testfun)
+        self.routes = routes
+
+    def match(self, cfg, url):
+        for route in self.routes:
+            print route, url
+            match = re.match(route[0], url)
+            if not match:
+                continue
+
+            data = dict(
+                (key, val) for key, val in match.groupdict().items()
+                if val is not None)
+
+            if route[1] is not None:
+                data = route[1](cfg, url, data)
+
+            if data:
+                return data
+
+
 LEVELS = {
     'critical': logging.CRITICAL,
     'error': logging.ERROR,

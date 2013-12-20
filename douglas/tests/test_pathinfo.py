@@ -12,7 +12,7 @@ class Testpathinfo(UnitTestBase):
         blosxom_process_path_info(args={"request": req})
         # print repr(expected), repr(req.data)
         self.dictsubset(expected, req.data)
- 
+
     def test_root(self):
         entries = self.build_file_set([])
 
@@ -100,63 +100,6 @@ class Testpathinfo(UnitTestBase):
                           "pi_yr": "2002", "pi_mo": "02", "pi_da": "04",
                           "theme": "html"})
 
-    def test_categories_and_dates(self):
-        entries = self.build_file_set(["cata/entry1.txt",
-                                       "cata/suba/entry1.txt",
-                                       "catb/entry1.txt"])
-
-        self.setup_files(entries)
-        try:
-            # /2006/cata/
-            self._basic_test("/2006/cata/", 
-                             {"bl_type": "entry_list",
-                              "pi_yr": "2006", "pi_mo": "", "pi_da": "",
-                              "theme": "html"})
-            # /2006/04/cata/
-            self._basic_test("/2006/04/cata/", 
-                             {"bl_type": "entry_list",
-                              "pi_yr": "2006", "pi_mo": "04", "pi_da": "",
-                              "theme": "html"})
-            # /2006/04/02/cata/
-            self._basic_test("/2006/04/02/cata/", 
-                             {"bl_type": "entry_list",
-                              "pi_yr": "2006", "pi_mo": "04", "pi_da": "02",
-                              "theme": "html"})
-            # /2006/04/02/cata/suba/
-            self._basic_test("/2006/04/02/cata/suba/", 
-                             {"bl_type": "entry_list",
-                              "pi_yr": "2006", "pi_mo": "04", "pi_da": "02",
-                              "theme": "html"})
-
-        finally:
-            self.tearDown()
-
-    def test_date_categories(self):
-        entries = self.build_file_set(["2007/entry1.txt",
-                                       "2007/05/entry3.txt",
-                                       "cata/entry2.txt"])
-
-        self.setup_files(entries)
-        try:
-            # /2007/              2007 here is a category
-            self._basic_test("/2007/",
-                             {"bl_type": "entry_list",
-                              "pi_yr": "", "pi_mo": "", "pi_da": "",
-                              "theme": "html"})
-            # /2007/05            2007/05 here is a category
-            self._basic_test("/2007/05",
-                             {"bl_type": "entry_list",
-                              "pi_yr": "", "pi_mo": "", "pi_da": "",
-                              "theme": "html"})
-            # /2007/05/entry3     2007/05/entry3 is a file
-            self._basic_test("/2007/05/entry3.html",
-                             {"bl_type": "entry",
-                              "pi_yr": "", "pi_mo": "", "pi_da": "",
-                              "theme": "html"})
-
-        finally:
-            self.tearDown()
-
     def test_theme(self):
         # theme var tests
         # The theme is the default theme, the extension of the request,
@@ -196,8 +139,10 @@ class Testpathinfo(UnitTestBase):
 
         try:
             self._basic_test("/", {"url": "http://www.example.com/"})
-            self._basic_test("/index.xml", {"url": "http://www.example.com/index.xml"})
-            self._basic_test("/cata/index.foo", {"url": "http://www.example.com/cata/index.foo"})
+            self._basic_test("/index.xml",
+                             {"url": "http://www.example.com/index.xml"})
+            self._basic_test("/cata/index.foo",
+                             {"url": "http://www.example.com/cata/index.foo"})
 
         finally:
             self.tearDown()

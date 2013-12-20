@@ -3,7 +3,7 @@ import cgi
 import os
 import os.path
 import locale
-import shutil
+import re
 import sys
 import time
 try:
@@ -1001,6 +1001,62 @@ def blosxom_truncate_list_handler(args):
     return entrylist
 
 
+def route_directory(cfg, url, data):
+    path = os.path.join(cfg['datadir'], data.get('path', '').lstrip('/'))
+    if os.path.isdir(path):
+        data.update({
+            'root_datadir': path,
+            'bl_type': 'entry_list'
+        })
+        return data
+
+
+def route_file(cfg, url, data):
+    path = os.path.join(cfg['datadir'], data['path'].lstrip('/'))
+    ext = tools.what_ext(cfg['extensions'].keys(), path)
+    if ext:
+        data.update({
+            'root_datadir': path + '.' + ext,
+            'bl_type': 'entry'
+        })
+        return data
+
+
+def route_date(cfg, url, data):
+    data.update({
+        'pi_bl': '',
+        'bl_type': 'entry_list',
+        'root_datadir': os.path.join(cfg['datadir'], url.lstrip('/'))
+    })
+    return data
+
+
+ROUTER = tools.URLRouter(
+    (r'^$', route_directory),
+    (r'^/(?P<path>.*)$', route_directory),
+    (r'^/(?P<path>.*?)index$', route_directory),
+    (r'^/(?P<path>.*?)index\.(?P<theme>[^./]+)$', route_directory),
+
+    (r'^/(?P<path>.+)$', route_file),
+    (r'^/(?P<path>.+)\.(?P<theme>[^./]+)$', route_file),
+
+    (r'^/(?P<pi_yr>\d{4})/?$', route_date),
+    (r'^/(?P<pi_yr>\d{4})/index$', route_date),
+    (r'^/(?P<pi_yr>\d{4})/index\.(?P<theme>[^./]+)$', route_date),
+    (r'^/(?P<pi_yr>\d{4})/(?P<pi_mo>\d{2})/?$', route_date),
+    (r'^/(?P<pi_yr>\d{4})/(?P<pi_mo>\d{2})/index$', route_date),
+    (r'^/(?P<pi_yr>\d{4})/(?P<pi_mo>\d{2})/index\.(?P<theme>[^./]+)$',
+     route_date),
+    (r'^/(?P<pi_yr>\d{4})/(?P<pi_mo>\d{2})/(?P<pi_da>\d{2})/?$',
+     route_date),
+    (r'^/(?P<pi_yr>\d{4})/(?P<pi_mo>\d{2})/(?P<pi_da>\d{2})/index$',
+     route_date),
+    (r'^/(?P<pi_yr>\d{4})/(?P<pi_mo>\d{2})/(?P<pi_da>\d{2})/index\.'
+     r'(?P<theme>[^./]+)$',
+     route_date),
+)
+
+
 def blosxom_process_path_info(args):
     """Process HTTP ``PATH_INFO`` for URI according to path
     specifications, fill in data dict accordingly.
@@ -1009,155 +1065,55 @@ def blosxom_process_path_info(args):
 
     - ``/foo.html`` and ``/cat/foo.html`` - file foo.* in / and /cat
     - ``/cat`` - category
-    - ``/2002`` - category
-    - ``/2002`` - year
-    - ``/2002/Feb`` and ``/2002/02`` - Year and Month
-    - ``/cat/2002/Feb/31`` and ``/cat/2002/02/31``- year and month day
-      in category.
+    - ``/2002`` - category (if that's a directory)
+    - ``/2002`` - year index
+    - ``/2002/02`` - year/month index
+    - ``/2002/02/04`` - year/month/day index
 
     :param args: dict containing the incoming Request object
 
     """
     request = args['request']
-    config = request.get_configuration()
+    cfg = request.get_configuration()
     data = request.get_data()
     pyhttp = request.get_http()
 
-    path_info = pi_bl = pyhttp.get('PATH_INFO', '')
-    pi_yr = pi_mo = pi_da = ''
-    root_datadir = config['datadir']
-    extensions = config['extensions'].keys()
-    theme = request.get_theme()
+    # Populate with default values
+    new_data = {
+        'path_info': pyhttp.get('PATH_INFO', ''),
+        'pi_yr': '',
+        'pi_mo': '',
+        'pi_da': '',
+        'pi_bl': pyhttp.get('PATH_INFO', ''),
+        'theme': request.get_theme(),
+        'root_datadir': cfg['datadir']
+    }
 
-    # first we check to see if this is a request for an index and we
-    # can pluck the extension (which is certainly a theme) right
-    # off.
-    newpath, ext = os.path.splitext(path_info)
-    if newpath.endswith('/index') and ext:
-        # there is a theme-like thing, so that's our new theme and
-        # we adjust the path_info to the new filename
-        theme = ext[1:]
-        path_info = newpath
+    routed_data = ROUTER.match(cfg, new_data['path_info'])
 
-    path_info = path_info.lstrip('/')
-    absolute_path = os.path.join(config['datadir'], path_info)
+    if not routed_data:
+        # If we're not routing it, then there's nothing to do here.
+        return
 
-    path_info = path_info.split('/')
+    new_data.update(routed_data)
 
-    if os.path.isdir(absolute_path):
-        # this is an absolute path for a directory
-        root_datadir = absolute_path
-        bl_type = 'entry_list'
-
-    elif (absolute_path.endswith("/index")
-          and os.path.isdir(absolute_path[:-6])):
-        # this is an absolute path with /index at the end of it
-        root_datadir = absolute_path[:-6]
-        bl_type = 'entry_list'
-
-    else:
-        # this is either a file or a date
-        ext = tools.what_ext(extensions, absolute_path)
-        if not ext:
-            # it's possible we didn't find the file because it's got a
-            # theme thing at the end--so try removing it and
-            # checking again.
-            newpath, possible_theme = os.path.splitext(absolute_path)
-            if possible_theme:
-                ext = tools.what_ext(extensions, newpath)
-                if ext:
-                    # there is a theme-like thing, so that's our new
-                    # theme and we adjust the absolute_path and
-                    # path_info to the new filename
-                    theme = possible_theme[1:]
-                    absolute_path = newpath
-                    path_info = os.path.splitext("/".join(path_info))[0]
-                    path_info = path_info.split("/")
-
-        if ext:
-            # this is a file
-            root_datadir = absolute_path + '.' + ext
-            bl_type = 'entry'
-
-        else:
-            bl_type = 'entry_list'
-            pi_bl = ''
-
-            # it's possible to have category/category/year/month/day
-            # (or something like that) so we pluck off the categories
-            # here.
-            while (path_info
-                   and not (len(path_info[0]) == 4
-                            and path_info[0].isdigit())):
-                pi_bl = os.path.join(pi_bl, path_info.pop(0))
-
-            # handle the case where we do in fact have a category
-            # preceeding the date.
-            if pi_bl:
-                pi_bl = pi_bl.replace('\\', '/')
-                root_datadir = os.path.join(config['datadir'], pi_bl)
-
-            if len(path_info) > 0:
-                item = path_info.pop(0)
-                # handle a year token
-                if len(item) == 4 and item.isdigit():
-                    pi_yr = item
-                    item = ''
-
-                    if (len(path_info) > 0):
-                        item = path_info.pop(0)
-                        # handle a month token
-                        if item in tools.MONTHS:
-                            pi_mo = item
-                            item = ''
-
-                            if (len(path_info) > 0):
-                                item = path_info.pop(0)
-                                # handle a day token
-                                if len(item) == 2 and item.isdigit():
-                                    pi_da = item
-                                    item = ''
-
-                                    if len(path_info) > 0:
-                                        item = path_info.pop(0)
-
-                # if the last item we picked up was "index", then we
-                # just ditch it because we don't need it.
-                if item == 'index':
-                    item = ''
-
-                # if we picked off an item we don't recognize and/or
-                # there is still stuff in path_info to pluck out, then
-                # it's likely this wasn't a date.
-                if item or len(path_info) > 0:
-                    root_datadir = absolute_path
-                    bl_type = 'entry_list'
-
-    # Construct complete URL
-    url = config['base_url'].rstrip('/\\') + '/' + pi_bl.lstrip('/\\')
+    # Construct final URL
+    new_data['url'] = '/'.join([
+        cfg['base_url'].rstrip('/\\'), new_data['pi_bl'].lstrip('/\\')])
 
     # Figure out whether to truncate the entry list
     truncate = False
-    if pi_yr:
-        truncate = config.get('truncate_date', False)
-    elif bl_type == 'entry_list':
-        if path_info == [''] or path_info == ['index']:
-            truncate = config.get('truncate_frontpage', True)
+    if new_data.get('pi_yr'):
+        truncate = cfg.get('truncate_date', False)
+    elif new_data.get('bl_type') == 'entry_list':
+        if new_data['path_info'] in ([''], ['index']):
+            truncate = cfg.get('truncate_frontpage', True)
         else:
-            truncate = config.get('truncate_category', True)
+            truncate = cfg.get('truncate_category', True)
+    new_data['truncate'] = truncate
 
-    data.update({
-        'theme': theme,
-        'pi_yr': pi_yr,
-        'pi_mo': pi_mo,
-        'pi_da': pi_da,
-        'pi_bl': pi_bl,
-        'path_info': path_info,
-        'truncate': truncate,
-        'url': url,
-        'root_datadir': root_datadir,
-        'bl_type': bl_type,
-    })
+    # Update the data dict in-place
+    data.update(new_data)
 
 
 def run_cgi(cfg):
