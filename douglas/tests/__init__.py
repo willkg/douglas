@@ -5,15 +5,15 @@ Includes up a number of mocks, environment variables, and Douglas
 data structures for useful testing plugins.
 """
 
-import cgi
 import StringIO
+import cgi
 import os
 import os.path
+import shutil
 import tempfile
 import time
-import urllib
-import shutil
 import unittest
+import urllib
 
 from nose.tools import eq_
 

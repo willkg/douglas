@@ -184,8 +184,8 @@ __category__ = "tags"
 __license__ = "MIT"
 
 
-import os
 import cPickle as pickle
+import os
 import shutil
 
 from douglas.memcache import memcache_decorator

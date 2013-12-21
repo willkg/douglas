@@ -136,10 +136,11 @@ __category__ = "content"
 __license__ = "MIT"
 
 
-import os
 import StringIO
-import sys
+import os
 import os.path
+import sys
+
 from douglas import tools
 from douglas.entries.fileentry import FileEntry
 from douglas.tools import pwrap_error

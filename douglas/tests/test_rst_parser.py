@@ -1,4 +1,3 @@
-import os
 from textwrap import dedent
 
 from nose.tools import eq_

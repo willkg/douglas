@@ -1,4 +1,5 @@
-"""Summary
+"""
+Summary
 =======
 
 Plugin for breaking up long index pages with many entries into pages.

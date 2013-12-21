@@ -1,4 +1,5 @@
-"""Summary
+"""
+Summary
 =======
 
 A reStructuredText entry formatter for douglas.  reStructuredText is

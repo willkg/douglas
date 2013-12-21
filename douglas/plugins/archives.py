@@ -75,7 +75,7 @@ def verify_installation(cfg):
     return True
 
 
-class PyblArchives:
+class PyblArchives(object):
     def __init__(self, request):
         self._request = request
         self._archives = None

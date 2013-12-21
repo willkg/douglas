@@ -11,6 +11,7 @@ debug module.
 import sys
 import time
 
+
 class RendererBase(object):
     """
     Douglas core handles the Input and Process of the system and

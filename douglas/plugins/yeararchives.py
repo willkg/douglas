@@ -40,7 +40,6 @@ import re
 import time
 
 from douglas import tools
-from douglas.app import blosxom_truncate_list_handler
 from douglas.entries.base import EntryBase
 from douglas.entries.fileentry import FileEntry
 

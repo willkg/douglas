@@ -5,8 +5,8 @@ and templates.
 
 import os
 
-from douglas.renderers.base import RendererBase
 from douglas import tools, plugin_utils
+from douglas.renderers.base import RendererBase
 
 
 HBAR = ('-' * 70) + '\n'

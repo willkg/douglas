@@ -1,4 +1,5 @@
-"""Summary
+"""
+Summary
 =======
 
 Walks through your blog root figuring out all the categories you have

@@ -7,15 +7,15 @@ This module has the code for handling crashes.
    modules or packages.
 """
 
-import sys
 import StringIO
 import cgi
+import sys
 import traceback
 
 _e = cgi.escape
 
 
-class Response:
+class Response(object):
     """This is a minimal response that is returned by the crash
     handler.
     """
@@ -28,7 +28,7 @@ class Response:
         self.read = body.read
 
 
-class CrashHandler:
+class CrashHandler(object):
     def __init__(self, httpresponse=False, environ=None):
         """
         :arg httpresponse: boolean representing whether when

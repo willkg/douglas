@@ -1,11 +1,11 @@
 # Python imports
 import cgi
+import locale
 import os
 import os.path
-import locale
-import re
 import sys
 import time
+
 try:
     from cStringIO import StringIO
 except ImportError:
@@ -14,8 +14,8 @@ except ImportError:
 # Douglas imports
 from douglas import __version__
 from douglas import crashhandling
-from douglas import tools
 from douglas import plugin_utils
+from douglas import tools
 from douglas.entries.fileentry import FileEntry
 
 
@@ -368,9 +368,7 @@ class Douglas(object):
         self.cleanup()
 
 
-class DouglasWSGIApp:
-    """This class is the WSGI application for Douglas."""
-
+class DouglasWSGIApp(object):
     def __init__(self, environ=None, start_response=None, configini=None):
         """
         Make WSGI app for Douglas.

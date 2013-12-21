@@ -13,7 +13,6 @@ import time
 import urllib
 from urlparse import urlparse, urlsplit, urlunsplit
 
-# douglas imports
 from douglas import plugin_utils
 
 
