@@ -19,6 +19,28 @@ from douglas import plugin_utils
 from douglas.entries.fileentry import FileEntry
 
 
+def initialize(cfg):
+    # import and initialize plugins
+    plugin_utils.initialize_plugins(
+        cfg.get("plugin_dirs", []), cfg.get("load_plugins", []))
+
+    # entryparser callback is run here first to allow other
+    # plugins register what file extensions can be used
+    extensions = tools.run_callback(
+        "entryparser",
+        {'txt': blosxom_entry_parser},
+        mappingfunc=lambda x, y: y,
+        defaultfunc=lambda x: x)
+
+    # go through the config.py and override entryparser extensions
+    for ext, parser_module in cfg.get('entryparsers', {}).items():
+        module, callable_name = parser_module.rsplit(':', 1)
+        module = tools.importname(None, module)
+        extensions[ext] = getattr(module, callable_name)
+
+    cfg['extensions'] = extensions
+
+
 class Douglas(object):
     """Main class for Douglas functionality.  It handles
     initialization, defines default behavior, and also pushes the
@@ -344,28 +366,6 @@ class Douglas(object):
 
         # We're done, clean up
         self.cleanup()
-
-
-def initialize(cfg):
-    # import and initialize plugins
-    plugin_utils.initialize_plugins(
-        cfg.get("plugin_dirs", []), cfg.get("load_plugins", []))
-
-    # entryparser callback is run here first to allow other
-    # plugins register what file extensions can be used
-    extensions = tools.run_callback(
-        "entryparser",
-        {'txt': blosxom_entry_parser},
-        mappingfunc=lambda x, y: y,
-        defaultfunc=lambda x: x)
-
-    # go through the config.py and override entryparser extensions
-    for ext, parser_module in cfg.get('entryparsers', {}).items():
-        module, callable_name = parser_module.rsplit(':', 1)
-        module = tools.importname(None, module)
-        extensions[ext] = getattr(module, callable_name)
-
-    cfg['extensions'] = extensions
 
 
 class DouglasWSGIApp:
