@@ -879,6 +879,9 @@ def blosxom_handler(request):
         if entry_list:
             renderer.set_content(entry_list)
         else:
+            # FIXME - We should have a 404 template. Instead, we're
+            # going to fake the entry and use the entry template.
+            data['bl_type'] = 'entry'
             renderer.add_header('Status', '404 Not Found')
             renderer.set_content(
                 {'title': 'The page you are looking for is not available',
@@ -1092,6 +1095,7 @@ def blosxom_process_path_info(args):
         'pi_mo': '',
         'pi_da': '',
         'pi_bl': pyhttp.get('PATH_INFO', ''),
+        'bl_type': '',
         'theme': request.get_theme(),
         'root_datadir': cfg['datadir']
     }
@@ -1099,8 +1103,12 @@ def blosxom_process_path_info(args):
     routed_data = ROUTER.match(cfg, new_data['path_info'])
 
     if not routed_data:
-        # If we're not routing it, then there's nothing to do here.
-        return
+        # If we have no idea what this is, then treat it like a file.
+        routed_data = {
+            'bl_type': '',
+            'root_datadir': os.path.join(cfg['datadir'].rstrip(),
+                                         pyhttp.get('PATH_INFO', '').lstrip())
+        }
 
     new_data.update(routed_data)
 

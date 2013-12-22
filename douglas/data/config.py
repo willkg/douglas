@@ -111,7 +111,7 @@ py["default_theme"] = "html"
 # What is the full url for your static assets? If you're using a CDN,
 # this should be a full url. If you're not using a CDN, then this is the
 # url path off of the base_url.
-py["static_url"] = '/static/'
+py["static_url"] = '/static'
 
 # What is the list of directories that hold static files? When compiling
 # your blog, these will be collected and placed

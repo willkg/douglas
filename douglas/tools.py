@@ -752,7 +752,6 @@ class URLRouter(object):
 
     def match(self, cfg, url):
         for route in self.routes:
-            print route, url
             match = re.match(route[0], url)
             if not match:
                 continue

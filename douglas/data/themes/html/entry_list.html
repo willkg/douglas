@@ -2,7 +2,9 @@
 
 {% block navigation %}
   {{ super() }}
-  {{ pager.as_list()|safe }}
+  {% if pager is defined %}
+    {{ pager.as_list()|safe }}
+  {% endif %}
 {% endblock navigation %}
 
 {% block content %}
