@@ -44,15 +44,15 @@ class TagsTest(PluginTest):
         tm = tags.TagManager(self.request)
         tm._tagsdata = {}
         eq_(tm.all_tags_cloud(),
-            '<div class="allTagsCloud">\n</div>'
-        )
+            '<div class="allTagsCloud">\n</div>')
 
     def test_tag_cloud_one_tag(self):
         tm = tags.TagManager(self.request)
         tm._tagsdata = {'tag2': ['a']}
         eq_(tm.all_tags_cloud(),
             '<div class="allTagsCloud">\n'
-            '<a class="tag smallestTag" href="http://example.com/tag/tag2.html">tag2</a>\n'
+            '<a class="tag smallestTag" '
+            'href="http://example.com/tag/tag2.html">tag2</a>\n'
             '</div>')
 
     def test_tag_cloud_many_tags(self):
@@ -64,7 +64,10 @@ class TagsTest(PluginTest):
             }
         eq_(tm.all_tags_cloud(),
             '<div class="allTagsCloud">\n'
-            '<a class="tag biggestTag" href="http://example.com/tag/tag1.html">tag1</a>\n'
-            '<a class="tag mediumTag" href="http://example.com/tag/tag2.html">tag2</a>\n'
-            '<a class="tag smallestTag" href="http://example.com/tag/tag3.html">tag3</a>\n'
+            '<a class="tag biggestTag" '
+            'href="http://example.com/tag/tag1.html">tag1</a>\n'
+            '<a class="tag mediumTag" '
+            'href="http://example.com/tag/tag2.html">tag2</a>\n'
+            '<a class="tag smallestTag" '
+            'href="http://example.com/tag/tag3.html">tag3</a>\n'
             '</div>')

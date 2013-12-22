@@ -34,7 +34,7 @@ class PagesTest(PluginTest):
         #meta1 val1
         body
         """))
-        
+
         extra_cfg = {
             'pagesdir': os.path.join(self.datadir, 'pages')
         }

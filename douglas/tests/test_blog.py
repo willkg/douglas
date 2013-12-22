@@ -14,7 +14,7 @@ def gen_time(s):
     a float of seconds since the epoch.
 
     For example:
-   
+
     >>> gen_time("2007/02/14 14:14")
     1171480440.0
     """
@@ -24,7 +24,7 @@ def gen_time(s):
 class BlogTest(UnitTestBase):
     def get_datadir(self):
         return os.path.join(self.datadir, "datadir")
-    
+
     def setup_blog(self, blist):
         datadir = self.get_datadir()
         for mem in blist:

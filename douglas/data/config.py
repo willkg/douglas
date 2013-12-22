@@ -76,6 +76,15 @@ py["themedir"] = os.path.join(BLOGDIR, "themes")
 # ex: py['ignore_directories'] = ["CVS", "temp"]
 py["ignore_directories"] = []
 
+# Whether or not to do day-based indexes?  (ex. /2012/01/01)
+py['day_indexes'] = False
+
+# Whether or not to do month-based indexes?  (ex. /2012/02)
+py['month_indexes'] = False
+
+# Whether or not to do year-based indexes?  (ex. /2012)
+py['year_indexes'] = True
+
 # Should I stick only to the datadir for items or travel down the directory
 # hierarchy looking for items?  If so, to what depth?
 # 0 = infinite depth (aka grab everything)
@@ -186,18 +195,6 @@ py["compile_themes"] = ["html"]
 
 # What themes should index pages be compiled with?
 py["compile_index_themes"] = ["html", "rss"]
-
-# Whether (True) or not (False) you want to generate day-based
-# indexes?  (ex. /2004/04/01)  Defaults to False.
-py["compile_day_indexes"] = False
-
-# Whether (True) or not (False) you want to generate month-based
-# indexes?  (ex. /2004/04)  Defaults to False.
-py["compile_month_indexes"] = False
-
-# Whether (True) or not (False) you want to generate year-based
-# indexes?  (ex. /2004)  Defaults to True.
-py["compile_year_indexes"] = True
 
 
 # Plugins

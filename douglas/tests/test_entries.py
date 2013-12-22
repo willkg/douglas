@@ -20,7 +20,7 @@ class TestEntryBase(UnitTestBase):
         self.__tz = environ.get('TZ')
         environ['TZ'] = 'US/Eastern'
         time.tzset()
-    
+
     def restore_tz(self):
         """
         Restore time zone to what it was before __force_tz() call.
@@ -73,10 +73,6 @@ class TestEntryBase(UnitTestBase):
 
         eq_(e.get("missing_key", "default"), "default")
         eq_(e.get("missing_key"), None)
-
-        eq_(e.has_key("foo"), True)
-        eq_(e.has_key("foo2"), False)
-        eq_(e.has_key("body"), True)
 
         eq_("foo" in e, True)
         eq_("foo2" in e, False)

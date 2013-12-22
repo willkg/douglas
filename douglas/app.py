@@ -212,9 +212,9 @@ class Douglas(object):
         themes = config.get('compile_themes', ['html'])
         index_themes = config.get('compile_index_themes', ['html'])
 
-        dayindexes = config.get('compile_day_indexes', False)
-        monthindexes = config.get('compile_month_indexes', False)
-        yearindexes = config.get('compile_yearindexes', True)
+        dayindexes = config.get('day_indexes', False)
+        monthindexes = config.get('month_indexes', False)
+        yearindexes = config.get('year_indexes', True)
 
         renderme = []
         dates = {}
@@ -1021,6 +1021,15 @@ def route_file(cfg, url, data):
 
 
 def route_date(cfg, url, data):
+    if not cfg['day_indexes'] and data['pi_da']:
+        return
+
+    if not cfg['month_indexes'] and data['pi_mo']:
+        return
+
+    if not cfg['year_indexes'] and data['pi_yr']:
+        return
+
     data.update({
         'pi_bl': '',
         'bl_type': 'entry_list',

@@ -41,8 +41,9 @@ class Testparse_entry_file(UnitTestBase):
         Body
         """))
         data = tools.parse_entry_file(fn)
-        eq_(data, {'title': 'Only a title', 'body': 'Body\nBody\nBody\n',
-                   'meta1': '1', 'meta2': 'val2', 'meta3': 'val3', 'meta4': '1'})
+        eq_(data,
+            {'title': 'Only a title', 'body': 'Body\nBody\nBody\n',
+             'meta1': '1', 'meta2': 'val2', 'meta3': 'val3', 'meta4': '1'})
 
 
 class Testis_year(UnitTestBase):
@@ -87,7 +88,7 @@ class Test_generate_rand_str(UnitTestBase):
 
     def test_generates_a_random_string_between_minlen_and_maxlen(self):
         for i in range(5):
-             self._gen_checker(tools.generate_rand_str(4, 10), 4, 10)
+            self._gen_checker(tools.generate_rand_str(4, 10), 4, 10)
 
         for i in range(5):
             self._gen_checker(tools.generate_rand_str(3, 12), 3, 12)
@@ -181,7 +182,7 @@ class Testwhat_ext(UnitTestBase):
     """tools.what_ext"""
     def get_ext_dir(self):
         return os.path.join(self.datadir, "ext")
-        
+
     def setUp(self):
         """
         Creates the directory with some files in it.
@@ -197,11 +198,11 @@ class Testwhat_ext(UnitTestBase):
     def test_returns_extension_if_file_has_extension(self):
         d = self.get_ext_dir()
         eq_(tools.what_ext(["txt", "html"], os.path.join(d, "a")),
-                 "txt")
+            "txt")
         eq_(tools.what_ext(["txt", "html"], os.path.join(d, "b")),
-                 "html")
+            "html")
         eq_(tools.what_ext(["txt", "html"], os.path.join(d, "español")),
-                 "txt")
+            "txt")
 
     def test_returns_None_if_extension_not_present(self):
         d = self.get_ext_dir()

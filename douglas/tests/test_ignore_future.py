@@ -22,7 +22,7 @@ class Test_ignore_future(PluginTest):
         filename = os.path.join(self.datadir, filename)
         if not os.path.exists(os.path.dirname(filename)):
             os.makedirs(os.path.dirname(filename))
-         
+
         with open(filename, 'w') as fp:
             fp.write('Test entry at {0}\nbody body body\n'.format(filename))
 
