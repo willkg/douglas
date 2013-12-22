@@ -625,12 +625,15 @@ def render_url_statically(cfg, url, querystring):
 
 def copy_dir(src, dst, notifyfun):
     for root, dirs, files in os.walk(src):
+        dst_root = os.path.join(dst, root[len(src):].lstrip('/'))
         for name in dirs:
-            os.makedirs(os.path.join(root, name))
+            if not os.path.exists(os.path.join(dst_root, name)):
+                os.makedirs(os.path.join(dst_root, name))
 
         for name in files:
-            notifyfun(os.path.join(root, name))
-            shutil.copy2(os.path.join(root, name), os.path.join(dst, name))
+            notifyfun(os.path.join(dst_root, name))
+            shutil.copy2(os.path.join(root, name),
+                         os.path.join(dst_root, name))
 
 
 def url_rewrite(html, old_url, new_url):

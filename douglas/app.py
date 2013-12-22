@@ -338,9 +338,10 @@ class Douglas(object):
         print 'Compiling {0} url(s) total.'.format(len(renderme))
         print ''
 
+        print 'Rendering files ...'
         for url, q in renderme:
             url = url.replace(os.sep, '/')
-            print 'Rendering {0} ...'.format(url)
+            print '   Rendering {0} ...'.format(url)
 
             tools.render_url_statically(dict(config), url, q)
 
@@ -348,6 +349,8 @@ class Douglas(object):
         if not config.get('static_url', '').startswith('http'):
             print 'Copying over static files ...'
             dst = os.path.join(config['compiledir'], 'static')
+            if not os.path.exists(dst):
+                os.makedirs(dst)
 
             def notifyfun(filename):
                 print '   Copying {0}'.format(filename)
@@ -358,8 +361,6 @@ class Douglas(object):
 
             # Copy over themes static dirs
             for mem in os.listdir(config['themedir']):
-                if not os.path.isdir(mem):
-                    continue
                 path = os.path.join(config['themedir'], mem, 'static')
                 if os.path.exists(path):
                     tools.copy_dir(path, dst, notifyfun=notifyfun)
@@ -1024,10 +1025,10 @@ def route_file(cfg, url, data):
 
 
 def route_date(cfg, url, data):
-    if not cfg['day_indexes'] and data['pi_da']:
+    if not cfg['day_indexes'] and data.get('pi_da'):
         return
 
-    if not cfg['month_indexes'] and data['pi_mo']:
+    if not cfg['month_indexes'] and data.get('pi_mo'):
         return
 
     if not cfg['year_indexes'] and data['pi_yr']:

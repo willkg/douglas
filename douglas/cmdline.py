@@ -136,13 +136,14 @@ def generate_handler(doug, cfg, host_port):
                 url = '/'
             if url.endswith('/'):
                 url = url + 'index.' + cfg.get('default_theme', 'html')
-            print 're-render {0}'.format(url)
-            render_url_statically(dict(cfg), url, '')
+
+            if cfg.get('static_url') and not url.startswith(cfg['static_url']):
+                print 're-render {0}'.format(url)
+                render_url_statically(dict(cfg), url, '')
 
             # Need to know whether htis is an html file or not because
             # we need to translate the urls.
             self._type = self.guess_type(self.translate_path(self.path))
-
             SimpleHTTPRequestHandler.do_GET(self)
 
         def copyfile(self, source, outputfile):
