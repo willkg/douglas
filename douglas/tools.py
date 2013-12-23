@@ -390,25 +390,6 @@ def what_ext(extensions, filepath):
     return None
 
 
-def is_year(s):
-    """
-    Checks to see if the string is likely to be a year or not.  In
-    order to be considered to be a year, it must pass the following
-    criteria:
-
-    1. four digits
-    2. first two digits are either 19 or 20.
-
-    :param s: the string to check for "year-hood"
-
-    :returns: ``True`` if it is a year and ``False`` otherwise.
-    """
-    if not s:
-        return False
-
-    return re.compile(r'^(19|20)\d\d$').match(s) is not None
-
-
 def importname(modulename, name):
     """
     Safely imports modules for runtime importing.
@@ -440,28 +421,6 @@ def importname(modulename, name):
                      (repr(modulename), repr(name), e))
 
     return None
-
-
-def generate_rand_str(minlen=5, maxlen=10):
-    """
-    Generate a random string between ``minlen`` and ``maxlen``
-    characters long.
-
-    The generated string consists of letters and numbers.
-
-    :param minlen: the minimum length of the generated random string
-    :param maxlen: the maximum length of the generated random string
-
-    :returns: generated string
-    """
-    chars = string.letters + string.digits
-    randstr = []
-    randstr_size = random.randint(minlen, maxlen)
-    x = 0
-    while x < randstr_size:
-        randstr.append(random.choice(chars))
-        x += 1
-    return "".join(randstr)
 
 
 def run_callback(chain, input,

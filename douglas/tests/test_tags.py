@@ -11,12 +11,12 @@ class TagsTest(PluginTest):
         PluginTest.setUp(self, tags)
 
     def test_get_tagsfile(self):
-        cfg = {"datadir": self.datadir}
+        cfg = {'datadir': self.datadir}
         eq_(tags.get_tagsfile(cfg),
-            os.path.join(self.datadir, os.pardir, "tags.index"))
+            os.path.join(self.datadir, os.pardir, 'tags.index'))
 
-        tags_filename = os.path.join(self.datadir, "tags.db")
-        cfg = {"datadir": self.datadir, "tags_filename": tags_filename}
+        tags_filename = os.path.join(self.datadir, 'tags.db')
+        cfg = {'datadir': self.datadir, 'tags_filename': tags_filename}
         eq_(tags.get_tagsfile(cfg), tags_filename)
 
     def test_functions(self):
@@ -58,9 +58,9 @@ class TagsTest(PluginTest):
     def test_tag_cloud_many_tags(self):
         tm = tags.TagManager(self.request)
         tm._tagsdata = {
-            "tag1": ["a", "b", "c", "d", "e", "f"],
-            "tag2": ["a", "b", "c", "d"],
-            "tag3": ["a"]
+            'tag1': ['a', 'b', 'c', 'd', 'e', 'f'],
+            'tag2': ['a', 'b', 'c', 'd'],
+            'tag3': ['a']
             }
         eq_(tm.all_tags_cloud(),
             '<div class="allTagsCloud">\n'

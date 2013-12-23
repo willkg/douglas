@@ -1025,13 +1025,13 @@ def route_file(cfg, url, data):
 
 
 def route_date(cfg, url, data):
-    if not cfg['day_indexes'] and data.get('pi_da'):
+    if not cfg.get('day_indexes', False) and data.get('pi_da'):
         return
 
-    if not cfg['month_indexes'] and data.get('pi_mo'):
+    if not cfg.get('month_indexes', False) and data.get('pi_mo'):
         return
 
-    if not cfg['year_indexes'] and data['pi_yr']:
+    if not cfg.get('year_indexes', True) and data['pi_yr']:
         return
 
     data.update({

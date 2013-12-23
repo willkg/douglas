@@ -40,18 +40,18 @@ class TestEntryBase(UnitTestBase):
         self.restore_tz()
 
         tests = [
-            ("timetuple", TIME1),
-            ("mtime", 1216659107.0),
-            ("ti", "12:51"),
-            ("mo", "Jul"),
-            ("mo_num", "07"),
-            ("da", "21"),
-            ("dw", "Monday"),
-            ("yr", "2008"),
-            ("fulltime", "20080721125147"),
-            ("date", "Mon, 21 Jul 2008"),
-            ("w3cdate", "2008-07-21T16:51:47Z"),
-            ("rfc822date", "Mon, 21 Jul 2008 16:51 GMT")
+            ('timetuple', TIME1),
+            ('mtime', 1216659107.0),
+            ('ti', '12:51'),
+            ('mo', 'Jul'),
+            ('mo_num', '07'),
+            ('da', '21'),
+            ('dw', 'Monday'),
+            ('yr', '2008'),
+            ('fulltime', '20080721125147'),
+            ('date', 'Mon, 21 Jul 2008'),
+            ('w3cdate', '2008-07-21T16:51:47Z'),
+            ('rfc822date', 'Mon, 21 Jul 2008 16:51 GMT')
         ]
 
         for key, expected in tests:
@@ -59,58 +59,58 @@ class TestEntryBase(UnitTestBase):
 
     def test_dictlike(self):
         e = EntryBase(req_())
-        e["foo"] = "bar"
-        e["body"] = "entry body"
+        e['foo'] = 'bar'
+        e['body'] = 'entry body'
 
-        eq_(sorted(e.keys()), ["body", "foo"])
+        eq_(sorted(e.keys()), ['body', 'foo'])
 
-        eq_(e["foo"], "bar")
-        eq_(e.get("foo"), "bar")
-        eq_(e.get("foo", "fickle"), "bar")
+        eq_(e['foo'], 'bar')
+        eq_(e.get('foo'), 'bar')
+        eq_(e.get('foo', 'fickle'), 'bar')
 
-        eq_(e["body"], "entry body", "e[\"body\"]")
-        eq_(e.get("body"), "entry body", "e.get(\"body\")")
+        eq_(e['body'], 'entry body', 'e[\'body\']')
+        eq_(e.get('body'), 'entry body', 'e.get(\'body\')')
 
-        eq_(e.get("missing_key", "default"), "default")
-        eq_(e.get("missing_key"), None)
+        eq_(e.get('missing_key', 'default'), 'default')
+        eq_(e.get('missing_key'), None)
 
-        eq_("foo" in e, True)
-        eq_("foo2" in e, False)
-        eq_("foo2" not in e, True)
-        eq_("body" in e, True)
+        eq_('foo' in e, True)
+        eq_('foo2' in e, False)
+        eq_('foo2' not in e, True)
+        eq_('body' in e, True)
 
-        e.update({"foo": "bah", "faux": "pearls"})
-        eq_(e["foo"], "bah")
-        eq_(e["faux"], "pearls")
+        e.update({'foo': 'bah', 'faux': 'pearls'})
+        eq_(e['foo'], 'bah')
+        eq_(e['faux'], 'pearls')
 
-        e.update({"body": "new body data"})
-        eq_(e["body"], "new body data")
+        e.update({'body': 'new body data'})
+        eq_(e['body'], 'new body data')
 
-        del e["foo"]
-        eq_(e.get("foo"), None)
+        del e['foo']
+        eq_(e.get('foo'), None)
 
     @raises(KeyError)
     def test_delitem_keyerror(self):
         e = EntryBase(req_())
-        del e["missing_key"]
+        del e['missing_key']
 
     @raises(KeyError)
     def test_delitem_valueerror(self):
         e = EntryBase(req_())
-        del e["body"]
+        del e['body']
 
     def test_generate_entry(self):
         # generate_entry takes local time, and we test the resulting
         # rfc822date which is UTC.  Result depends on time zone.
         self.force_tz()
-        e = generate_entry(req_(), {"foo": "bar"}, "entry body", TIME1)
+        e = generate_entry(req_(), {'foo': 'bar'}, 'entry body', TIME1)
         self.restore_tz()
 
-        eq_(e["foo"], "bar")
-        eq_(e["body"], "entry body")
-        eq_(e["rfc822date"], "Mon, 21 Jul 2008 16:51 GMT")
+        eq_(e['foo'], 'bar')
+        eq_(e['body'], 'entry body')
+        eq_(e['rfc822date'], 'Mon, 21 Jul 2008 16:51 GMT')
 
-        e = generate_entry(req_(), {"foo": "bar"}, "entry body")
+        e = generate_entry(req_(), {'foo': 'bar'}, 'entry body')
 
     def test_repr(self):
         # it doesn't really matter what __repr__ sends back--it's only used

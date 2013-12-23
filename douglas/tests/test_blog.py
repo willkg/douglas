@@ -23,30 +23,30 @@ def gen_time(s):
 
 class BlogTest(UnitTestBase):
     def get_datadir(self):
-        return os.path.join(self.datadir, "datadir")
+        return os.path.join(self.datadir, 'datadir')
 
     def setup_blog(self, blist):
         datadir = self.get_datadir()
         for mem in blist:
             tools.create_entry(datadir,
-                               mem["category"],
-                               mem["filename"],
-                               mem["mtime"],
-                               mem["title"],
-                               mem["metadata"],
-                               mem["body"])
+                               mem['category'],
+                               mem['filename'],
+                               mem['mtime'],
+                               mem['title'],
+                               mem['metadata'],
+                               mem['body'])
 
     def cleanup_blog(self):
         shutil.rmtree(self.get_datadir(), ignore_errors=True)
 
 
 class TestBlogTest(BlogTest):
-    blog = [{"category": "cat1",
-             "filename": "entry1.txt",
-             "mtime": gen_time("2007/02/14 14:14"),
-             "title": "Happy Valentine's Day!",
-             "metadata": {},
-             "body": "<p>Today is Valentine's Day!  w00t!</p>"}]
+    blog = [{'category': 'cat1',
+             'filename': 'entry1.txt',
+             'mtime': gen_time('2007/02/14 14:14'),
+             'title': 'Happy Valentine\'s Day!',
+             'metadata': {},
+             'body': '<p>Today is Valentine\'s Day!  w00t!</p>'}]
 
     def test_harness(self):
         # this is kind of a bogus assert, but if we get this far

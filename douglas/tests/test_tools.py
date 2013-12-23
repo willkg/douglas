@@ -15,17 +15,17 @@ req = app.Request({}, {}, {})
 
 class Testparse_entry_file(UnitTestBase):
     def test_empty(self):
-        fn = self.create_file('test1.txt', "")
+        fn = self.create_file('test1.txt', '')
         data = tools.parse_entry_file(fn)
         eq_(data, {'body': '', 'title': ''})
 
     def test_title(self):
-        fn = self.create_file('test1.txt', "Only a title")
+        fn = self.create_file('test1.txt', 'Only a title')
         data = tools.parse_entry_file(fn)
         eq_(data, {'body': '', 'title': 'Only a title'})
 
     def test_title_body(self):
-        fn = self.create_file('test1.txt', "Only a title\nbody")
+        fn = self.create_file('test1.txt', 'Only a title\nbody')
         data = tools.parse_entry_file(fn)
         eq_(data, {'body': 'body', 'title': 'Only a title'})
 
@@ -46,84 +46,36 @@ class Testparse_entry_file(UnitTestBase):
              'meta1': '1', 'meta2': 'val2', 'meta3': 'val3', 'meta4': '1'})
 
 
-class Testis_year(UnitTestBase):
-    """tools.is_year"""
-    def test_must_be_four_digits(self):
-        for mem in (("abab", False),
-                    ("ab", False),
-                    ("199", False),
-                    ("19999", False),
-                    ("1997", True),
-                    ("2097", True)):
-            eq_(tools.is_year(mem[0]), mem[1])
-
-    def test_must_start_with_19_or_20(self):
-        for mem in (("3090", False),
-                    ("0101", False)):
-            eq_(tools.is_year(mem[0]), mem[1])
-
-    def test_everything_else_returns_false(self):
-        for mem in ((None, False),
-                    ("", False),
-                    ("ab", False),
-                    ("97", False)):
-            eq_(tools.is_year(mem[0]), mem[1])
-
-
-class Test_generate_rand_str(UnitTestBase):
-    """tools.generate_rand_str
-
-    Note: This is a mediocre test because generate_rand_str produces a
-    string that's of random length and random content.  It's possible
-    for this test to pass even when the code is bad.
-    """
-    def _gen_checker(self, s, minlen, maxlen):
-        assert len(s) >= minlen and len(s) <= maxlen
-        for c in s:
-            assert c in string.letters or c in string.digits
-
-    def test_generates_a_random_string(self):
-        for i in range(5):
-            self._gen_checker(tools.generate_rand_str(), 5, 10)
-
-    def test_generates_a_random_string_between_minlen_and_maxlen(self):
-        for i in range(5):
-            self._gen_checker(tools.generate_rand_str(4, 10), 4, 10)
-
-        for i in range(5):
-            self._gen_checker(tools.generate_rand_str(3, 12), 3, 12)
-
-
 class Testescape_text(UnitTestBase):
     """tools.escape_text"""
     def test_none_to_none(self):
         eq_(tools.escape_text(None), None)
 
     def test_empty_string_to_empty_string(self):
-        eq_(tools.escape_text(""), "")
+        eq_(tools.escape_text(''), '')
 
     def test_single_quote_to_pos(self):
-        eq_(tools.escape_text("a'b"), "a&#x27;b")
+        eq_(tools.escape_text('a\'b'), 'a&#x27;b')
 
     def test_double_quote_to_quot(self):
-        eq_(tools.escape_text("a\"b"), "a&quot;b")
+        eq_(tools.escape_text('a"b'), 'a&quot;b')
 
     def test_greater_than(self):
-        eq_(tools.escape_text("a>b"), "a&gt;b")
+        eq_(tools.escape_text('a>b'), 'a&gt;b')
 
     def test_lesser_than(self):
-        eq_(tools.escape_text("a<b"), "a&lt;b")
+        eq_(tools.escape_text('a<b'), 'a&lt;b')
 
     def test_ampersand(self):
-        eq_(tools.escape_text("a&b"), "a&amp;b")
+        eq_(tools.escape_text('a&b'), 'a&amp;b')
 
     def test_complicated_case(self):
-        eq_(tools.escape_text("a&>b"), "a&amp;&gt;b")
+        eq_(tools.escape_text('a&>b'), 'a&amp;&gt;b')
 
     def test_everything_else_unchanged(self):
         for mem in ((None, None),
-                    ("", ""),
-                    ("abc", "abc")):
+                    ('', ''),
+                    ('abc', 'abc')):
             eq_(tools.escape_text(mem[0]), mem[1])
 
 
@@ -133,24 +85,24 @@ class Testurlencode_text(UnitTestBase):
         eq_(tools.urlencode_text(None), None)
 
     def test_empty_string_to_empty_string(self):
-        eq_(tools.urlencode_text(""), "")
+        eq_(tools.urlencode_text(''), '')
 
     def test_equals_to_3D(self):
-        eq_(tools.urlencode_text("a=c"), "a%3Dc")
+        eq_(tools.urlencode_text('a=c'), 'a%3Dc')
 
     def test_ampersand_to_26(self):
-        eq_(tools.urlencode_text("a&c"), "a%26c")
+        eq_(tools.urlencode_text('a&c'), 'a%26c')
 
     def test_space_to_20(self):
-        eq_(tools.urlencode_text("a c"), "a%20c")
+        eq_(tools.urlencode_text('a c'), 'a%20c')
 
     def test_utf8(self):
-        eq_(tools.urlencode_text("español"), "espa%C3%B1ol")
+        eq_(tools.urlencode_text('español'), 'espa%C3%B1ol')
 
     def test_everything_else_unchanged(self):
         for mem in ((None, None),
-                    ("", ""),
-                    ("abc", "abc")):
+                    ('', ''),
+                    ('abc', 'abc')):
             eq_(tools.urlencode_text(mem[0]), mem[1])
 
 
@@ -162,8 +114,8 @@ class Testimportname(UnitTestBase):
 
     def tearDown(self):
         UnitTestBase.tearDown(self)
-        if "_config" in tools.__dict__:
-            del tools.__dict__["_config"]
+        if '_config' in tools.__dict__:
+            del tools.__dict__['_config']
 
     def _c(self, mn, n):
         m = tools.importname(mn, n)
@@ -171,43 +123,40 @@ class Testimportname(UnitTestBase):
         return m
 
     def test_goodimport(self):
-        eq_(tools.importname("", "string"), string)
-        eq_(tools.importname("os", "path"), os.path)
+        eq_(tools.importname('', 'string'), string)
+        eq_(tools.importname('os', 'path'), os.path)
 
     def test_badimport(self):
-        eq_(tools.importname("", "foo"), None)
+        eq_(tools.importname('', 'foo'), None)
 
 
 class Testwhat_ext(UnitTestBase):
     """tools.what_ext"""
     def get_ext_dir(self):
-        return os.path.join(self.datadir, "ext")
+        return os.path.join(self.datadir, 'ext')
 
     def setUp(self):
         """
         Creates the directory with some files in it.
         """
         UnitTestBase.setUp(self)
-        self._files = ["a.txt", "b.html", "c.txtl", "español.txt"]
+        self._files = ['a.txt', 'b.html', 'c.txtl', 'español.txt']
         os.mkdir(self.get_ext_dir())
 
         for mem in self._files:
-            with open(os.path.join(self.get_ext_dir(), mem), "w") as fp:
+            with open(os.path.join(self.get_ext_dir(), mem), 'w') as fp:
                 fp.write('lorem ipsum')
 
     def test_returns_extension_if_file_has_extension(self):
         d = self.get_ext_dir()
-        eq_(tools.what_ext(["txt", "html"], os.path.join(d, "a")),
-            "txt")
-        eq_(tools.what_ext(["txt", "html"], os.path.join(d, "b")),
-            "html")
-        eq_(tools.what_ext(["txt", "html"], os.path.join(d, "español")),
-            "txt")
+        eq_(tools.what_ext(['txt', 'html'], os.path.join(d, 'a')), 'txt')
+        eq_(tools.what_ext(['txt', 'html'], os.path.join(d, 'b')), 'html')
+        eq_(tools.what_ext(['txt', 'html'], os.path.join(d, 'español')), 'txt')
 
     def test_returns_None_if_extension_not_present(self):
         d = self.get_ext_dir()
-        eq_(tools.what_ext([], os.path.join(d, "a")), None)
-        eq_(tools.what_ext(["html"], os.path.join(d, "a")), None)
+        eq_(tools.what_ext([], os.path.join(d, 'a')), None)
+        eq_(tools.what_ext(['html'], os.path.join(d, 'a')), None)
 
 
 class Testconvert_configini_values(UnitTestBase):
@@ -219,39 +168,39 @@ class Testconvert_configini_values(UnitTestBase):
         eq_(tools.convert_configini_values({}), {})
 
     def test_no_markup(self):
-        eq_(tools.convert_configini_values({"a": "b"}), {"a": "b"})
+        eq_(tools.convert_configini_values({'a': 'b'}), {'a': 'b'})
 
     def test_integers(self):
-        for mem in (({"a": "1"}, {"a": 1}),
-                    ({"a": "1", "b": "2"}, {"a": 1, "b": 2}),
-                    ({"a": "10"}, {"a": 10}),
-                    ({"a": "100"}, {"a": 100}),
-                    ({"a": " 100  "}, {"a": 100})):
+        for mem in (({'a': '1'}, {'a': 1}),
+                    ({'a': '1', 'b': '2'}, {'a': 1, 'b': 2}),
+                    ({'a': '10'}, {'a': 10}),
+                    ({'a': '100'}, {'a': 100}),
+                    ({'a': ' 100  '}, {'a': 100})):
             eq_(tools.convert_configini_values(mem[0]), mem[1])
 
     def test_strings(self):
-        for mem in (({"a": "'b'"}, {"a": "b"}),
-                    ({"a": "\"b\""}, {"a": "b"}),
-                    ({"a": "   \"b\" "}, {"a": "b"}),
-                    ({"a": "español"}, {"a": "español"}),
-                    ({"a": "'español'"}, {"a": "español"})):
+        for mem in (({'a': '\'b\''}, {'a': 'b'}),
+                    ({'a': '\"b\"'}, {'a': 'b'}),
+                    ({'a': '   \"b\" '}, {'a': 'b'}),
+                    ({'a': 'español'}, {'a': 'español'}),
+                    ({'a': '\'español\''}, {'a': 'español'})):
             eq_(tools.convert_configini_values(mem[0]), mem[1])
 
     def test_lists(self):
-        for mem in (({"a": "[]"}, {"a": []}),
-                    ({"a": "[1]"}, {"a": [1]}),
-                    ({"a": "[1, 2]"}, {"a": [1, 2]}),
-                    ({"a": "  [1 ,2 , 3]"}, {"a": [1, 2, 3]}),
-                    ({"a": "['1' ,\"2\" , 3]"}, {"a": ["1", "2", 3]})):
+        for mem in (({'a': '[]'}, {'a': []}),
+                    ({'a': '[1]'}, {'a': [1]}),
+                    ({'a': '[1, 2]'}, {'a': [1, 2]}),
+                    ({'a': '  [1 ,2 , 3]'}, {'a': [1, 2, 3]}),
+                    ({'a': '[\'1\' ,\"2\" , 3]'}, {'a': ['1', '2', 3]})):
             eq_(tools.convert_configini_values(mem[0]), mem[1])
 
     def test_syntax_exceptions(self):
-        for mem in ({"a": "'b"},
-                    {"a": "b'"},
-                    {"a": "\"b"},
-                    {"a": "b\""},
-                    {"a": "[b"},
-                    {"a": "b]"}):
+        for mem in ({'a': '\'b'},
+                    {'a': 'b\''},
+                    {'a': '"b'},
+                    {'a': 'b"'},
+                    {'a': '[b'},
+                    {'a': 'b]'}):
             self.assertRaises(tools.ConfigSyntaxErrorException,
                               tools.convert_configini_values, mem)
 

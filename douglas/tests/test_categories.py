@@ -14,7 +14,7 @@ class Test_categories(PluginTest):
     def setUp(self):
         PluginTest.setUp(self, categories)
         # FIXME - should run initialize here instead
-        self.request.get_configuration()["extensions"] = {"txt": parse_text}
+        self.request.get_configuration()['extensions'] = {'txt': parse_text}
 
     def tearDown(self):
         PluginTest.tearDown(self)
@@ -30,7 +30,7 @@ class Test_categories(PluginTest):
     def test_no_categories(self):
         cm = categories.CategoryManager(self.request)
         eq_(cm.as_list(),
-            "<ul class=\"categorygroup\">\n\n</ul>")
+            '<ul class="categorygroup">\n\n</ul>')
 
     def test_categories(self):
         self.generate_entry('test1.txt')

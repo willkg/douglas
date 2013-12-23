@@ -14,16 +14,16 @@ class PagesTest(PluginTest):
     def test_is_frontpage(self):
         # test setup-related is_frontpage = False possibilities
         eq_(pages.is_frontpage({}, {}), False)
-        eq_(pages.is_frontpage({"PATH_INFO": "/"}, {}), False)
-        eq_(pages.is_frontpage({"PATH_INFO": "/"}, {"pages_frontpage": False}),
+        eq_(pages.is_frontpage({'PATH_INFO': '/'}, {}), False)
+        eq_(pages.is_frontpage({'PATH_INFO': '/'}, {'pages_frontpage': False}),
             False)
 
         # test path-related possibilities
-        for path, expected in (("/", True),
-                               ("/index", True),
-                               ("/index.html", True),
-                               ("/index.xml", True),
-                               ("/foo", False)):
+        for path, expected in (('/', True),
+                               ('/index', True),
+                               ('/index.html', True),
+                               ('/index.xml', True),
+                               ('/foo', False)):
             eq_(pages.is_frontpage({'PATH_INFO': path},
                                    {'pages_frontpage': True}),
                 expected)

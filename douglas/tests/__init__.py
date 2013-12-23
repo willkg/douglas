@@ -42,7 +42,7 @@ class UnitTestBase(unittest.TestCase):
         return fn
 
     def setup_files(self, files):
-        os.makedirs(os.path.join(self.datadir, "entries"))
+        os.makedirs(os.path.join(self.datadir, 'entries'))
         for fn in sorted(files):
             d, f = os.path.split(fn)
 
@@ -54,7 +54,7 @@ class UnitTestBase(unittest.TestCase):
                     fp.write('test file: {0}\n'.format(fn))
 
     def build_file_set(self, filelist):
-        return [os.path.join(self.datadir, "entries/%s" % fn)
+        return [os.path.join(self.datadir, 'entries/%s' % fn)
                 for fn in filelist]
 
     def build_request(self, cfg=None, http=None, data=None, inputstream=""):
@@ -86,9 +86,9 @@ class UnitTestBase(unittest.TestCase):
         if data:
             _data.update(data)
 
-        _http = {"wsgi.input": StringIO.StringIO(inputstream),
-                 "REQUEST_METHOD": len(inputstream) and "GET" or "POST",
-                 "CONTENT_LENGTH": len(inputstream)}
+        _http = {'wsgi.input': StringIO.StringIO(inputstream),
+                 'REQUEST_METHOD': len(inputstream) and 'GET' or 'POST',
+                 'CONTENT_LENGTH': len(inputstream)}
         if http:
             _http.update(http)
 
@@ -102,9 +102,8 @@ class UnitTestBase(unittest.TestCase):
 class TestTestInfrastructure(UnitTestBase):
     def test_setup_teardown(self):
         """Test the setup/teardown for UnitTestBase"""
-        fileset1 = self.build_file_set(["file.txt",
-                                        "cata/file.txt",
-                                        "cata/subcatb/file.txt"])
+        fileset1 = self.build_file_set([
+            'file.txt', 'cata/file.txt', 'cata/subcatb/file.txt'])
 
         self.setup_files(fileset1)
         try:
@@ -124,7 +123,9 @@ TIMESTAMP = time.mktime(time.strptime('Wed Dec 26 11:00:00 2007'))
 class FrozenTime(object):
     """Wraps the time module to provide a single, frozen timestamp.
 
-    Allows for dependency injection."""
+    Allows for dependency injection.
+
+    """
     def __init__(self, timestamp):
         """Sets the time to timestamp, as seconds since the epoch."""
         self.timestamp = timestamp
