@@ -6,6 +6,15 @@ This covers the basics you need to know for contributing to
 Douglas.
 
 
+Status
+======
+
+I'm rewriting Pyblosxom fixing a lot of problems I had with it. This
+project is in crazy flux right now. I don't expect anyone to want to
+help at this stage. If you want to help anyways, see the issues in
+the issue tracker for what's in the queue of things to fix.
+
+
 How to clone the project
 ========================
 
@@ -16,7 +25,7 @@ If you have a GitHub account [Recommended]
 -------------------------------------------
 
 This is the ideal way to contribute because GitHub makes things simple
-and convenient .
+and convenient.
 
 Go to the project page (https://github.com/willkg/douglas) and click on
 "Fork" at the top right on the screen. GitHub will create a copy of the 
@@ -61,6 +70,10 @@ Code conventions
 
 Follow `PEP-8 <http://www.python.org/dev/peps/pep-0008/>`_.
 
+Best to run pyflakes and pep8 over your code.
+
+Don't use l as a variable name.
+
 
 Tests
 =====
@@ -71,6 +84,8 @@ test pass.
 
 Tests go in ``douglas/tests/``.
 
+Tests are run with `nose <https://nose.readthedocs.org/en/latest/>`_.
+
 
 Documentation
 =============
@@ -78,5 +93,5 @@ Documentation
 New features should come with appropriate changes to the documentation.
 
 Documentation is in the ``docs/`` directory, written using
-`restructured text <http://docutils.sourceforge.net/rst.html>`_, and
+`reStructuredText <http://docutils.sourceforge.net/rst.html>`_, and
 built with `Sphinx <http://sphinx.pocoo.org/>`_.
