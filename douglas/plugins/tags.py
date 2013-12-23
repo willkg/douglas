@@ -193,7 +193,7 @@ from douglas.memcache import memcache_decorator
 
 def savefile(path, tagdata):
     """Saves tagdata to file at path."""
-    with open(path + '.new', 'r') as fp:
+    with open(path + '.new', 'w') as fp:
         pickle.dump(tagdata, fp)
     shutil.move(path + '.new', path)
 
