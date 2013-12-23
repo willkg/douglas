@@ -34,7 +34,7 @@ setup(
     scripts=["bin/douglas-cmd"],
     zip_safe=False,
     include_package_data=True,
-    install_requires=['Jinja2'],
+    install_requires=['Jinja2', 'wsgiref'],
     classifiers=[
         "Development Status :: 2 - Pre-Alpha",
         "Environment :: Web Environment",
