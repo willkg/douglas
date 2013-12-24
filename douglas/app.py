@@ -914,7 +914,8 @@ def blosxom_entry_parser(filename, request):
               particular file (and plugin)
 
     """
-    return tools.parse_entry_file(filename)
+    cfg = request.get_configuration()
+    return tools.parse_entry_file(filename, cfg.get('blog_encoding', 'utf-8'))
 
 
 def blosxom_file_list_handler(args):

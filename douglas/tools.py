@@ -1,12 +1,11 @@
 import HTMLParser
+import codecs
 import logging
 import os
 import os.path
-import random
 import re
 import shutil
 import stat
-import string
 import sys
 import textwrap
 import time
@@ -121,10 +120,10 @@ def convert_configini_values(configini):
     return config
 
 
-def parse_entry_file(filename):
+def parse_entry_file(filename, encoding='utf-8'):
     """Parses a a Douglas-structured entry file"""
     entry_data = {}
-    with open(filename, 'r') as fp:
+    with codecs.open(filename, 'r', encoding) as fp:
         lines = fp.readlines()
 
     if not lines:

@@ -130,7 +130,9 @@ def parse(body, request):
 
 
 def parse_rst_file(filename, request):
-    entry_data = tools.parse_entry_file(filename)
+    cfg = request.get_configuration()
+    entry_data = tools.parse_entry_file(
+        filename, cfg.get('blog_encoding', 'utf-8'))
     body = entry_data['body']
 
     if '.. break::' in body:

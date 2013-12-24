@@ -93,6 +93,7 @@ class Renderer(RendererBase):
 
             template_name = context.get('bl_type', 'entry') + '.' + theme
             template = env.get_template(template_name)
-            self.write(template.render(context))
+            output = template.render(context)
+            self.write(output.encode(config.get('blog_encoding', 'utf-8')))
 
         self.rendered = 1
