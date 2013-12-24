@@ -54,7 +54,7 @@ class Renderer(RendererBase):
         config = self._request.get_configuration()
         data = self._request.get_data()
 
-        themedir = config.get('themedir')
+        themedir = config.get('themedir', 'themes')
         theme = data.get("theme") or "html"
 
         data['content-type'] = self.get_content_type(themedir, theme)
