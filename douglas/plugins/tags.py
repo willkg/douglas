@@ -327,6 +327,18 @@ def cb_start(args):
     data['tagsdata'] = tagsdata
 
 
+def cb_pathinfo(args):
+    req = args['request']
+    cfg = req.get_configuration()
+    data = req.get_data()
+    pyhttp = req.get_http()
+
+    trigger = '/' + cfg.get('tags_trigger', 'tag')
+    if pyhttp['PATH_INFO'].startswith(trigger):
+        data['bl_type'] = 'entry_list'
+        return data
+
+
 def cb_filelist(args):
     from douglas import tools
     from douglas.app import blosxom_truncate_list_handler

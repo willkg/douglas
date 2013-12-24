@@ -1131,6 +1131,7 @@ def blosxom_process_path_info(args):
 
     # Update the data dict in-place
     data.update(new_data)
+    return data
 
 
 def run_cgi(cfg):
