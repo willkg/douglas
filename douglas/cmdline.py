@@ -158,6 +158,10 @@ def generate_handler(doug, cfg, host_port):
     return DouglasHTTPRequestHandler
 
 
+class ReusableSocketServer(SocketServer.TCPServer):
+    allow_reuse_address = True
+
+
 @with_config
 def cmd_serve(cfg, command, argv):
     """Serves the compiled_site."""
@@ -181,7 +185,7 @@ def cmd_serve(cfg, command, argv):
 
     handler = generate_handler(doug, cfg, host_port)
 
-    httpd = SocketServer.TCPServer((host, port), handler)
+    httpd = ReusableSocketServer((host, port), handler)
     print 'Serving at http://{0}:{1}'.format(host, port)
     httpd.serve_forever()
 
