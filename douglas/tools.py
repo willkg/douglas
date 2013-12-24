@@ -660,6 +660,8 @@ def url_rewrite(html, old_url, new_url):
             out.append('&' + name + ';')
 
     URLRewriter(old_url, new_url).feed(html)
+    out = [mem.encode('utf-8') if isinstance(mem, unicode) else mem
+           for mem in out]
     return ''.join(out)
 
 
