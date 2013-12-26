@@ -346,24 +346,23 @@ class Douglas(object):
             tools.render_url_statically(dict(config), url, q)
 
         # Copy over static files
-        if not config.get('static_url', '').startswith('http'):
-            print 'Copying over static files ...'
-            dst = os.path.join(config['compiledir'], 'static')
-            if not os.path.exists(dst):
-                os.makedirs(dst)
+        print 'Copying over static files ...'
+        dst = os.path.join(config['compiledir'], 'static')
+        if not os.path.exists(dst):
+            os.makedirs(dst)
 
-            def notifyfun(filename):
-                print '   Copying {0}'.format(filename)
+        def notifyfun(filename):
+            print '   Copying {0}'.format(filename)
 
-            # Copy over static_files_dirs files first
-            for mem in config.get('static_files_dirs', []):
-                tools.copy_dir(mem, dst, notifyfun=notifyfun)
+        # Copy over static_files_dirs files first
+        for mem in config.get('static_files_dirs', []):
+            tools.copy_dir(mem, dst, notifyfun=notifyfun)
 
-            # Copy over themes static dirs
-            for mem in os.listdir(config['themedir']):
-                path = os.path.join(config['themedir'], mem, 'static')
-                if os.path.exists(path):
-                    tools.copy_dir(path, dst, notifyfun=notifyfun)
+        # Copy over themes static dirs
+        for mem in os.listdir(config['themedir']):
+            path = os.path.join(config['themedir'], mem, 'static')
+            if os.path.exists(path):
+                tools.copy_dir(path, dst, notifyfun=notifyfun)
 
         # We're done, clean up
         self.cleanup()

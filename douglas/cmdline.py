@@ -88,25 +88,26 @@ def build_parser(usage):
 def generate_handler(doug, cfg, host_port):
     """Creates a closure so our DouglasHTTPRequestHandler has what it needs"""
     base_url = cfg.get('base_url', '/')
-    base_path = urlparse(base_url).path.lstrip('/')
+    base_path = urlparse(base_url).path
+    static_url = cfg.get('static_url', '')
+    if static_url.startswith(base_url):
+        static_url = static_url[len(base_url):]
     compiledir = cfg['compiledir']
     default_theme = cfg.get('default_theme', 'html')
-    serving_base_url = 'http://{0}/{1}'.format(host_port, base_path)
+    serving_base_url = 'http://{0}/{1}'.format(host_port, base_path.lstrip('/'))
 
     class DouglasHTTPRequestHandler(SimpleHTTPRequestHandler):
         """Handler that serves compiled_site locally at the right path"""
         def translate_path(self, path):
             """Translate a url path to the local file."""
             newpath = urlparse(path).path
-            newpath = newpath.lstrip('/')
 
             if not newpath.startswith(base_path):
                 newpath = base_path
             else:
                 newpath = newpath[len(base_path):]
 
-            newpath = newpath.lstrip('/')
-            newpath = os.path.join(compiledir, newpath)
+            newpath = os.path.join(compiledir, newpath.lstrip('/'))
 
             # If the path doesn't exist, try the path with the
             # default_theme tacked on.
@@ -124,9 +125,9 @@ def generate_handler(doug, cfg, host_port):
         def do_GET(self):
             if self.path == '/' and base_path:
                 # Redirect to the base_path.
-                print 'Redirecting to /{0}'.format(base_path)
+                print 'Redirecting to {0}'.format(base_path)
                 self.send_response(302)
-                self.send_header("Location", '/' + base_path)
+                self.send_header("Location", base_path)
                 self.end_headers()
                 return
 
@@ -137,7 +138,8 @@ def generate_handler(doug, cfg, host_port):
             if url.endswith('/'):
                 url = url + 'index.' + cfg.get('default_theme', 'html')
 
-            if cfg.get('static_url') and not url.startswith(cfg['static_url']):
+            # If this isn't a static asset, we should re-render it.
+            if not static_url or not url.startswith(static_url):
                 print 're-render {0}'.format(url)
                 render_url_statically(dict(cfg), url, '')
 
