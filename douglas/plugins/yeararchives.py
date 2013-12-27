@@ -78,7 +78,7 @@ class YearArchivesManager(object):
         output = []
         output.append('<ul class="yearArchives">')
 
-        for year in sorted(years):
+        for year in sorted(years, reverse=True):
             output.append(item_t.format(
                 baseurl=config.get('base_url', ''),
                 year=year,
