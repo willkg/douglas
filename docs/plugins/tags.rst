@@ -100,7 +100,7 @@ how tag metadata is formatted, and how tag lists triggered.
 Usage in templates
 ==================
 
-The ``TagManager`` gets added to the context as ``tags. It has the
+The ``TagManager`` gets added to the context as ``tags``. It has the
 following methods:
 
 ``all_tags()``
