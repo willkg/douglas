@@ -519,6 +519,19 @@ def cmd_compile(cfg, command, argv):
     return p.run_compile(options.incremental)
 
 
+@with_config
+def cmd_collectstatic(cfg, command, argv):
+    """Collects static files and copies them to compiledir."""
+    parser = build_parser('%prog collectstatic [options]')
+    (options, args) = parser.parse_args(argv)
+
+    p = build_douglas(cfg)
+    if not p:
+        return 0
+
+    return p.run_collectstatic()
+
+
 DEFAULT_HANDLERS = [
     (key[4:], fun, fun.__doc__)
     for key, fun in globals().items() if key.startswith('cmd_')

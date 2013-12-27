@@ -196,9 +196,9 @@ class Douglas(object):
         """
         self.initialize()
 
-        config = self._request.get_configuration()
-        compiledir = config.get('compiledir', '')
-        datadir = config['datadir']
+        cfg = self._request.get_configuration()
+        compiledir = cfg.get('compiledir', '')
+        datadir = cfg['datadir']
 
         if not compiledir:
             print 'Error: You must set compiledir in your config file.'
@@ -209,25 +209,25 @@ class Douglas(object):
             print 'Incremental is set.'
         print ''
 
-        themes = config.get('compile_themes', ['html'])
-        index_themes = config.get('compile_index_themes', ['html'])
+        themes = cfg.get('compile_themes', ['html'])
+        index_themes = cfg.get('compile_index_themes', ['html'])
 
-        dayindexes = config.get('day_indexes', False)
-        monthindexes = config.get('month_indexes', False)
-        yearindexes = config.get('year_indexes', True)
+        dayindexes = cfg.get('day_indexes', False)
+        monthindexes = cfg.get('month_indexes', False)
+        yearindexes = cfg.get('year_indexes', True)
 
         renderme = []
         dates = {}
         categories = {}
 
         # first we handle entries and categories
-        listing = tools.get_entries(config, datadir)
+        listing = tools.get_entries(cfg, datadir)
 
         for mem in listing:
             # Skip files that have extensions we don't know what to do
             # with.
             ext = os.path.splitext(mem)[1].lstrip('.')
-            if not ext in config['extensions'].keys():
+            if not ext in cfg['extensions'].keys():
                 continue
 
             # Get the mtime of the entry.
@@ -305,7 +305,7 @@ class Douglas(object):
                 for f in index_themes:
                     renderme.append((mem + f, ''))
 
-        additional_stuff = config.get('compile_urls', [])
+        additional_stuff = cfg.get('compile_urls', [])
         if additional_stuff:
             print '- Found {0} arbitrary url(s) ...'.format(
                 len(additional_stuff))
@@ -342,12 +342,20 @@ class Douglas(object):
         for url, q in renderme:
             url = url.replace(os.sep, '/')
             print '   Rendering {0} ...'.format(url)
+            tools.render_url_statically(dict(cfg), url, q)
 
-            tools.render_url_statically(dict(config), url, q)
+        # We're done, clean up
+        self.cleanup()
+
+    def run_collectstatic(self):
+        """Collects static files and copies them to compiledir"""
+        cfg = self._request.get_configuration()
+
+        self.initialize()
 
         # Copy over static files
         print 'Copying over static files ...'
-        dst = os.path.join(config['compiledir'], 'static')
+        dst = os.path.join(cfg['compiledir'], 'static')
         if not os.path.exists(dst):
             os.makedirs(dst)
 
@@ -355,12 +363,14 @@ class Douglas(object):
             print '   Copying {0}'.format(filename)
 
         # Copy over static_files_dirs files first
-        for mem in config.get('static_files_dirs', []):
+        static_files_dirs = cfg.get('static_files_dirs', [])
+        static_files_dirs.append(os.path.join(cfg['datadir'], '..', 'static'))
+        for mem in static_files_dirs:
             tools.copy_dir(mem, dst, notifyfun=notifyfun)
 
         # Copy over themes static dirs
-        for mem in os.listdir(config['themedir']):
-            path = os.path.join(config['themedir'], mem, 'static')
+        for mem in os.listdir(cfg['themedir']):
+            path = os.path.join(cfg['themedir'], mem, 'static')
             if os.path.exists(path):
                 tools.copy_dir(path, dst, notifyfun=notifyfun)
 
