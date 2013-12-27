@@ -36,7 +36,9 @@ Usage
 Add the following blurb where you want page navigation to your
 ``entry_list`` template::
 
-    {{ pager.as_list()|safe }}
+    {% if pager is defined %}
+      {{ pager.as_list()|safe }}
+    {% endif %}
 
 which generates HTML like this::
 
@@ -44,7 +46,9 @@ which generates HTML like this::
 
 Or::
 
-    {{ pager.as_span()|safe }}
+    {% if pager is defined %}
+      {{ pager.as_span()|safe }}
+    {% endif %}
 
 which generates HTMl like this::
 

@@ -31,44 +31,6 @@ This plugin comes with douglas.  To install, do the following:
    http://docutils.sourceforge.net/
 
 
-Usage
-=====
-
-Blog entries with a ``.rst`` extension will be parsed as
-restructuredText.
-
-You can also configure this as your default preformatter for ``.txt``
-files by configuring it in your config file as follows::
-
-   py['parser'] = 'reST'
-
-Additionally, you can do this on an entry-by-entry basis by adding a
-``#parser reST`` line in the metadata section.  For example::
-
-   My Little Blog Entry
-   #parser reST
-   My main story...
-
-
-Additionally, blog entries can have a summary. Insert a break directive
-at the point where the summary should end. For example::
-
-    First part of my blog entry....
-
-    .. break::
-
-    Secon part of my blog entry after the fold.
-
-In your templates, you can show just the summary like this::
-
-    {% if entry.summary is defined %}
-      {{ entry.summary|safe }}
-      <p><a href="{{ entry.url }}">Read more...</a></p>
-    {% else %}
-      {{ entry.body|safe }}
-    {% endif %}
-
-
 Configuration
 =============
 
@@ -81,14 +43,43 @@ control over the rendered HTML::
 
    # Enable or disable the promotion of a lone top-level section title to
    # document title (and subsequent section title to document subtitle
-   # promotion); enabled by default.
-   py['reST_transform_doctitle'] = 1
+   # promotion); disabled by default.
+   py['reST_transform_doctitle'] = 0
 
 
 .. Note::
 
    If you're not seeing headings that you think should be there, try
    changing the ``reST_initial_header_level`` property to 0.
+
+
+Usage
+=====
+
+Blog entries with a ``.rst`` extension will be parsed as
+reStructuredText.
+
+Blog entries can have a summary. Insert a break directive at the point
+where the summary should end. For example::
+
+    First part of my blog entry....
+
+    .. break::
+
+    Second part of my blog entry after the fold.
+
+Some entries don't have a summary attribute, so if you're going to
+show the summary, you need to make sure it's defined first.
+
+For example, in your entry_list template, you could show the summary
+like this::
+
+    {% if entry.summary is defined %}
+      {{ entry.summary|safe }}
+      <p><a href="{{ entry.url }}">Read more...</a></p>
+    {% else %}
+      {{ entry.body|safe }}
+    {% endif %}
 
 
 License

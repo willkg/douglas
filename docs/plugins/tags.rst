@@ -100,7 +100,8 @@ how tag metadata is formatted, and how tag lists triggered.
 Usage in templates
 ==================
 
-The ``TagManager`` has the following methods:
+The ``TagManager`` gets added to the context as ``tags. It has the
+following methods:
 
 ``all_tags()``
     Returns a list of (tag, tag_url, count) tuples.
@@ -108,9 +109,19 @@ The ``TagManager`` has the following methods:
     You can iterate over this to render tag data for all the tags
     on your blog.
 
+    ::
+
+        {{ tags.all_tags()|safe }}
+
+
 ``all_tags_div()``
     Generates HTML for a div of class ``allTags`` with ``a`` tags of
     class ``tag`` in it--one for each tag.
+
+    ::
+
+        {{ tags.all_tags_div()|safe }}
+
 
 ``all_tags_cloud()``
     Generates HTML for a div of class ``allTagsCloud`` with ``a`` tags
@@ -119,13 +130,29 @@ The ``TagManager`` has the following methods:
     ``smallestTag`` depending on how "big" the tag should show up in
     the cloud.
 
+    ::
+
+        {{ tags.all_tags_cloud()|safe }}
+
+
 ``entry_tags(entry)``
     Returns a list of (tag, tag_url) tuples for tags for the specified
     entry.
 
+    ::
+
+        {% for tag in tags.entry_tags(entry) %}
+          {{ tag }}
+        {% endfor %}
+
+
 ``entry_tags_span(entry)``
     Generates HTML for a span of class ``entryTags`` with ``a`` tags
     of class ``tag`` in it--one for each tag.
+
+    ::
+
+        {{ tags.entry_tags_span(entry)|safe }}
 
 
 .. Note::
