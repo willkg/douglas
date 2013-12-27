@@ -13,9 +13,9 @@ Summary
 
 Compiling your blog to static HTML allows you to generate your blog
 and push it via scp or ftp to host most anywhere.  If your blog isn't
-interactive or you need to host your blog on a system that doesn't
-let you run a CGI script or a WSGI app, then this is the easiest way
-to do it.
+interactive or you need to host your blog on a system that doesn't let
+you run a CGI script or a WSGI app, then this is the easiest way to do
+it.
 
 Compiling your blog happens in two steps:
 
@@ -30,20 +30,22 @@ to the host for serving.
 Configuring compiling
 =====================
 
-To compile your blog, you need to set the ``compiledir`` setting in your
-``config.py`` file.  That tells Douglas which directory to compile your
-blog to.  Everything else is optional and has defaults.
+To compile your blog, you need to set the ``compiledir`` setting in
+your ``config.py`` file.  That tells Douglas which directory to
+compile your blog to.  Everything else is optional and has defaults.
 
 
 ``compiledir``
     This is the directory we will save all the output.  The value of
-    ``compiledir`` should be a string representing the **absolute path** of the
-    output directory for compiling.
+    ``compiledir`` should be a string representing the **absolute
+    path** of the output directory for compiling.
 
-    For example, Joe puts the output in his ``public_html`` directory of his
-    account::
+    For example, Joe puts the output in his ``public_html`` directory
+    of his account:
 
-        py["compiledir"] = "/home/joe/public_html"
+    .. code-block:: python
+
+       py["compiledir"] = "/home/joe/public_html"
 
 
 ``base_url``
@@ -53,20 +55,24 @@ blog to.  Everything else is optional and has defaults.
     For example, if your ``compiledir`` were set to
     ``/home/joe/public_html`` and the url for that directory were
     ``http://example.com/~joe/``, then you probably want to set your
-    base_url like this::
+    base_url like this:
 
-        py["base_url"] = "http://example.com/~joe/"
+    .. code-block:: python
+
+       py["base_url"] = "http://example.com/~joe/"
 
 
 ``compile_themes`` (Optional)
     Defaults to ``['html']``.
 
-    The value of ``compile_themes`` should be a list of strings representing
-    all the themes that should be rendered.
+    The value of ``compile_themes`` should be a list of strings
+    representing all the themes that should be rendered.
 
-    For example::
+    For example:
 
-        py["compile_themes"] = ["html"]
+    .. code-block:: python
+
+       py["compile_themes"] = ["html"]
 
 
 ``compile_index_themes`` (Optional)
@@ -78,9 +84,12 @@ blog to.  Everything else is optional and has defaults.
 
     Defaults to ``["html"]`` which only renders the html theme.
 
-    For example::
+    For example:
 
-        py["compile_index_themes"] = ["html"]
+    .. code-block:: python
+
+       py["compile_index_themes"] = ["html"]
+
 
     If you want your index files to also be feeds, then you should add
     a feed theme to the list.
@@ -91,9 +100,11 @@ blog to.  Everything else is optional and has defaults.
 
     Whether or not to generate indexes per day.
 
-    For example::
+    For example:
 
-        py["compile_day_indexes"] = True
+    .. code-block:: python
+
+       py["compile_day_indexes"] = True
 
 
 ``compile_month_indexes`` (Optional)
@@ -101,20 +112,24 @@ blog to.  Everything else is optional and has defaults.
 
     Whether or not to generate indexes per day.
 
-    For example::
+    For example:
 
-        py["compile_month_indexes"] = True
+    .. code-block:: python
+
+       py["compile_month_indexes"] = True
 
 
 ``compile_urls`` (Optional)
-    Any other url paths to compile.  Sometimes plugins require you
-    to add additional paths---this is where you'd do it.
+    Any other url paths to compile.  Sometimes plugins require you to
+    add additional paths---this is where you'd do it.
 
-    For example::
+    For example:
 
-        py["compile_urls"] = [
-            "/booklist"
-        ]
+    .. code-block:: python
+
+       py["compile_urls"] = [
+           "/booklist"
+       ]
 
 
 Configuring collectstatic
@@ -128,45 +143,59 @@ Configuring collectstatic
     If you're not using a CDN, this is probably the base_url plus
     ``/static``.
 
-    You can use this variable in your templates. For example::
+    You can use this variable in your templates. For example:
 
-        <link rel="stylesheet" href="{{ static_url }}/css/style.css">
+    .. code-block:: html
+
+       <link rel="stylesheet" href="{{ static_url }}/css/style.css">
+
 
 ``static_files_dirs`` (Optional)
     Any additional directories you want copied over to the compiledir.
 
-    For example::
+    For example:
 
-        py['static_files_dirs'] = [
-            '/home/joe/blog/staticimages/',
-            '/home/joe/blog/blogimages/'
-        ]
+    .. code-block:: python
 
-
-
+       py['static_files_dirs'] = [
+           '/home/joe/blog/staticimages/',
+           '/home/joe/blog/blogimages/'
+       ]
 
 
 Compiling your blog
 ===================
 
-To compile your blog, ``cd`` into your blog's directory and run::
+To compile your blog, ``cd`` into your blog's directory and run:
 
-    % douglas-cmd compile
+.. code-block:: bash
 
-After that, collect the static files::
+   $ douglas-cmd compile
 
-    % douglas-cmd collectstatic
 
-Once you've done both of those steps, you can copy the compiledir
-to your blog host.
+After that, collect the static files:
 
-See::
+.. code-block:: bash
 
-    % douglas-cmd compile --help
+   $ douglas-cmd collectstatic
 
-and::
 
-    % douglas-cmd collectstatic --help
+Once you've done both of those steps, you can copy the compiledir to
+your blog host.
+
+See:
+
+.. code-block:: bash
+
+   $ douglas-cmd compile --help
+
+
+and:
+
+.. code-block:: bash
+
+   $ douglas-cmd collectstatic --help
+
 
 for options.
 
@@ -210,6 +239,7 @@ Here's the relevant portions of my ``config.py`` file:
    py["static_url"] = "http://example.com/~joe/blog/static"
    py["static_files_dirs"] = []
 
+
 My compile.sh file looks like this:
 
 .. code-block:: bash
@@ -249,11 +279,16 @@ OMG! I don't want an RSS version of every page in my blog!
 You probably don't want to compile an RSS or Atom version of every
 blog entry, so don't include those themes in ``compile_themes`` and
 instead specify the themes you want for index pages in
-``compile_index_themes`` or the specific urls you want in ``compile_urls``.
+``compile_index_themes`` or the specific urls you want in
+``compile_urls``.
 
 
 I want to use a CSS compiler, JS minifier, etc
 ----------------------------------------------
 
 Put your CSS/JS source files in your static directories, then compile
-them into their CSS/JS forms and then run ``douglas-cmd collectstatic``.
+them into their CSS/JS forms and then run:
+
+.. code-block:: bash
+
+   $ douglas-cmd collectstatic
