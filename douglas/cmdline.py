@@ -131,17 +131,20 @@ def generate_handler(doug, cfg, host_port):
                 self.end_headers()
                 return
 
-            # Re-render this url, so it's up-to-date.
-            url = self.path[len(base_path):]
-            if not url:
-                url = '/'
-            if url.endswith('/'):
-                url = url + 'index.' + cfg.get('default_theme', 'html')
+            # If they did a hard-refresh, then there will be a Cache-Control
+            # header. If that's there, then we re-render the page so it's
+            # up to date.
+            if self.headers.get('Cache-Control', '') == 'no-cache':
+                url = self.path[len(base_path):]
+                if not url:
+                    url = '/'
+                if url.endswith('/'):
+                    url = url + 'index.' + cfg.get('default_theme', 'html')
 
-            # If this isn't a static asset, we should re-render it.
-            if not static_url or not url.startswith(static_url):
-                print 're-render {0}'.format(url)
-                render_url_statically(dict(cfg), url, '')
+                # If this isn't a static asset, we should re-render it.
+                if not static_url or not url.startswith(static_url):
+                    print 're-render {0}'.format(url)
+                    render_url_statically(dict(cfg), url, '')
 
             # Need to know whether htis is an html file or not because
             # we need to translate the urls.
