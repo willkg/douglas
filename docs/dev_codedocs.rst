@@ -13,7 +13,7 @@ When in doubt, read the code.
 
 
 Douglas
-=========
+=======
 
 .. data:: __version__
 

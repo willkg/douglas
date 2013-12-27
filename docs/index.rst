@@ -22,17 +22,15 @@ purposes.
    license
    whatsnew
    douglas_cmd
+   deploy_compiled
    deploy_cgi
    deploy_paste
    deploy_apache_mod_wsgi
    deploy_lighttpd_fastcgi
-   deploy_compiled
    config_variables
    writing_entries
    themes_and_templates
-   syndication
    renderers
-   comments
    plugins
    authors
 
@@ -61,7 +59,6 @@ plugins, or things of that ilk.
    :maxdepth: 2
 
    dev_contributing
-   dev_hacking
    dev_architecture
    dev_writing_plugins
    dev_codedocs

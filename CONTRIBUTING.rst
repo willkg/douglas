@@ -5,9 +5,14 @@ Contributing
 This covers the basics you need to know for contributing to
 Douglas.
 
+.. contents::
+   :local:
+
 
 Status
 ======
+
+**December 27th, 2013**
 
 I'm rewriting Pyblosxom fixing a lot of problems I had with it. This
 project is in crazy flux right now. I don't expect anyone to want to
@@ -28,7 +33,7 @@ This is the ideal way to contribute because GitHub makes things simple
 and convenient.
 
 Go to the project page (https://github.com/willkg/douglas) and click on
-"Fork" at the top right on the screen. GitHub will create a copy of the 
+"Fork" at the top right on the screen. GitHub will create a copy of the
 Douglas repository in your account for you to work on.
 
 Create a new branch off of master for any new work that you do.
@@ -42,27 +47,66 @@ If you need help with this process, `see the GitHub documentation
 If you don't have a GitHub account
 ----------------------------------
 
-Clone the project using git::
+Clone the project using git:
 
-    git clone https://github.com/willkg/douglas.git
+.. code-block:: bash
 
-Set ``user.name`` and ``user.email`` git configuration::
+   $ git clone https://github.com/willkg/douglas.git
 
-    git config user.name "your name"
-    git config user.email "your@email.address"
+Set ``user.name`` and ``user.email`` git configuration:
+
+.. code-block:: bash
+
+   $ git config user.name "your name"
+   $ git config user.email "your@email.address"
 
 Create a new branch off of master for any new work that you do.
 
-When you want to send it upstream, do::
+When you want to send it upstream, do:
 
-    git format-patch --stdout origin/master > NAME_OF_PATCH_FILE.patch
+.. code-block:: bash
+
+   $ git format-patch --stdout origin/master > NAME_OF_PATCH_FILE.patch
 
 where ``NAME_OF_PATCH_FILE`` is a nice name that's short and
-descriptive of what the patch holds and master should be replaced with your 
+descriptive of what the patch holds and master should be replaced with your
 branch name
 
 Then attach that ``.patch`` file and send it to douglas-devel
 mailing list.
+
+
+Installing for hacking
+======================
+
+1. Clone the project into a directory
+2. Create a virtual environment and activate it
+3. Install Douglas into your virtual environment in a way that's suitable for hacking:
+
+   .. code-block:: bash
+
+      $ pip install -e .
+
+4. Install development requirements:
+
+   .. code-block:: bash
+
+      $ pip install -r requirements-dev.txt
+
+
+Create a new blog:
+
+.. code-block:: bash
+
+   $ douglas-cmd create [<dir>]
+
+Generate "sample" entries:
+
+.. code-block:: bash
+
+   $ douglas-cmd generate [<num_entries>]
+
+Douglas comes with
 
 
 Code conventions
