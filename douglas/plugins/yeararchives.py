@@ -1,5 +1,4 @@
-"""
-Summary
+"""Summary
 =======
 
 Walks through your blog root figuring out all the available years for
@@ -24,6 +23,14 @@ Add::
     {{ yeararchives.as_list()|safe }}
 
 to the appropriate place in your template.
+
+This requires an additional template called
+``yeararchives_list``. It'll be similar to your ``entry_list``
+template, except the entries look different and have the following
+variables:
+
+* title
+* body
 
 When the user clicks on one of the year links (e.g.
 ``http://example.com/2004/``), then yeararchives will display a
@@ -61,7 +68,7 @@ class YearArchivesManager(object):
                 self._entries.append(
                     (time.strftime('%Y', timetuple),
                      time.strftime('%Y-%m', timetuple),
-                     time.strftime('%Y-%m-d', timetuple),
+                     time.strftime('%Y-%m-%d', timetuple),
                      mem))
 
         return self._entries
@@ -144,7 +151,19 @@ def parse_path_info(path):
     return (year, None)
 
 
-# FIXME - probably want to switch the template
+def cb_pathinfo(args):
+    req = args['request']
+    data = req.get_data()
+    pyhttp = req.get_http()
+
+    path = pyhttp['PATH_INFO']
+
+    ret = parse_path_info(path)
+    if ret:
+        data['bl_type'] = 'yeararchives_list'
+        return data
+
+
 def cb_filelist(args):
     request = args['request']
     pyhttp = request.get_http()
