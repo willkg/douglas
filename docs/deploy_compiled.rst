@@ -98,7 +98,7 @@ blog to.  Everything else is optional and has defaults.
 
 Here's an example of compiling configuration::
 
-   py["compiledir"] = "/home/joe/public_html/compiled/"
+   py["compiledir"] = "/home/joe/public_html/compiled_site/"
    py["compile_themes"] = ["html"]
    py["compile_index_themes"] = ["html", "atom"]
    py["compile_day_indexes"] = False
@@ -180,6 +180,32 @@ for my main page, I would set it like this::
    ]
 
 
+Static assets
+=============
+
+Douglas can collect all the static assets from the various places they're
+located and copy them all over to your ``compiledir``.
+
+Run::
+
+    $ douglas-cmd collectstatic
+
+
+By default, it looks in the ``static/`` subdirectory of the parent
+directory of your datadir as well as the ``static/`` subdirectory of
+all your theme directories.
+
+You can tell it to copy over static files from other directories using the
+``static_files_dirs`` configuration variable.
+
+For example::
+
+    py['static_files_dirs'] = [
+        '/home/joe/blog/staticimages/',
+        '/home/joe/blog/blogimages/'
+    ]
+
+
 Things to note
 ==============
 
@@ -191,9 +217,8 @@ Things to note
   instead specify the urls by hand in ``compile_urls`` or
   ``compile_index_themes``.
 
-* If your website requires more files than just the ones that are
-  rendered by Douglas (images, CSS, ...), then you need to copy
-  those files over separately---Douglas won't do it for you.
+* Compiling doesn't copy over static assets---you have to do that separately
+  with ``douglas-cmd collectstatic``.
 
 
 Example setup
@@ -239,5 +264,8 @@ The script looks like this:
    # compile entire blog
    douglas-cmd compile --config ${BLOGDIR} --incremental
 
+   # copy static assets
+   douglas-cmd collectstatic --config ${BLOGDIR}
+
    # copy static files (images, css, ...)
-   cp -ar ${BLOGDIR}/www/* ${OUTPUTDIR}
+   cp -ar ${BLOGDIR}/compiled_site/* ${OUTPUTDIR}
