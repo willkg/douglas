@@ -31,36 +31,38 @@ where:
 Most configuration values are strings and must be enclosed in quotes,
 but some are lists, numbers or other types of values.
 
-Examples::
+Examples:
 
-    # this has a string value
-    py["foo"] = "this is a string"
+.. code-block:: python
 
-    # this is a long string value
-    py["foo"] = (
-        "This is a really long string value that breaks over "
-        "multiple lines.  The parentheses cause Python to "
-        "allow this string to span several lines."
-    )
+   # this has a string value
+   py["foo"] = "this is a string"
 
-    # this has an integer value
-    py["foo"] = 4
+   # this is a long string value
+   py["foo"] = (
+       "This is a really long string value that breaks over "
+       "multiple lines.  The parentheses cause Python to "
+       "allow this string to span several lines."
+   )
 
-    # this is a boolean--True has a capital T
-    py["foo"] = True
+   # this has an integer value
+   py["foo"] = 4
 
-    # this is a boolean--False has a capital F
-    py["foo"] = False
+   # this is a boolean--True has a capital T
+   py["foo"] = True
 
-    # this is a list of strings
-    py["foo"] = [
-        "list",
-        "of",
-        "strings"
-        ]
+   # this is a boolean--False has a capital F
+   py["foo"] = False
 
-    # this is the same list of strings formatted slightly differently
-    py["foo"] = ["list", "of", "strings"]
+   # this is a list of strings
+   py["foo"] = [
+       "list",
+       "of",
+       "strings"
+   ]
+
+   # this is the same list of strings formatted slightly differently
+   py["foo"] = ["list", "of", "strings"]
 
 
 Since ``config.py`` is a Python code file, it's written in Python and
@@ -105,18 +107,20 @@ Codebase configuration
    distribution's package manager or Python setuptools then you don't
    need to set the codebase variable.
 
-   If you cannot install Douglas on your web server then you can
-   save the Douglas source code to a location on your server and use
-   the codebase setting instead. The codebase setting tells the Python
-   interpreter where to find the Douglas codebase. This should be
-   the full path to where the Douglas directory is on your
-   system. It should be the path to the directory that holds the
-   "Douglas" directory (note the case--uppercase P lowercase b!).
+   If you cannot install Douglas on your web server then you can save
+   the Douglas source code to a location on your server and use the
+   codebase setting instead. The codebase setting tells the Python
+   interpreter where to find the Douglas codebase. This should be the
+   full path to where the Douglas directory is on your system. It
+   should be the path to the directory that holds the "Douglas"
+   directory (note the case--uppercase P lowercase b!).
 
    For example, if you untarred Douglas into
    ``/home/joe/douglas-1.5/``, then the Douglas (uppercase P and
-   lowercase b) directory should be in ``/home/joe/douglas-1.5/``
-   and you would set your codebase variable like this::
+   lowercase b) directory should be in ``/home/joe/douglas-1.5/`` and
+   you would set your codebase variable like this:
+
+   .. code-block:: python
 
       py["codebase"] = "/home/joe/douglas-1.5/"
 
@@ -128,12 +132,14 @@ Blog configuration
 
    string
 
-   This is the title of your blog.  Typically this should be short and is
-   accompanied by a longer summary of your blog which is set in
+   This is the title of your blog.  Typically this should be short and
+   is accompanied by a longer summary of your blog which is set in
    ``blog_description``.
 
-   For example, if Joe were writing a blog about cooking, he might title
-   his blog::
+   For example, if Joe were writing a blog about cooking, he might
+   title his blog:
+
+   .. code-block:: python
 
       py["blog_title"] = "Joe's blog about cooking"
 
@@ -142,17 +148,21 @@ Blog configuration
 
    (optional) string; defaults to ``""``
 
-   This is the description or byline of your blog.  Typically this is a
-   phrase or a sentence that summarizes what your blog covers.
+   This is the description or byline of your blog.  Typically this is
+   a phrase or a sentence that summarizes what your blog covers.
 
-   If you were writing a blog about restaurants in the Boston area, you
-   might have a ``blog_description`` of::
+   If you were writing a blog about restaurants in the Boston area,
+   you might have a ``blog_description`` of:
+
+   .. code-block:: python
 
       py["blog_description"] = "Critiques of restaurants in the Boston area"
 
 
    Or if your blog covered development on Douglas, your
-   ``blog_description`` might go like this::
+   ``blog_description`` might go like this:
+
+   .. code-block:: python
 
       py["blog_description"] = (
           "Ruminations on the development of Douglas and "
@@ -167,14 +177,18 @@ Blog configuration
    This is the name of the author of your blog.  Very often this is
    your name or a pseudonym.
 
-   If Joe Smith had a blog, he might set his blog_author to "Joe
-   Smith"::
+   If Joe Smith had a blog, he might set his ``blog_author`` to "Joe
+   Smith":
+
+   .. code-block:: python
 
       py["blog_author"] = "Joe Smith"
 
 
    If Joe Smith had a blog, but went by the pseudonym "Magic Rocks",
-   he might set his blog_author to "Magic Rocks"::
+   he might set his ``blog_author`` to "Magic Rocks":
+
+   .. code-block:: python
 
       py["blog_author"] = "Magic Rocks"
 
@@ -187,7 +201,9 @@ Blog configuration
 
    For example, say Joe Smith had an email address
    ``joe@joesmith.net`` and wanted that associated with his blog.
-   Then he would set the email address as such::
+   Then he would set the email address as such:
+
+   .. code-block:: python
 
       py["blog_email"] = "joe@joesmith.net"
 
@@ -198,7 +214,9 @@ Blog configuration
 
    These are the rights you give to others in regards to the content
    on your blog. Generally this is the copyright information, for
-   example::
+   example:
+
+   .. code-block:: python
 
        py["blog_rights"] = "Copyright 2005 Joe Bobb"
 
@@ -213,9 +231,12 @@ Blog configuration
 
    This is the primary language code for your blog.
 
-   For example, English users should use ``en``::
+   For example, English users should use ``en``:
+
+   .. code-block:: python
 
       py["blog_language"] = "en"
+
 
    This gets used in the RSS themes.
 
@@ -237,7 +258,9 @@ Blog configuration
    This is the character encoding of your blog.
 
    For example, if your blog was encoded in utf-8, then you would set
-   the ``blog_encoding`` to::
+   the ``blog_encoding`` to:
+
+   .. code-block:: python
 
       py["blog_encoding"] = "utf-8"
 
@@ -250,8 +273,8 @@ Blog configuration
 
    This value should be in the meta section of any HTML- or
    XHTML-based themes and it's also in the header for any feed-based
-   themes.  An improper encoding will gummy up some/most feed
-   readers and web-browsers.
+   themes.  An improper encoding will gummy up some/most feed readers
+   and web-browsers.
 
    W3C has a nice `tutorial on encoding`_.  You may refer to `IANA
    charset registry`_ for a complete list of encoding names.
@@ -265,12 +288,14 @@ Blog configuration
 
    string
 
-   This is the full path to where your blog entries are kept on the file
-   system.
+   This is the full path to where your blog entries are kept on the
+   file system.
 
    For example, if you are storing your blog entries in
-   ``/home/joe/blog/entries/``, then you would set the ``datadir`` like
-   this::
+   ``/home/joe/blog/entries/``, then you would set the ``datadir``
+   like this:
+
+   .. code-block:: python
 
       py["datadir"] = "/home/joe/blog/entries/"
 
@@ -279,8 +304,9 @@ Blog configuration
 
       A note about ``datadir`` on Windows:
 
-      Use ``/`` to separate directories in the ``datadir`` path even if
-      you are using Windows.  Examples of valid datadirs on Windows::
+      Use ``/`` to separate directories in the ``datadir`` path even
+      if you are using Windows.  Examples of valid datadirs on
+      Windows::
 
          py["datadir"] = "/blog/entries/"
 
@@ -339,8 +365,8 @@ Blog configuration
 
    This is the full path to where your Douglas themes are kept.
 
-   If you do not set the ``themedir``, then Douglas will look for
-   your themes and templates in the datadir alongside your entries.
+   If you do not set the ``themedir``, then Douglas will look for your
+   themes and templates in the datadir alongside your entries.
 
    .. Note::
 
