@@ -157,9 +157,11 @@ def cb_pathinfo(args):
     pyhttp = req.get_http()
 
     path = pyhttp['PATH_INFO']
-
+    theme = req.get_theme()
     ret = parse_path_info(path)
-    if ret:
+
+    # FIXME: These are hard-coded theme names.
+    if ret and theme not in ('rss', 'atom'):
         data['bl_type'] = 'yeararchives_list'
         return data
 
