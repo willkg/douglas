@@ -55,8 +55,10 @@ class Douglas(object):
         :param environ: dict containing the environment variables.
         :param data: dict containing data variables.
         """
-        environ['douglas_name'] = "douglas"
-        environ['douglas_version'] = __version__
+        if data is None:
+            data = {}
+        data['douglas_name'] = "Douglas"
+        data['douglas_version'] = __version__
 
         self._config = config
         self._request = Request(config, environ, data)
@@ -616,6 +618,10 @@ class Request(object):
         form = self.get_form()
         if 'theme' in form:
             return form['theme'].value
+        pathinfo = self.get_http().get('PATH_INFO', '')
+        path, ext = os.path.splitext(pathinfo)
+        if ext:
+            return ext[1:]
         return self.get_configuration().get('default_theme', 'html')
 
     def get_configuration(self):
