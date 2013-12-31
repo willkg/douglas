@@ -87,7 +87,7 @@ class YearArchivesManager(object):
 
         for year in sorted(years, reverse=True):
             output.append(item_t.format(
-                baseurl=config.get('base_url', ''),
+                baseurl=config['base_url'],
                 year=year,
                 theme=theme))
         output.append('</ul>')

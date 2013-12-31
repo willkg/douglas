@@ -54,7 +54,7 @@ class Renderer(RendererBase):
         config = self._request.get_configuration()
         data = self._request.get_data()
 
-        themedir = config.get('themedir', 'themes')
+        themedir = config['themedir']
         theme = data.get("theme") or "html"
 
         data['content-type'] = self.get_content_type(themedir, theme)
@@ -94,6 +94,6 @@ class Renderer(RendererBase):
             template_name = context.get('bl_type', 'entry') + '.' + theme
             template = env.get_template(template_name)
             output = template.render(context)
-            self.write(output.encode(config.get('blog_encoding', 'utf-8')))
+            self.write(output.encode(config['blog_encoding']))
 
         self.rendered = 1
