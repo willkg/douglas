@@ -24,8 +24,9 @@ from douglas.tools import filestat
 
 
 def cb_entries(args):
-    # FIXME - This is expensive and should cache the data in a file
-    # like the tags plugin does.
+    # FIXME - This can be expensive depending on how filestat is
+    # implemented and should cache the data in a file like the tags
+    # plugin does.
     cfg = args['config']
     entry_files = args['entry_files']
 

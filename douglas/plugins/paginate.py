@@ -186,21 +186,19 @@ def page(request, num_entries, entry_list):
     config = request.get_configuration()
     data = request.get_data()
 
+    entries_per_page = num_entries
+
+    if entries_per_page <= 0 or len(entry_list) <= entries_per_page:
+        return
+
+    count_from = 1
+
     previous_text = config.get('paginate_previous_text', '&lt;&lt;')
     next_text = config.get('paginate_next_text', '&gt;&gt;')
 
     linkstyle = config.get('paginate_linkstyle', 1)
     if linkstyle > 1:
         linkstyle = 1
-
-    entries_per_page = num_entries
-    count_from = 1
-
-    if (entries_per_page <= 0
-        or not isinstance(entry_list, list)
-        or len(entry_list) <= entries_per_page):
-
-        return
 
     page = count_from
     url = http.get('REQUEST_URI', http.get('HTTP_REQUEST_URI', ''))
@@ -217,7 +215,7 @@ def page(request, num_entries, entry_list):
 
         # The REQUEST_URI isn't the full url here--it's only the
         # path and so we need to add the base_url.
-        base_url = config['base_url'].rstrip('/')
+        base_url = config['base_url']
         url_template = base_url + url_template
         url_template = url_template.split('/')
 
@@ -297,6 +295,9 @@ def page(request, num_entries, entry_list):
 def cb_truncatelist(args):
     request = args['request']
     entry_list = args['entry_list']
+
+    if not isinstance(entry_list, (tuple, list)):
+        return entry_list
 
     page(request, request.config['num_entries'], entry_list)
     return request.data.get('entry_list', entry_list)

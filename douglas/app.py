@@ -899,7 +899,7 @@ def blosxom_entry_parser(filename, request):
 
     """
     cfg = request.get_configuration()
-    return tools.parse_entry_file(filename, cfg['blog_encoding'])
+    return dict(tools.parse_entry_file(filename, cfg['blog_encoding']))
 
 
 def blosxom_file_list_handler(args):

@@ -2,6 +2,7 @@ import os.path
 
 from jinja2 import BaseLoader, Environment, TemplateNotFound
 
+from douglas.memcache import memcache_decorator
 from douglas.renderers.base import RendererBase
 from douglas.tools import run_callback
 
@@ -24,6 +25,15 @@ def guess_autoescape(template_name):
     if template_name is None or '.' not in template_name:
         return False
     return template_name.endswith(('.html', '.htm', 'xml', 'rss'))
+
+
+@memcache_decorator('jinja_env')
+def build_environment(themedir, theme):
+    return Environment(
+        autoescape=guess_autoescape,
+        loader=ThemeLoader(os.path.join(themedir, theme)),
+        extensions=['jinja2.ext.autoescape']
+    )
 
 
 class Renderer(RendererBase):
@@ -84,12 +94,7 @@ class Renderer(RendererBase):
                 defaultfunc=lambda x:x)
 
             context = args['context']
-
-            env = Environment(
-                autoescape=guess_autoescape,
-                loader=ThemeLoader(os.path.join(themedir, theme)),
-                extensions=['jinja2.ext.autoescape']
-            )
+            env = build_environment(themedir, theme)
 
             template_name = context.get('bl_type', 'entry') + '.' + theme
             template = env.get_template(template_name)

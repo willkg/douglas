@@ -281,12 +281,11 @@ def cmd_buildtags(command, argv):
 
 
 def cmd_category_to_tags(command, argv):
-    """Goes through all entries and converts the category to tags
-    metadata.
+    """Converts the category to tags metadata for all entries.
 
-    It adds the tags line as the second line.
+    It adds the tags line as the second line and maintains the mtime
+    for the file.
 
-    It maintains the mtime for the file.
     """
     cfg = import_config()
 
@@ -331,21 +330,6 @@ def cb_commandline(args):
         cmd_category_to_tags,
         'builds tag metadata from categories for entries')
     return args
-
-
-# FIXME - Probably can nix this and have everything call loaddata.
-def cb_start(args):
-    request = args['request']
-    data = request.get_data()
-    tagsfile = get_tagsfile(request.get_configuration())
-    if os.path.exists(tagsfile):
-        try:
-            tagsdata = loadfile(tagsfile)
-        except IOError:
-            tagsdata = {}
-    else:
-        tagsdata = {}
-    data['tagsdata'] = tagsdata
 
 
 def cb_pathinfo(args):
@@ -527,14 +511,10 @@ def cb_context_processor(args):
 def cb_compile_filelist(args):
     req = args["request"]
 
-    # We call our own cb_start() here because we need to initialize
-    # the tagsdata.
-    cb_start({"request": req})
-
     config = req.get_configuration()
     filelist = args["filelist"]
 
-    tagsdata = req.get_data()["tagsdata"]
+    tagsdata = loadfile(get_tagsfile(config))
     index_themes = config['compile_index_themes']
     trigger = "/" + config.get("tags_trigger", "tag")
 

@@ -61,6 +61,7 @@ class YearArchivesManager(object):
     def entries(self):
         """List of (year, entry) tuples"""
         if self._entries is None:
+            # FIXME - probably good to memoize this
             cfg = self.request.get_configuration()
             entry_list = tools.get_entries(cfg, cfg['datadir'])
             self._entries = []

@@ -13,6 +13,7 @@ import urllib
 from urlparse import urlparse, urlsplit, urlunsplit
 
 from douglas import plugin_utils
+from douglas.memcache import get_cache, memcache_decorator, set_cache
 
 
 MONTHS = [
@@ -53,9 +54,7 @@ def abort(msg):
 
 
 class ConfigSyntaxErrorException(Exception):
-    """Thrown when ``convert_configini_values`` encounters a syntax
-    error.
-    """
+    """Thrown for ``convert_configini_values`` syntax errors."""
     pass
 
 
@@ -120,6 +119,7 @@ def convert_configini_values(configini):
     return config
 
 
+@memcache_decorator('parse_entry')
 def parse_entry_file(filename, encoding='utf-8'):
     """Parses a a Douglas-structured entry file"""
     entry_data = {}
@@ -209,12 +209,10 @@ def get_entries(cfg, root, recurse=0):
     if not os.path.isdir(root):
         return []
 
-    ext = cfg.get('extensions', {})
+    ext = cfg['extensions']
     pattern = re.compile(r'.*\.(' + '|'.join(ext.keys()) + r')$')
 
-    ignore = cfg.get("ignore_directories", None)
-    if isinstance(ignore, basestring):
-        ignore = [ignore]
+    ignore = cfg['ignore_directories']
 
     if ignore:
         ignore = [re.escape(i) for i in ignore]
@@ -292,6 +290,7 @@ def walk(request, root='.', recurse=0, pattern='', return_folders=0):
     return _walk_internal(root, recurse, pattern, ignorere, return_folders)
 
 
+@memcache_decorator('walk')
 def _walk_internal(root, recurse, pattern, ignorere, return_folders):
     """
     Note: This is an internal function--don't use it and don't expect
@@ -360,7 +359,8 @@ def filestat(config, filename):
                            argdict,
                            mappingfunc=lambda x, y: y,
                            donefunc=lambda x: x and x["mtime"][MT] != 0,
-                           defaultfunc=lambda x: x)
+                           defaultfunc=lambda x: x,
+                           cache_key=lambda x: x['filename'])
 
     # Since no plugin handled cb_filestat; we default to asking the
     # filesystem
@@ -425,10 +425,10 @@ def importname(modulename, name):
 def run_callback(chain, input,
                  mappingfunc=lambda x, y: x,
                  donefunc=lambda x: 0,
-                 defaultfunc=None):
-    """
-    Executes a callback chain on a given piece of data.  passed in is
-    a dict of name/value pairs.  Consult the documentation for the
+                 defaultfunc=None,
+                 cache_key=None):
+    """Executes a callback chain on a given piece of data.  passed in is a
+    dict of name/value pairs.  Consult the documentation for the
     specific callback chain you're executing.
 
     Callback chains should conform to their documented behavior.  This
@@ -446,31 +446,51 @@ def run_callback(chain, input,
     :param chain: the name of the callback chain to run
 
     :param input: dict with name/value pairs that gets passed as the
-                  args dict to all callback functions
+        args dict to all callback functions
 
     :param mappingfunc: the function that maps output arguments to
-                        input arguments for the next iteration.  It
-                        must take two arguments: the original dict and
-                        the return from the previous function.  It
-                        defaults to returning the original dict.
+        input arguments for the next iteration.  It must take two
+        arguments: the original dict and the return from the previous
+        function.  It defaults to returning the original dict.
 
     :param donefunc: this function tests whether we're done doing what
-                     we're doing.  This function takes as input the
-                     output of the most recent iteration.  If this
-                     function returns True then we'll drop out of the
-                     loop.  For example, if you wanted a callback to
-                     stop running when one of the registered functions
-                     returned a 1, then you would pass in:
-                     ``donefunc=lambda x: x`` .
+        we're doing.  This function takes as input the output of the
+        most recent iteration.  If this function returns True then
+        we'll drop out of the loop.  For example, if you wanted a
+        callback to stop running when one of the registered functions
+        returned a 1, then you would pass in: ``donefunc=lambda x: x``
+        .
 
     :param defaultfunc: if this is set and we finish going through all
-                        the functions in the chain and none of them
-                        have returned something that satisfies the
-                        donefunc, then we'll execute the defaultfunc
-                        with the latest version of the input dict.
+        the functions in the chain and none of them have returned
+        something that satisfies the donefunc, then we'll execute the
+        defaultfunc with the latest version of the input dict.
+
+    :param cache_key: If the return value for this callback with these
+        arguments can be cached, then this is a function that takes the
+        original input args dict and returns the cache key.
 
     :returns: varies
+
     """
+    if cache_key is not None:
+        hash_key = cache_key(input)
+        try:
+            return get_cache('cb_' + chain, hash_key)
+        except KeyError:
+            pass
+
+    ret = _run_callback(chain, input, mappingfunc, donefunc, defaultfunc)
+
+    if cache_key is not None:
+        set_cache('cb_' + chain, hash_key, ret)
+    return ret
+
+
+def _run_callback(chain, input,
+                 mappingfunc=lambda x, y: x,
+                 donefunc=lambda x: 0,
+                 defaultfunc=None):
     chain = plugin_utils.get_callback_chain(chain)
     output = None
 
@@ -562,7 +582,7 @@ def render_url_statically(cfg, url, querystring):
     :param querystring: querystring of the url to render or ""
 
     """
-    compiledir = cfg.get("compiledir", "")
+    compiledir = cfg['compiledir']
 
     # If there is no compile_dir, then they're not set up for
     # compiling.
@@ -686,7 +706,7 @@ def render_url(cfg, pathinfo, querystring=""):
     else:
         request_uri = pathinfo
 
-    parts = urlparse(cfg.get('base_url', ''))
+    parts = urlparse(cfg['base_url'])
 
     env = {
         'HTTP_HOST': parts.netloc,
@@ -740,10 +760,10 @@ LEVELS = {
 
 
 def setup_logging(cfg):
-    level = cfg.get('log_level', 'error')
+    level = cfg['log_level']
     level = LEVELS[level]
 
-    if cfg.get('log_file') is None:
+    if not cfg['log_file']:
         # If no log file is set up, set to logging.ERROR and stderr.
         logging.basicConfig(level=level, stream=sys.stderr)
     else:

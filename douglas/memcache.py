@@ -4,6 +4,14 @@ usecache = False
 _memcache_cache = {}
 
 
+def get_cache(scope, key):
+    return _memcache_cache.setdefault(scope, {})[key]
+
+
+def set_cache(scope, key, value):
+    _memcache_cache.setdefault(scope, {})[key] = value
+
+
 def memcache_decorator(scope, instance=False):
     """Caches function results in memory
 
@@ -50,10 +58,10 @@ def memcache_decorator(scope, instance=False):
                 return fun(*args, **kwargs)
 
             try:
-                ret = _memcache_cache.setdefault(scope, {})[hash_key]
+                ret = get_cache(scope, hash_key)
             except KeyError:
                 ret = fun(*args, **kwargs)
-                _memcache_cache[scope][hash_key] = ret
+                set_cache(scope, hash_key, ret)
             return ret
         return _memcache_decorated
     return _memcache
