@@ -51,7 +51,7 @@ class Config(object):
     #:
     #: .. Note::
     #: 
-    #:    Your ``base_url`` property should *not* have a trailing slash.
+    #:    Your ``base_url`` property should **not** have a trailing slash.
     base_url = Required(validate=lambda x: x and not x.endswith('/'))
 
     #: This is the title of your blog.  Typically this should be short and

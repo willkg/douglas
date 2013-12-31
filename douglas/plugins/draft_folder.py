@@ -84,7 +84,7 @@ def cb_filelist(args):
 
         files = os.listdir(draftdir)
 
-        baseurl = config.get('base_url', '')
+        baseurl = config['base_url']
         output = []
         output.append('<ul>')
         for fn in files:
@@ -130,7 +130,7 @@ def cb_filelist(args):
     fe["file_path"] = trigger + "/" + draft_name
 
     # FIXME - this is icky
-    config['blog_title'] = 'DRAFT : ' + config.get('blog_title', '')
+    config['blog_title'] = 'DRAFT : ' + config['blog_title']
 
     return [fe]
 
@@ -155,7 +155,7 @@ def cb_compile_filelist(args):
     if not drafts:
         return
 
-    themes = config.get('compile_themes', ['html'])
+    themes = config['compile_themes']
     trigger = '/' + config.get('draft_trigger', TRIGGER)
     extensions = config['extensions'].keys()
 

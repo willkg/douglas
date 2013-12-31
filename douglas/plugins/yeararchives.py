@@ -1,4 +1,5 @@
-"""Summary
+"""
+Summary
 =======
 
 Walks through your blog root figuring out all the available years for
@@ -75,10 +76,9 @@ class YearArchivesManager(object):
 
     def as_list(self):
         config = self.request.get_configuration()
-        data = self.request.get_data()
 
         item_t = '<li><a href="{baseurl}/{year}/index.{theme}">{year}</a></li>'
-        theme = data.get('theme', config.get('default_theme', 'html'))
+        theme = self.request.get_theme()
 
         years = set([mem[0] for mem in self.entries])
 
@@ -171,7 +171,7 @@ def cb_filelist(args):
     pyhttp = request.get_http()
     data = request.get_data()
     cfg = request.get_configuration()
-    baseurl = cfg.get('base_url', '')
+    baseurl = cfg['base_url']
 
     path = pyhttp['PATH_INFO']
 
@@ -189,7 +189,7 @@ def cb_filelist(args):
 
     # Set and use current (or default) theme for permalinks
     if not theme:
-        theme = data.get('theme', cfg.get('default_theme', 'html'))
+        theme = data.get('theme', cfg['default_theme'])
 
     data['theme'] = theme
 

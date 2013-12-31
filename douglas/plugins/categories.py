@@ -85,7 +85,7 @@ class CategoryManager(object):
 
     def as_list(self):
         config = self.request.get_configuration()
-        baseurl = config.get('base_url', '')
+        baseurl = config['base_url']
 
         start_t = '<ul class="categorygroup">'
         begin_t = '<li><ul class="categorygroup">'

@@ -91,13 +91,13 @@ def build_parser(usage):
 
 def generate_handler(doug, cfg, host_port):
     """Creates a closure so our DouglasHTTPRequestHandler has what it needs"""
-    base_url = cfg.get('base_url', '/')
+    base_url = cfg['base_url']
     base_path = urlparse(base_url).path
-    static_url = cfg.get('static_url', '')
+    static_url = cfg['static_url']
     if static_url.startswith(base_url):
         static_url = static_url[len(base_url):]
     compiledir = cfg['compiledir']
-    default_theme = cfg.get('default_theme', 'html')
+    default_theme = cfg['default_theme']
     serving_base_url = 'http://{0}/{1}'.format(host_port, base_path.lstrip('/'))
 
     class DouglasHTTPRequestHandler(SimpleHTTPRequestHandler):
@@ -143,7 +143,7 @@ def generate_handler(doug, cfg, host_port):
                 if not url:
                     url = '/'
                 if url.endswith('/'):
-                    url = url + 'index.' + cfg.get('default_theme', 'html')
+                    url = url + 'index.' + default_theme
 
                 # If this isn't a static asset, we should re-render it.
                 if not static_url or not url.startswith(static_url):
@@ -216,10 +216,7 @@ def cmd_generate(cfg, command, argv):
         num_entries = 5
 
     verbose = options.verbose
-
-    datadir = cfg.get('datadir')
-    if not datadir:
-        return abort('Error: No datadir.')
+    datadir = cfg['datadir']
 
     sm_para = "<p>Lorem ipsum dolor sit amet.</p>"
     med_para = """<p>
@@ -497,7 +494,7 @@ def cmd_renderurl(cfg, command, argv):
     for url in args:
         p = build_douglas(cfg)
 
-        base_url = cfg.get('base_url', '')
+        base_url = cfg['base_url']
         if url.startswith(base_url):
             url = url[len(base_url):]
         p.run_render_one(url, options.headers)
@@ -546,8 +543,7 @@ DEFAULT_HANDLERS = [
 
 
 def get_handlers(cfg):
-    plugin_utils.initialize_plugins(
-        cfg.get("plugin_dirs", []), cfg.get("load_plugins", []))
+    plugin_utils.initialize_plugins(cfg['plugin_dirs'], cfg['load_plugins'])
 
     handlers_dict = dict([(v[0], (v[1], v[2])) for v in DEFAULT_HANDLERS])
     handlers_dict = run_callback("commandline", handlers_dict,

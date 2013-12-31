@@ -277,7 +277,7 @@ def page(request, num_entries, entry_list):
     # If we're compiling and there wasn't a page specified and this is
     # one of the themes to compile, then this is the first page and we
     # need to render all the rest of the pages, so we do that here.
-    compile_themes = config.get('compile_themes', ['html'])
+    compile_themes = config['compile_themes']
     if ((data.get('COMPILING') and page == count_from
          and data.get('theme') in compile_themes)):
         # Turn http://example.com/index.html into
@@ -298,7 +298,7 @@ def cb_truncatelist(args):
     request = args['request']
     entry_list = args['entry_list']
 
-    page(request, request.config.get('num_entries', 10), entry_list)
+    page(request, request.config['num_entries'], entry_list)
     return request.data.get('entry_list', entry_list)
 
 

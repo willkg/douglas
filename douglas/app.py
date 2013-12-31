@@ -38,6 +38,7 @@ def initialize(cfg):
         module = tools.importname(None, module)
         extensions[ext] = getattr(module, callable_name)
 
+    # FIXME - this is a lousy place to store this
     cfg['extensions'] = extensions
 
 

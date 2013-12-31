@@ -42,7 +42,7 @@ compile your blog to.  Everything else is optional and has defaults.
 
    .. code-block:: python
 
-      py["base_url"] = "http://example.com/~joe/"
+      py["base_url"] = "http://example.com/~joe"
 
 :py:data:`compiledir <douglas.settings.Config.compiledir>`
     The directory to compile your blog into.

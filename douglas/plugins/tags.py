@@ -216,6 +216,7 @@ import os
 import shutil
 
 from douglas.memcache import memcache_decorator
+from douglas.settings import import_config
 
 
 def savefile(path, tagdata):
@@ -244,12 +245,8 @@ def get_tagsfile(cfg):
 
 def cmd_buildtags(command, argv):
     """Command for building the tags index."""
-    from config import py as cfg
-
-    datadir = cfg.get('datadir')
-    if not datadir:
-        raise ValueError('config.py has no datadir property.')
-
+    cfg = import_config()
+    datadir = cfg['datadir']
     sep = cfg.get('tags_separator', ',')
     tagsfile = get_tagsfile(cfg)
 
@@ -291,12 +288,9 @@ def cmd_category_to_tags(command, argv):
 
     It maintains the mtime for the file.
     """
-    from config import py as cfg
+    cfg = import_config()
 
-    datadir = cfg.get("datadir")
-    if not datadir:
-        raise ValueError("config.py has no datadir property.")
-
+    datadir = cfg['datadir']
     sep = cfg.get("tags_separator", ",")
 
     from douglas import tools
@@ -433,7 +427,7 @@ class TagManager(object):
         """Returns list of (tag, tag_url, count) tuples"""
         theme = self.request.get_theme()
         cfg = self.request.get_configuration()
-        baseurl = cfg.get('base_url', '')
+        baseurl = cfg['base_url']
         trigger = cfg.get('tags_trigger', 'tag')
 
         tags = [
@@ -502,7 +496,7 @@ class TagManager(object):
         sep = cfg.get('tags_seperator', ',')
         tags = sorted([t.strip() for t in entry.get('tags', '').split(sep)])
         theme = self.request.get_theme()
-        baseurl = cfg.get('base_url', '')
+        baseurl = cfg['base_url']
         trigger = cfg.get('tags_trigger', 'tag')
 
         return [
@@ -541,7 +535,7 @@ def cb_compile_filelist(args):
     filelist = args["filelist"]
 
     tagsdata = req.get_data()["tagsdata"]
-    index_themes = config.get("compile_index_themes", ["html"])
+    index_themes = config['compile_index_themes']
     trigger = "/" + config.get("tags_trigger", "tag")
 
     # Go through and add an index for each index_theme for each tag.

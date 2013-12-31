@@ -150,7 +150,8 @@ your templates.  For example, these standard properties in your
 * ``blog_encoding``
 * ``blog_author``
 * ``blog_email``
-* ``base_url`` (if you provided it)
+* ``base_url``
+* ``static_url``
 * ...
 
 
