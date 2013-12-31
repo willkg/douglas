@@ -105,7 +105,8 @@ def get_metadata(lines):
 
 
 def cmd_persistdate(command, argv):
-    import config
+    from douglas.cmdline import import_config
+    config = import_config()
 
     datadir = config.py.get('datadir')
 

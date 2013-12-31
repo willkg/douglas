@@ -41,14 +41,14 @@ class Test_categories(PluginTest):
         cm = categories.CategoryManager(self.request)
         eq_(cm.as_list(),
             '<ul class="categorygroup">\n'
-            '<li><a href="http://example.com//index.html">/</a>(4)</li>\n'
+            '<li><a href="http://example.com/index.html">/</a>(4)</li>\n'
             '<li><ul class="categorygroup">\n'
-            '<li><a href="http://example.com//cat1/index.html">cat1/</a>(1)'
+            '<li><a href="http://example.com/cat1/index.html">cat1/</a>(1)'
             '</li>\n'
-            '<li><a href="http://example.com//cat2/index.html">cat2/</a>(2)'
+            '<li><a href="http://example.com/cat2/index.html">cat2/</a>(2)'
             '</li>\n'
             '<li><ul class="categorygroup">\n'
-            '<li><a href="http://example.com//cat2/subcat2/index.html">'
+            '<li><a href="http://example.com/cat2/subcat2/index.html">'
             'subcat2/</a>(1)</li>\n'
             '</ul></li>'
             '</ul></li>\n'

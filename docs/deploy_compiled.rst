@@ -34,133 +34,48 @@ To compile your blog, you need to set the ``compiledir`` setting in
 your ``config.py`` file.  That tells Douglas which directory to
 compile your blog to.  Everything else is optional and has defaults.
 
+:py:data:`base_url <douglas.settings.Config.base_url>`
+   For example, if your ``compiledir`` were set to
+   ``/home/joe/public_html`` and the url for that directory were
+   ``http://example.com/~joe/``, then you probably want to set your
+   base_url like this:
 
-``compiledir``
-    This is the directory we will save all the output.  The value of
-    ``compiledir`` should be a string representing the **absolute
-    path** of the output directory for compiling.
+   .. code-block:: python
 
-    For example, Joe puts the output in his ``public_html`` directory
-    of his account:
+      py["base_url"] = "http://example.com/~joe/"
 
-    .. code-block:: python
+:py:data:`compiledir <douglas.settings.Config.compiledir>`
+    The directory to compile your blog into.
 
-       py["compiledir"] = "/home/joe/public_html"
+:py:data:`compile_themes <douglas.settings.Config.compile_themes>`
+    The themes to compile all pages in.
 
+:py:data:`compile_index_themes <douglas.settings.Config.compile_index_themes>`
+    The themes to compile index pages in.
 
-``base_url``
-    Set ``base_url`` in your ``config.py`` file to the base url your
-    blog will have.
+:py:data:`day_indexes <douglas.settings.Config.day_indexes>`
+    Whether or not to do day-based indexes.
 
-    For example, if your ``compiledir`` were set to
-    ``/home/joe/public_html`` and the url for that directory were
-    ``http://example.com/~joe/``, then you probably want to set your
-    base_url like this:
+:py:data:`month_indexes <douglas.settings.Config.month_indexes>`
+    Whether or not to do month-based indexes.
 
-    .. code-block:: python
+:py:data:`year_indexes <douglas.settings.Config.year_indexes>`
+    Whether or not to do year-based indexes.
 
-       py["base_url"] = "http://example.com/~joe/"
-
-
-``compile_themes`` (Optional)
-    Defaults to ``['html']``.
-
-    The value of ``compile_themes`` should be a list of strings
-    representing all the themes that should be rendered.
-
-    For example:
-
-    .. code-block:: python
-
-       py["compile_themes"] = ["html"]
-
-
-``compile_index_themes`` (Optional)
-    Defaults to ``["html"]``.
-
-    ``compile_index_themes`` is just like ``compile_themes`` except
-    it's the themes of the index files: frontpage index, category
-    indexes, date indexes, ...
-
-    Defaults to ``["html"]`` which only renders the html theme.
-
-    For example:
-
-    .. code-block:: python
-
-       py["compile_index_themes"] = ["html"]
-
-
-    If you want your index files to also be feeds, then you should add
-    a feed theme to the list.
-
-
-``compile_day_indexes`` (Optional)
-    Defaults to ``False``.
-
-    Whether or not to generate indexes per day.
-
-    For example:
-
-    .. code-block:: python
-
-       py["compile_day_indexes"] = True
-
-
-``compile_month_indexes`` (Optional)
-    Defaults to ``False``.
-
-    Whether or not to generate indexes per day.
-
-    For example:
-
-    .. code-block:: python
-
-       py["compile_month_indexes"] = True
-
-
-``compile_urls`` (Optional)
-    Any other url paths to compile.  Sometimes plugins require you to
-    add additional paths---this is where you'd do it.
-
-    For example:
-
-    .. code-block:: python
-
-       py["compile_urls"] = [
-           "/booklist"
-       ]
+:py:data:`compile_urls <douglas.settings.Config.compile_urls>`
+    List of additional urls to compile.
 
 
 Configuring collectstatic
 =========================
 
-``static_url``
-    The full url for your static assets.
+:py:data:`static_url <douglas.settings.Config.static_url>`
+    The url where your static assets will be. If you're using a CDN, then this
+    will be a complete url. Otherwise you probably want to set this to your
+    :py:data:`base_url <douglas.settings.Config.base_url>` plus ``/static``.
 
-    If you're using a CDN, this is the CDN url.
-
-    If you're not using a CDN, this is probably the base_url plus
-    ``/static``.
-
-    You can use this variable in your templates. For example:
-
-    .. code-block:: html
-
-       <link rel="stylesheet" href="{{ static_url }}/css/style.css">
-
-
-``static_files_dirs`` (Optional)
-    Any additional directories you want copied over to the compiledir.
-
-    For example:
-
-    .. code-block:: python
-
-       py['static_files_dirs'] = [
-           '/home/joe/blog/staticimages/',
-           '/home/joe/blog/blogimages/'
-       ]
+:py:data:`static_files_dir <douglas.settings.Config.static_files_dir>`
+    The list of additional directories to copy static assets from.
 
 
 Compiling your blog

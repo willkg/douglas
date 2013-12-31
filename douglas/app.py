@@ -17,12 +17,12 @@ from douglas import crashhandling
 from douglas import plugin_utils
 from douglas import tools
 from douglas.entries.fileentry import FileEntry
+from douglas.settings import import_config
 
 
 def initialize(cfg):
     # import and initialize plugins
-    plugin_utils.initialize_plugins(
-        cfg.get("plugin_dirs", []), cfg.get("load_plugins", []))
+    plugin_utils.initialize_plugins(cfg['plugin_dirs'], cfg['load_plugins'])
 
     # entryparser callback is run here first to allow other
     # plugins register what file extensions can be used
@@ -33,7 +33,7 @@ def initialize(cfg):
         defaultfunc=lambda x: x)
 
     # go through the config.py and override entryparser extensions
-    for ext, parser_module in cfg.get('entryparsers', {}).items():
+    for ext, parser_module in cfg['entryparsers'].items():
         module, callable_name = parser_module.rsplit(':', 1)
         module = tools.importname(None, module)
         extensions[ext] = getattr(module, callable_name)
@@ -69,28 +69,7 @@ class Douglas(object):
         registering plugins, and entryparsers.
         """
         data = self._request.get_data()
-        pyhttp = self._request.get_http()
-        config = self._request.get_configuration()
-
         data['pi_bl'] = ''
-
-        # if the user specifies base_url in config, we use that.
-        # otherwise we compose it from SCRIPT_NAME in the environment
-        # or we leave it blank.
-        if not 'base_url' in config:
-            if 'SCRIPT_NAME' in pyhttp:
-                # allow http and https
-                config['base_url'] = '{0}://{1}{2}'.format(
-                    pyhttp['wsgi.url_scheme'], pyhttp['HTTP_HOST'],
-                    pyhttp['SCRIPT_NAME'])
-            else:
-                config['base_url'] = ''
-
-        # take off the trailing slash for base_url
-        config['base_url'] = config['base_url'].rstrip('/')
-
-        # take off trailing slashes for datadir
-        config['datadir'] = config["datadir"].rstrip('\\/')
 
     def cleanup(self):
         """This cleans up Douglas after a run.
@@ -199,7 +178,7 @@ class Douglas(object):
         self.initialize()
 
         cfg = self._request.get_configuration()
-        compiledir = cfg.get('compiledir', '')
+        compiledir = cfg['compiledir']
         datadir = cfg['datadir']
 
         if not compiledir:
@@ -211,12 +190,12 @@ class Douglas(object):
             print 'Incremental is set.'
         print ''
 
-        themes = cfg.get('compile_themes', ['html'])
-        index_themes = cfg.get('compile_index_themes', ['html'])
+        themes = cfg['compile_themes']
+        index_themes = cfg['compile_index_themes']
 
-        dayindexes = cfg.get('day_indexes', False)
-        monthindexes = cfg.get('month_indexes', False)
-        yearindexes = cfg.get('year_indexes', True)
+        dayindexes = cfg['day_indexes']
+        monthindexes = cfg['month_indexes']
+        yearindexes = cfg['year_indexes']
 
         renderme = []
         dates = {}
@@ -307,7 +286,7 @@ class Douglas(object):
                 for f in index_themes:
                     renderme.append((mem + f, ''))
 
-        additional_stuff = cfg.get('compile_urls', [])
+        additional_stuff = cfg['compile_urls']
         if additional_stuff:
             print '- Found {0} arbitrary url(s) ...'.format(
                 len(additional_stuff))
@@ -365,7 +344,7 @@ class Douglas(object):
             print '   Copying {0}'.format(filename)
 
         # Copy over static_files_dirs files first
-        static_files_dirs = cfg.get('static_files_dirs', [])
+        static_files_dirs = cfg['static_files_dirs']
         static_files_dirs.append(os.path.join(cfg['datadir'], '..', 'static'))
         for mem in static_files_dirs:
             tools.copy_dir(mem, dst, notifyfun=notifyfun)
@@ -397,20 +376,11 @@ class DouglasWSGIApp(object):
         self.environ = environ
         self.start_response = start_response
 
-        if configini is None:
-            configini = {}
-
-        _config = tools.convert_configini_values(configini)
-
-        import config
-        self.config = dict(config.py)
-
-        self.config.update(_config)
-        if "codebase" in _config:
-            sys.path.insert(0, _config["codebase"])
+        self.config = import_config()
+        if configini is not None:
+            self.config.update(tools.convert_configini_values(configini))
 
         tools.setup_logging(self.config)
-
         initialize(self.config)
 
     def run_douglas(self, env, start_response):
@@ -419,8 +389,8 @@ class DouglasWSGIApp(object):
         try:
             # ensure that PATH_INFO exists. a few plugins break if this is
             # missing.
-            if "PATH_INFO" not in env:
-                env["PATH_INFO"] = ""
+            if 'PATH_INFO' not in env:
+                env['PATH_INFO'] = ''
 
             p = Douglas(dict(self.config), env)
             p.run()
@@ -483,7 +453,7 @@ class EnvDict(dict):
         ``_request.get_form()``.  Otherwise this returns the item for
         that key in the wrapped dict.
         """
-        if key == "form":
+        if key == 'form':
             return self._request.get_form()
 
         return dict.__getitem__(self, key)
@@ -566,14 +536,14 @@ class Request(object):
         # TODO: tests on memory consumption when uploading huge files
         pyhttp = self.get_http()
         winput = pyhttp['wsgi.input']
-        method = pyhttp["REQUEST_METHOD"]
+        method = pyhttp['REQUEST_METHOD']
 
         # there's no data on stdin for a GET request.  douglas
         # will block indefinitely on the read for a GET request with
         # thttpd.
-        if method != "GET":
+        if method != 'GET':
             try:
-                length = int(pyhttp.get("CONTENT_LENGTH", 0))
+                length = int(pyhttp.get('CONTENT_LENGTH', 0))
             except ValueError:
                 length = 0
 
@@ -583,15 +553,13 @@ class Request(object):
                 self._in.seek(0)
 
     def set_response(self, response):
-        """Sets the Response object.
-        """
+        """Sets the Response object."""
         self._response = response
         # for backwards compatibility
         self.get_configuration()['stdoutput'] = response
 
     def get_response(self):
-        """Returns the Response for this request.
-        """
+        """Returns the Response for this request."""
         return self._response
 
     def _getform(self):
@@ -622,7 +590,7 @@ class Request(object):
         path, ext = os.path.splitext(pathinfo)
         if ext:
             return ext[1:]
-        return self.get_configuration().get('default_theme', 'html')
+        return self.get_configuration()['default_theme']
 
     def get_configuration(self):
         """Returns the *actual* configuration dict.  The configuration
@@ -831,7 +799,7 @@ def blosxom_handler(request):
 
     if not rend:
         # get the renderer we want to use
-        rend = config.get('renderer', 'jinjarenderer')
+        rend = config['renderer']
 
         # import the renderer
         rend = tools.importname('douglas.renderers', rend)
@@ -930,7 +898,7 @@ def blosxom_entry_parser(filename, request):
 
     """
     cfg = request.get_configuration()
-    return tools.parse_entry_file(filename, cfg.get('blog_encoding', 'utf-8'))
+    return tools.parse_entry_file(filename, cfg['blog_encoding'])
 
 
 def blosxom_file_list_handler(args):
@@ -950,7 +918,7 @@ def blosxom_file_list_handler(args):
 
     if data['bl_type'] == 'entry_list':
         filelist = tools.get_entries(
-            config, data['root_datadir'], int(config.get("depth", "0")))
+            config, data['root_datadir'], int(config['depth']))
     elif data['bl_type'] == 'entry':
         filelist = [data['root_datadir']]
     else:
@@ -1013,7 +981,7 @@ def blosxom_truncate_list_handler(args):
     data = request.get_data()
     config = request.get_configuration()
 
-    num_entries = config.get('num_entries', 5)
+    num_entries = config['num_entries']
     if data.get('truncate', False) and num_entries:
         entrylist = args['entry_list'][:num_entries]
     return entrylist
@@ -1041,13 +1009,13 @@ def route_file(cfg, url, data):
 
 
 def route_date(cfg, url, data):
-    if not cfg.get('day_indexes', False) and data.get('pi_da'):
+    if not cfg['day_indexes'] and data.get('pi_da'):
         return
 
-    if not cfg.get('month_indexes', False) and data.get('pi_mo'):
+    if not cfg['month_indexes'] and data.get('pi_mo'):
         return
 
-    if not cfg.get('year_indexes', True) and data['pi_yr']:
+    if not cfg['year_indexes'] and data['pi_yr']:
         return
 
     data.update({
@@ -1136,12 +1104,12 @@ def blosxom_process_path_info(args):
     # Figure out whether to truncate the entry list
     truncate = False
     if new_data.get('pi_yr'):
-        truncate = cfg.get('truncate_date', False)
+        truncate = cfg['truncate_date']
     elif new_data.get('bl_type') == 'entry_list':
         if new_data['path_info'] in ([''], ['index']):
-            truncate = cfg.get('truncate_frontpage', True)
+            truncate = cfg['truncate_frontpage']
         else:
-            truncate = cfg.get('truncate_category', True)
+            truncate = cfg['truncate_category']
     new_data['truncate'] = truncate
 
     # Update the data dict in-place

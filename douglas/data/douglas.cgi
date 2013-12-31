@@ -4,12 +4,16 @@
 # of gzip compressed content on Windows and OS/2
 #!/path/to/python -u
 
-import os, sys
+import os
+import sys
 
 # Uncomment this line to add the directory your config.py file is in to the
-# python path:
+# Python path:
 #sys.path.append("%(basedir)s")
 
+# Uncomment this line to add the Douglas codebase directory to the Python
+# path in the case that Douglas isn't already on the Python path:
+#sys.path.append("/path/to/douglas")
 
 
 # -------------------------------------------------------
@@ -33,12 +37,6 @@ if root is not None:
 # Settings are now in config.py, you should disable access to it by htaccess
 # (make it executable or deny access)
 from config import py as cfg
-
-# If the user defined a "codebase" property in their config file,
-# then we insert that into our sys.path because that's where the
-# Douglas installation is.
-if 'codebase' in cfg:
-    sys.path.insert(0, cfg["codebase"])
 
 from douglas.app import run_cgi
 

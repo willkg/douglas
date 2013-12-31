@@ -17,7 +17,10 @@ import urllib
 
 from nose.tools import eq_
 
-from douglas import app, tools, entries
+from douglas import app
+from douglas import entries
+from douglas.settings import Config
+from douglas import tools
 
 
 def req_():
@@ -26,7 +29,11 @@ def req_():
 
 class UnitTestBase(unittest.TestCase):
     def setUp(self):
-        self.datadir = tempfile.mkdtemp(prefix='douglas_test_datadir')
+        self.blogdir = tempfile.mkdtemp(prefix='douglas_test_blog')
+        self.datadir = os.path.join(self.blogdir, 'entries')
+        os.makedirs(self.datadir)
+        self.themedir = os.path.join(self.blogdir, 'themes')
+        os.makedirs(self.themedir)
 
     def tearDown(self):
         if self.datadir:
@@ -54,8 +61,7 @@ class UnitTestBase(unittest.TestCase):
                     fp.write('test file: {0}\n'.format(fn))
 
     def build_file_set(self, filelist):
-        return [os.path.join(self.datadir, 'entries/%s' % fn)
-                for fn in filelist]
+        return [os.path.join(self.datadir, '%s' % fn) for fn in filelist]
 
     def build_request(self, cfg=None, http=None, data=None, inputstream=""):
         """
@@ -73,13 +79,17 @@ class UnitTestBase(unittest.TestCase):
         - req.pyhttp["REQUEST_METHOD"]    - GET or POST
         - req.pyhttp["CONTENT_LENGTH"]    - integer
         """
-        _config = {"default_theme": "html",
-                   "datadir": os.path.join(self.datadir, "entries"),
-                   "blog_title": "Joe's blog",
-                   "base_url": "http://www.example.com/"}
+        _config = {
+            'default_theme': 'html',
+            'datadir': self.datadir,
+            'themedir': self.themedir,
+            'blog_title': 'My blog',
+            'base_url': 'http://www.example.com'
+        }
         if cfg:
             _config.update(cfg)
 
+        _config = Config.validate(_config)
         app.initialize(_config)
 
         _data = {}
@@ -181,11 +191,12 @@ class PluginTest(UnitTestBase):
         self.timestamp_w3c = time.strftime('%Y-%m-%dT%H:%M:%SZ', gmtime)
 
         plugin_file = os.path.dirname(plugin_module.__file__)
-        self.config = {
+        self.config = Config.validate({
             'datadir': self.datadir,
+            'themedir': self.themedir,
             'plugin_dirs': [plugin_file],
-            'base_url': 'http://example.com/',
-        }
+            'base_url': 'http://example.com',
+        })
 
         # set up environment vars and http request
         self.environ = {'PATH_INFO': '/', 'REMOTE_ADDR': ''}

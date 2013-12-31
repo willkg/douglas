@@ -18,6 +18,7 @@ import time
 from douglas import __version__
 from douglas import plugin_utils
 from douglas.app import Douglas, initialize
+from douglas.settings import import_config
 from douglas.tools import (
     abort, run_callback, pwrap, pwrap_error, setup_logging,
     render_url_statically, url_rewrite)
@@ -27,13 +28,12 @@ USAGE = "%prog [options] [command] [command-options]"
 VERSION = "%prog " + __version__
 
 
-def import_config(quiet=True):
+def get_config(quiet=True):
     if not quiet:
         pwrap("Trying to import the config module....")
 
     try:
-        from config import py as cfg
-        return cfg
+        return import_config()
 
     except StandardError:
         if not quiet:
@@ -47,13 +47,17 @@ def import_config(quiet=True):
                 '\n\n'
                 'See "{prog} --help" for more details.'.format(
                     prog=scriptname))
+            # FIXME - need to provide better messages for wtf happened
+            # here.
+            import traceback
+            print traceback.format_exc()
         return {}
 
 
 def with_config(fun):
     @wraps(fun)
     def _wrapped(*args, **kwargs):
-        cfg = import_config(quiet=False)
+        cfg = get_config(quiet=False)
         return fun(cfg, *args, **kwargs)
     return _wrapped
 
@@ -295,7 +299,7 @@ def cmd_test(cfg, command, argv):
     pwrap("- sys.version:  %s" % sys.version.replace("\n", " "))
     pwrap("- os.name:      %s" % os.name)
     codebase = os.path.dirname(os.path.dirname(__file__))
-    pwrap("- codebase:     %s" % cfg.get("codebase", codebase))
+    pwrap("- codebase:     %s" % codebase)
     pwrap("")
 
     pwrap("Checking config.py file")
@@ -604,7 +608,7 @@ def main(argv):
         sys.path.insert(0, configdir)
         print 'Inserting {0} to beginning of sys.path....'.format(configdir)
 
-    cfg = import_config(quiet=True)
+    cfg = get_config(quiet=True)
 
     handlers = get_handlers(cfg)
 

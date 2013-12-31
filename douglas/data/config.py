@@ -17,18 +17,6 @@
 # Don't touch this next line.
 py = {}
 
-
-# Codebase configuration
-# ======================
-
-# If you did not install Douglas as a library (i.e. python setup.py install)
-# then uncomment this next line and point it to your Douglas installation
-# directory.
-#
-# Note, this should be the parent directory of the "Douglas" directory
-# (note the case--uppercase P lowercase b!).
-#py["codebase"] = "%(codedir)s"
-
 import os
 
 BLOGDIR = "%(basedir)s"
