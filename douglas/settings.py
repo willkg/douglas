@@ -560,7 +560,7 @@ class Config(object):
     #:        '/home/joe/blog/staticimages/',
     #:        '/home/joe/blog/blogimages/'
     #:    ]
-    static_files_dir = Optional([], lambda x: isinstance(x, (tuple, list)))
+    static_files_dirs = Optional([], lambda x: isinstance(x, (tuple, list)))
 
     @classmethod
     def validate(cls, cfg):
