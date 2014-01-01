@@ -122,13 +122,49 @@ Don't use l as a variable name.
 Tests
 =====
 
+In the douglas git repository, there are two big things that have
+test suites:
+
+1. the Douglas core code
+2. the plugins that are in ``douglas/plugins/``
+
 Please add tests for changes you make. In general, it's best to write
 a test, verify that it fails, then fix the code which should make the
 test pass.
 
 Tests go in ``douglas/tests/``.
 
-Tests are run with `nose <https://nose.readthedocs.org/en/latest/>`_.
+We use `nose <https://nose.readthedocs.org/en/latest/>`_ because it's
+super.
+
+Run the tests by:
+
+.. code-block:: bash
+
+   $ nosetests
+
+
+The ``douglas.tests`` package defines helper functions, classes, and
+other things to make testing easier.
+
+Writing tests is pretty easy:
+
+1. create a file in ``douglas/tests/`` with a filename that starts
+   with ``test_`` and ends with ``.py``.
+
+2. at the top, do:
+
+   .. code-block:: python
+
+      from douglas.tests import UnitTestBase
+
+
+3. create a subclass of ``UnitTestBase``
+
+4. write some tests using pretty standard unittest/nose stuff
+
+See ``douglas/tests/`` for examples testing the core as well as core
+plugins.
 
 
 Documentation

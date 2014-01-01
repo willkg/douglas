@@ -45,37 +45,37 @@ compile your blog to.  Everything else is optional and has defaults.
       py["base_url"] = "http://example.com/~joe"
 
 :py:data:`compiledir <douglas.settings.Config.compiledir>`
-    The directory to compile your blog into.
+   The directory to compile your blog into.
 
 :py:data:`compile_themes <douglas.settings.Config.compile_themes>`
-    The themes to compile all pages in.
+   The themes to compile all pages in.
 
 :py:data:`compile_index_themes <douglas.settings.Config.compile_index_themes>`
-    The themes to compile index pages in.
+   The themes to compile index pages in.
 
 :py:data:`day_indexes <douglas.settings.Config.day_indexes>`
-    Whether or not to do day-based indexes.
+   Whether or not to do day-based indexes.
 
 :py:data:`month_indexes <douglas.settings.Config.month_indexes>`
-    Whether or not to do month-based indexes.
+   Whether or not to do month-based indexes.
 
 :py:data:`year_indexes <douglas.settings.Config.year_indexes>`
-    Whether or not to do year-based indexes.
+   Whether or not to do year-based indexes.
 
 :py:data:`compile_urls <douglas.settings.Config.compile_urls>`
-    List of additional urls to compile.
+   List of additional urls to compile.
 
 
 Configuring collectstatic
 =========================
 
 :py:data:`static_url <douglas.settings.Config.static_url>`
-    The url where your static assets will be. If you're using a CDN, then this
-    will be a complete url. Otherwise you probably want to set this to your
-    :py:data:`base_url <douglas.settings.Config.base_url>` plus ``/static``.
+   The url where your static assets will be. If you're using a CDN, then this
+   will be a complete url. Otherwise you probably want to set this to your
+   :py:data:`base_url <douglas.settings.Config.base_url>` plus ``/static``.
 
 :py:data:`static_files_dir <douglas.settings.Config.static_files_dir>`
-    The list of additional directories to copy static assets from.
+   The list of additional directories to copy static assets from.
 
 
 Compiling your blog

@@ -20,7 +20,7 @@ Douglas
    Douglas version as a string.  Conforms to `PEP-386
    <http://www.python.org/dev/peps/pep-0386/>`_.
 
-   For example ``"1.5"``.
+   For example ``"0.1"``.
 
 
 douglas.app

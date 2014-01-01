@@ -28,123 +28,81 @@ plugins easier to distribute, maintain, update, and easier for users
 to use them.
 
 
+Example
+-------
+
+Here's a really short example plugin named ``ignore_future.py``:
+
+.. code-block:: python
+   
+   """
+   Summary
+   =======
+    
+   Prevents blog entries published in the future from showing up on
+   the blog.
+    
+    
+   Install
+   =======
+    
+   Add ``douglas.plugins.ignore_future`` to the ``load_plugins`` list in
+   your ``config.py`` file.
+    
+   """
+    
+   __description__ = "Ignores entries in the future."
+   __category__ = "content"
+   __license__ = "MIT"
+    
+   import time
+    
+   from douglas.tools import filestat
+    
+    
+   def cb_entries(args):
+       cfg = args['config']
+       entry_files = args['entry_files']
+    
+       now = time.time()
+    
+       def check_mtime(cfg, now, path):
+           mtime = time.mktime(filestat(cfg, path))
+           return mtime < now
+    
+       entry_files = [path for path in entry_files
+                      if check_mtime(cfg, now, path)]
+       args['entry_files'] = entry_files
+    
+       return args
+    
+
 Name
 ----
 
-All plugins need a good name that's unique so that your plugin doesn't get
-confused with other plugins.  Additionally, the filename for your plugin
-needs to be unique.
+All plugins need a good name that's unique so that your plugin doesn't
+get confused with other plugins.  Additionally, the filename for your
+plugin needs to be unique.
 
 .. Warning::
 
-   Make sure the filename for your plugin is unique!  Douglas imports your
-   plugin using Python import machinery which means that if your plugin has
-   the same name as a package on your system, then depending on how sys.path
-   is set up, Douglas may load the package on your system and NOT your
-   plugin.
+   Make sure the filename for your plugin is unique!  Douglas imports
+   your plugin using Python import machinery which means that if your
+   plugin has the same name as a package on your system, then
+   depending on how ``sys.path`` is set up, Douglas may load the
+   package on your system and NOT your plugin.
 
-   If you think this might be happening to you, do ``douglas-cmd test`` and
-   it'll tell you the paths of what it's loading.
+   If you think this might be happening to you, do ``douglas-cmd
+   test`` and it'll tell you the paths of what it's loading.
 
 
 Documentation
 -------------
 
-All plugins should have a docstring at the top of the file that describes
-in detail:
+All plugins should have a docstring at the top of the file that
+explains what the plugin does, how to install it, how to configure it
+and how to use it.
 
-1. what the plugin does
-2. how to install it
-3. how to configure it
-4. the license the plugin is distributed under
-5. and any copyright information you have
-6. any notes about requirements (e.g. "Requires Python 2.3 or greater")
-
-For example, this is at the top of Will's wbgpager plugin::
-
-   """
-   Quickly written plugin for paging long index pages.  
-
-   Douglas uses the num_entries configuration variable to prevent
-   more than num_entries being rendered by cutting the list down
-   to num_entries entries.  So if your num_entries is set to 20, you
-   will only see the first 20 entries rendered.
-
-   The wbgpager overrides this functionality and allows for paging.
-   It does some dirty stuff so that Douglas doesn't cut the list down
-   and then wbgpager cuts it down in the prepare callback later down
-   the line.
-
-   To install wbgpager, do the following:
-
-     1. add "wbgpager" to your load_plugins list variable in your
-        config.py file---make sure it's the first thing listed so
-        that it has a chance to operate on the entry list before
-        other plugins.
-     2. add the $page_navigation variable to your head or foot
-        (or both) templates.  this is where the page navigation
-        HTML will appear.
-
-
-   Here are some additional configuration variables to adjust the 
-   behavior:
-
-     wbgpager_count_from
-       datatype:       int
-       default value:  0
-       description:    Some folks like their paging to start at 1---this
-                       enables you to do that.
-
-     wbgpager_previous_text
-       datatype:       string
-       default value:  &lt;&lt;
-       description:    Allows you to change the text for the prev link.
-
-     wbgpager_next_text
-       datatype:       string
-       default value:  &gt;&gt;
-       description:    Allows you to change the text for the next link.
-
-     wbgpager_linkstyle
-       datatype:       integer
-       default value:  0
-       description:    This allows you to change the link style of the paging.
-                       style 0:  [1] 2 3 4 5 6 7 8 9 ... >>
-                       style 1:  Page 1 of 4 >>
-
-
-   That should be it!
-
-
-   Note: This plugin doesn't work particularly well with compiling.
-   The problem is that it relies on the querystring to figure out which
-   page to show and when you're compiling, only the first page
-   is rendered.  This will require a lot of thought to fix.  If you are
-   someone who is passionate about fixing this issue, let me know.
-
-
-   Permission is hereby granted, free of charge, to any person
-   obtaining a copy of this software and associated documentation
-   files (the "Software"), to deal in the Software without restriction,
-   including without limitation the rights to use, copy, modify,
-   merge, publish, distribute, sublicense, and/or sell copies of the
-   Software, and to permit persons to whom the Software is furnished
-   to do so, subject to the following conditions:
-
-   The above copyright notice and this permission notice shall be
-   included in all copies or substantial portions of the Software.
-
-   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-   EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
-   OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-   NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
-   BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
-   ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-   CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-   SOFTWARE.
-
-   Copyright 2004, 2005, 2006 Will Kahn-Greene
-   """
 
 Metadata
 --------
@@ -152,139 +110,61 @@ Metadata
 All plugins should have the following module-level variables 
 defined in them just after the docstring:
 
-* ``__author__`` - This holds your name and email address
-  so that people can contact you when they have problems.
-
-* ``__version__`` - This holds the version number and release
-  date so that people know what version of the plugin they're looking 
-  at.
-
-* ``__url__`` - This holds the url where people can find information
-  about your plugin and documentation and download new versions of your
-  plugin.
-
 * ``__description__`` - This is a one-sentence description of what your 
   plugin does.
 
+* ``__license__`` - The license this plugin is distributed under.
 
-For example::
+* ``__category__`` - (Optional) A one-word category for the plugin. You
+  only need to include this if you're planning to create a pull request
+  to add this plugin to Douglas core plugins.
 
-   __author__      = "Will Kahn-Greene - willg at bluesock dot org"
-   __version__     = "version 1.5 2006-01-15"
-   __url__         = "http://www.bluesock.org/~willg/douglas/"
-   __description__ = "Splits long indexes into multiple pages."
+* ``__url__`` (Optional) The canonical url where information about
+  this plugin is. GitHub repository, web-site, author's blog
+  entry---whatever. Users will use this url to figure out whether
+  their copy of the plugin is up-to-date, contact the author with
+  issues, etc.
 
 
 Configuration, installation and verification
 --------------------------------------------
 
-After that, you should have a ``verify_installation`` section that
-verifies that the plugin is configured correctly.  As of Douglas 0.9, 
-Douglas allows users to test their configuration and installation from
-the console.
+After that, you could have a ``verify_installation`` function that
+verifies that the plugin is configured correctly. This helps when your
+plugin has complex configuration since you can walk the user through
+misconfiguration issues rather than the user see your plugin fail
+inexplicably.
 
-You can test your blog configuration like this::
+If your plugin doesn't require much configuration or the configuration
+is trivial, feel free to skip this.
 
-    $ douglas-cmd test
-    douglas: version 0.1.dev
-    Trying to import the config module....
-    System Information
-    ==================
+Here's an example:
 
-    - douglas:      0.1.dev
-    - sys.version:  2.7.5 (default, Nov 12 2013, 16:18:42)  [GCC 4.8.2
-      20131017 (Red Hat 4.8.2-1)]
-    - os.name:      posix
-    - codebase:     /home/willkg/projects/douglas
+.. code-block:: python
 
-    Checking config.py file
-    =======================
-    - properties set: 31
-    - datadir '/home/willkg/tmp/douglas/blog/entries' exists.
-    - themedir '/home/willkg/tmp/douglas/blog/themes' exists.
+   def verify_installation(request):
+       cfg = request.get_configuration()
 
-    Checking plugin configuration
-    =============================
-     - There are no plugins installed.
-
-    Verification complete.  Correct any errors and warnings above.
+       if 'important_key' not in cfg:
+           print 'You are missing important_key in your configuration!'
+	   return False
+       return True
 
 
-This goes through and verifies the properties in the ``config.py``
-file as best as it can.  It also prints out diagnostic information
-which is useful when things don't work.  It also loads and initializes
-all the plugins and asks them to verify their configurations as best
-they can.
+Return ``False`` if it fails verification.
 
-As a plugin developer, you should add a ``verify_installation``
-function to your plugin module.  Something like this (taken from
-categories)::
-
-    def verify_installation(request):
-        config = request.get_configuration()
-
-        if not config.has_key("category_theme"):
-            print "missing optional config property 'category_theme' "
-            print "which allows you to specify the theme for the category "
-            print "link.  refer to pycategory plugin documentation for more "
-            print "details."
-        return 1
+Return ``True`` if it passes verification.
 
 
-This gives you (the plugin developer) the opportunity to walk the user
-through configuring your highly complex, quantum-charged, turbo plugin
-in small baby steps without having to hunt for where their logs might
-be.
+How to log to the log file
+==========================
 
-So check the things you need to check, print out error messages
-(informative ones) using ``print``, and then return a 1 if the plugin
-is configured correctly or a 0 if it's not configured correctly.
+The user can configure logging in their ``config.py`` file. If it's
+not configured, then logging is at the ``error`` level and is piped to
+stdout.
 
-.. Note::
-
-    This is not a substitute for the user to read the installation
-    instructions.  It should be a really easy way to catch a lot of
-    potential problems without involving the web server's error logs and
-    debugging information being sent to a web-browser and things of that
-    nature.
-
-Here's an example of ``verify_installation`` from Will's wbgpager
-plugin::
-
-    def verify_installation(request):
-        config = request.get_configuration()
-        if config.get("num_entries", 0) == 0:
-            print "missing config property 'num_entries'.  wbgpager won't do "
-            print "anything without num_entries set.  either set num_entries "
-            print "to a positive integer, or disable the wbgpager plugin."
-            print "see the documentation at the top of the wbgpager plugin "
-            print "code file for more details."
-            return 0
-
-        return 1
-
-
-
-How to log messages to a log file
-=================================
-
-First you need to get the logger instance.  After that, you can call
-debug, info, warning, error and critical on the logger instance.  For
-example::
-
-    import logging
-
-    log = logging.getLogger()
-
-
-    def cb_prepare(args):
-        # ...
-        log.info("blah blah blah...")
-
-        try:
-            # ...
-        except ValueError, e:
-            log.error(e)
+Douglas uses the `Python logging module
+<http://docs.python.org/2/library/logging.html>`_.
 
 
 How to implement a callback
@@ -308,7 +188,7 @@ Each callback passes in arguments through a single dictionary.  Each
 callback passes in different arguments and expects different return
 values.  Check the doc:`dev_architecture <architecture>` chapter
 for a list of all the callbacks that are available, their arguments,
-and return values.
+and how they work.
 
 
 .. _writing-an-entryparser:
@@ -316,123 +196,13 @@ and return values.
 Writing an entryparser
 ======================
 
-Entry parsing functions take in a filename and the Request object.
-They then open the file and parse it out.  They can call
-``cb_preformat`` and ``cb_postformat`` as they see fit.  They should
-return a dict containing at least ``"title"`` and ``"body"`` keys.
-The "title" should be a single string.  The ``"body"`` should be a
-single string and should be formatted in HTML.
+FIXME - write this
 
-Here's an example code that reads ``.plain`` files which have the
-title as the first line, metadata lines that start with ``#`` and then
-after all the metadata the body of the entry::
-
-    import os
-
-    def cb_entryparser(entryparsingdict):
-        """
-        Register self as plain file handler
-        """
-        entryparsingdict["plain"] = parse
-        return entryparsingdict
-
-    def parse(filename, request):
-        """
-        We just read everything off the file here, using the filename
-        as the title.
-        """
-        entrydata = {}
-
-        f = open(filename, "r")
-        lines = f.readlines()
-        f.close()
-
-        entrydata["title"] = filename
-        entrydata["body"] = "<pre>" + "".join(lines) + "</pre>"
-
-        return entrydata
-
-
-You can also specify the template to use by setting the
-``"template_name"`` variable in the returned dict.  If the template
-specified doesn't exist, Douglas will use the ``story`` template for
-the specified theme.
-
-For example, if you were creating a tumblelog and the file parsed was
-a image entry and you want image entries to be displayed on your blog
-with an image and then a caption below it and that's it, then you
-would create a template for that and set ``"template_name"`` to the
-name of the template::
-
-    def cb_entryparser(entryparsingdict):
-        """
-        Register self as plain file handler
-        """
-        entryparsingdict['image'] = parse_image
-        return entryparsingdict
-
-    def parse_image(filename, request):
-        """
-        An image entry consists of an image file name followed by
-        the caption.  Like this::
-
-            cimg_8229.jpg
-            This is a picture of me standing on my head.
-
-        Note that there's no title, no metadata, ...
-        """
-        entrydata = {}
-
-        f = open(filename, "r")
-        lines = f.readlines()
-        f.close()
-
-        # we do this for RSS purposes
-        entrydata['title'] = "image %s" % lines[0]
-        entrydata['body'] = "\n".join([
-            "<img src=\"/images/%s\">",
-            "<p>%s</p>" % "".join(lines[1:])
-            ])
-
-        entrydata["template_name"] = "image_post"
-
-        return entrydata
-
-
-.. _writing-a-preformatter:
-
-Writing a preformatter plugin
-=============================
-
-FIXME - need more about preformatters here
-
-A typical preformatter plugin looks like this::
-
-    def cb_preformat(args):
-        if args['parser'] == 'linebreaks':
-            return parse(''.join(args['story']))
-
-    def parse(text):
-        # A preformatter to convert linebreak to its HTML counterpart
-        text = re.sub('\\n\\n+','</p><p>',text)
-        text = re.sub('\\n','<br />',text)
-        return '<p>%s</p>' % text
-
-
-.. _writing-a-postformatter:
-
-Writing a postformatter plugin
-==============================
-
-FIXME - write this section
-
-
-.. _writing-a-renderer:
 
 Writing a renderer
 ==================
 
-FIXME - write this section
+FIXME - write this
 
 
 .. _writing-a-command:
@@ -449,26 +219,28 @@ To write a new command, you must:
 
 1. implement the ``commandline`` callback which adds the command,
    handler, and command summary
+
 2. implement the command function
 
-For example, this adds a command to print command line arguments::
+For example, this adds a command to print command line arguments:
 
-    def printargs(command, argv):
-        print argv
-        return 0
+.. code-block:: python
 
-    def cb_commandline(args):
-        args["printargs"] = (printargs, "prints arguments")
-        return args
+   def printargs(command, argv):
+       print argv
+       return 0
 
+   def cb_commandline(args):
+       args["printargs"] = (printargs, "prints arguments")
+       return args
 
-.. Note::
-
-   The plugin must be in a directory specified by ``load_plugins`` in
-   the user's ``config.py`` file.
 
 Executing the command looks like this::
 
-    % douglas-cmd printargs --config /path/to/config.py/dir a b c
+    % douglas-cmd printargs a b c
     douglas-cmd version 0.1
     a b c
+
+
+For examples, see ``douglas/cmdline.py`` and
+``douglas/plugins/tags.py``.

@@ -24,7 +24,7 @@ Setting Douglas up to use plugins
 
 There are two properties in your ``config.py`` file that affect the
 behavior for loading plugins: ``plugin_dirs`` and ``load_plugins``.
-There's more documentation on these in :ref:`plugin-configuration`.
+There's more documentation on these in :ref:`configuration-variables`.
 
 
 Finding plugins

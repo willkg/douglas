@@ -1,6 +1,7 @@
 # Python imports
 import cgi
 import locale
+import logging
 import os
 import os.path
 import sys
@@ -79,7 +80,7 @@ class Douglas(object):
         needs to do before exiting.
         """
         # Log some useful stuff for debugging.
-        log = tools.logging.getLogger()
+        log = logging.getLogger()
         response = self.get_response()
         log.debug('status = %s' % response.status)
         log.debug('headers = %s' % response.headers)

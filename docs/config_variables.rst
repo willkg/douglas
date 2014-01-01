@@ -19,9 +19,13 @@ required, others are optional.
 Config variables and syntax
 ===========================
 
-Each configuration variable is set with a line like::
+Each configuration variable is set with a line like:
 
-    py["blog_title"] = "Another douglas blog"
+
+.. code-block:: python
+
+   py["blog_title"] = "Another douglas blog"
+
 
 where:
 
@@ -95,6 +99,8 @@ Apache and then set the config.py variable ``py["media_url"]`` to the
 directory with media files and use ``$media_url`` to refer to this URL
 in your theme templates.
 
+
+.. _configuration-variables:
 
 Configuration variables
 =======================

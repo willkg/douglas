@@ -1,77 +1,132 @@
 .. _themes-and-templates:
 
-====================
-Themes and Templates
-====================
+===============================
+Renderers, Themes and Templates
+===============================
 
 Summary
 =======
 
-This chapter covers writing a theme for Douglas.  The default renderer
-is `Jinja2 <http://jinja.pocoo.org/docs/>`_. You can set up other
-renderers using plugins.  See the chapter on:ref:`renderers <renderers>`
-for more details.
+This chapter covers renderers, themes and templates.
+
+.. contents::
+   :local:
+
+
+Renderers
+=========
+
+Douglas supports multiple renderers and comes with two by default:
+debug and Jinja2.
+
+
+debug
+-----
+
+The debug renderer outputs your blog in a form that makes it easy to
+see the data generated when handling a Douglas request.  This is
+useful for debugging plugins, working on Jinja2 themes and templates,
+and probably other things as well.
+
+To set Douglas to use the debug renderer, do this in your
+``config.py`` file::
+
+    py["renderer"] = "debug"
+
+
+jinjarenderer
+-------------
+
+This is the default renderer and it renders the blog using `Jinja2
+<http://jinja.pocoo.org/docs/>`_.  This renderer lets you specify how
+your blog is rendered using themes which are composed of Jinja2
+templates.  This is described later in this chapter.
+
+It's the default renderer, so if you want to use it, you don't have to
+do anything special.
+
+
+Other renderers
+---------------
+
+If you want your blog rendered by a different renderer, you'll need to
+install a plugin that implements the ``renderer`` callback or write
+your own.
 
 
 Themes and templates
 ====================
 
+The jinjarenderer lets you specify how your blog should be rendered
+with themes and templates.
+
 A theme consists of at least:
 
-* a ``content_type`` file which has the mimetype of the output being rendered
-  (e.g. ``text/html``)
-* an ``entry.<themename>`` file which is used when rendering a page
-  with a single entry
-* an ``entry_list.<themename>`` file which is used when rendering a
-  page with a bunch of entries (e.g. category list, date archive list,
-  front page, ...)
+* a ``content_type`` file which has the mimetype of the output being
+  rendered (e.g. ``text/html``)
+* an ``entry.<themename>`` Jinja2 template file which is used when
+  rendering a page with a single entry
+* an ``entry_list.<themename>`` Jinja2 template file which is used
+  when rendering a page with a bunch of entries (e.g. category list,
+  date archive list, front page, ...)
 
-Plugins may require additional templates. See the plugin's documentation
-for details.
+Plugins may require additional templates.  See each plugin's
+documentation for details.
 
 
 Example blog
 ------------
 
-Joe has this set in his ``config.py`` file::
+Joe has this set in his ``config.py`` file:
 
-    py["themedir"] = "/home/joe/blog/themes/"
+.. code-block:: python
+
+   py["themedir"] = "/home/joe/blog/themes/"
 
 
 Joe's blog directory structure looks like this::
 
    /home/joe/blog/
-             |- entries/             <-- datadir
-             |  |- work/             <-- work category of entries
-             |  |- home/             <-- home category of entries
-             |
-             |- themes/
-                |- html/             <-- html theme
-                |  |- content_type
-                |  |- entry.html
-                |  |- entry_list.html
-                |
-                |- rss/              <-- rss theme
-                   |- content_type
-                   |- entry.rss
-                   |- entry_list.rss
+       |- entries/              <-- datadir
+       |  |- work/              <-- work category of entries
+       |  |- home/              <-- home category of entries
+       |
+       |- themes/
+          |- html/              <-- html theme
+          |  |- content_type
+          |  |- entry.html
+          |  |- entry_list.html
+          |
+          |- rss/               <-- rss theme
+             |- content_type
+             |- entry.rss
+             |- entry_list.rss
 
 
 .. Note::
 
-   There's some redundancy between the theme named directory and
-   the theme in the extension. Having the theme in the extension
-   makes it more likely your editor will use the right syntax
-   highlighting. So that's helpful. Having themes in separate
-   directories means that if you have a bunch of files, they don't
-   overlap and get all confuzzled. That's helpful, too.
+   There's some redundancy between the theme named directory and the
+   theme in the extension. Having the theme in the extension makes it
+   more likely your editor will use the right syntax highlighting. So
+   that's helpful. Having themes in separate directories means that if
+   you have a bunch of files, they don't overlap and get all
+   confuzzled. That's helpful, too.
+
+   However, this gets a bit irritating when you go to rename a theme
+   and have to rename the directory as well as the extensions of all
+   the files.
+
+   However however, given that the file extensions triggers syntax
+   highlighting in editors, I suspect this won't happen often and that
+   themes will be a .tar.gz file consisting of an ``html/`` directory
+   with ``*.html`` files in it.
 
 
 Template writing tips
 =====================
 
-We're using Jinja2, so we reference variables using Jinja2 syntax and we can
-use Jinja2 blocks, built-in functions and built-in filters.
+We're using Jinja2, so we reference variables using Jinja2 syntax and
+we can use Jinja2 blocks, built-in functions and built-in filters.
 
 This prints a variable::
 
@@ -84,15 +139,15 @@ You can iterate through a list::
         ...
     {% endfor %}
 
-Douglas has autoescaping set, so if the variable you're printing
-is HTML and you know that it's safe, you can use the ``safe`` filter::
+Douglas has autoescaping set, so if the variable you're printing is
+HTML and you know that it's safe, you can use the ``safe`` filter::
 
     {{ entry.body|safe }}
 
-Templates can inherit from other templates. It's probably the case
-you want to have a base layout template that defines the common
-parts of your site, then have the entry or entry-list specific
-stuff in those templates.
+Templates can inherit from other templates. It's probably the case you
+want to have a base layout template that defines the common parts of
+your site, then have the entry or entry-list specific stuff in those
+templates.
 
 To inherit from another template, use the ``extends`` tag::
 
@@ -441,9 +496,10 @@ use by using the ``flav`` variable in the query string.
 
 The order in which we figure out which theme to use is this:
 
-1. look at the URI extension: if the URI has one, then we use that.
-2. look at the ``theme`` querystring variable: if there is one, 
+1. Look at the URI extension: if the URI has one, then we use that.
+
+2. Look at the ``theme`` querystring variable: if there is one, 
    then we use that.
-3. look at the ``default_theme`` property in the ``config.py`` 
-   file: if there is one, then we use that.
-4. use the ``html`` theme.
+
+3. Look at the ``default_theme`` property in the ``config.py`` 
+   file which defaults to ``html``.

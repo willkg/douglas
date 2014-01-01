@@ -26,11 +26,9 @@ purposes.
    deploy_cgi
    deploy_paste
    deploy_apache_mod_wsgi
-   deploy_lighttpd_fastcgi
    config_variables
    writing_entries
    themes_and_templates
-   renderers
    plugins
    authors
 
@@ -62,7 +60,6 @@ plugins, or things of that ilk.
    dev_architecture
    dev_writing_plugins
    dev_codedocs
-   dev_testing
    dev_release
 
 

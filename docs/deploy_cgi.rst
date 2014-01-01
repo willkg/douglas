@@ -1,8 +1,8 @@
 .. _deploy-cgi-chapter:
 
-============================
+==========================
 Deploying Douglas with CGI
-============================
+==========================
 
 Summary
 =======
@@ -61,9 +61,12 @@ Deployment
 5. Make sure your blog directory has the correct permissions for being
    read by the process executing your CGI script.
 
-6. Run your ``douglas.cgi`` script by doing::
+6. Run your ``douglas.cgi`` script by doing:
 
-       % ./douglas.cgi test
+   .. code-block:: bash
+
+      $ ./douglas.cgi test
+
 
    If that doesn't work, double-check to make sure you've completed
    the above steps, then check the trouble-shooting section below.
@@ -82,7 +85,7 @@ us and keep trying things.
 
 
 Running ./douglas.cgi doesn't work
-------------------------------------
+----------------------------------
 
 If Python is installed on your system, make sure the first line in
 ``douglas.cgi`` points to the correct Python interpreter.  By
@@ -90,9 +93,12 @@ default, ``douglas.cgi`` uses ``env`` to execute the Python
 interpreter.  In some rare systems, ``/usr/bin/env`` doesn't exist or
 the system may have odd environment settings.  In those cases, you may
 edit the first line to point to the Python interpreter directly.  For
-example::
+example:
 
-    #!/usr/bin/python
+.. code-block:: bash
+
+   #!/usr/bin/python
+
 
 Then try running ``./douglas.cgi`` again.
 
@@ -148,14 +154,20 @@ Do you have plugins loaded?  If you do, comment out the
 ``load_plugins`` setting in your ``config.py`` file so that Douglas
 isn't loading any plugins.
 
-For example::
+For example:
 
-    py["load_plugins"] = ['plugina', 'pluginb', ...]
+.. code-block:: python
 
-would get changed to::
+   py["load_plugins"] = ['plugina', 'pluginb', ...]
 
-    # commenting this out to see if it's a plugin problem
-    # py["load_plugins"] = ['plugina', 'pluginb', ...]
+
+would get changed to:
+
+.. code-block:: python
+
+   # commenting this out to see if it's a plugin problem
+   # py["load_plugins"] = ['plugina', 'pluginb', ...]
+
 
 Check to see if the problem persists.  Sometimes there are issues with
 plugins that only show up in certain situations.
@@ -166,9 +178,12 @@ I have other issues
 
 Try changing the renderer for your blog to the debug renderer.  You
 can do this by setting the ``renderer`` property in your ``config.py``
-file to ``debug``.  For example::
+file to ``debug``.  For example:
 
-    py["renderer"] = "debug"
+.. code-block:: python
+
+   py["renderer"] = "debug"
+
 
 That will show a lot more detail about your configuration, what the
 web server passes Douglas in environment variables, and other data
@@ -224,7 +239,7 @@ a long way in helping us to help you.
 
 
 Renaming the douglas.cgi script
-=================================
+===============================
 
 In the default installation, the Douglas script is named
 ``douglas.cgi``.
@@ -232,9 +247,9 @@ In the default installation, the Douglas script is named
 For a typical user on an Apache installation with user folders turned
 on, Douglas URLs could look like this::
 
-    http://example.com/~joe/cgi-bin/douglas.cgi
-    http://example.com/~joe/cgi-bin/douglas.cgi/an_entry.html
-    http://example.com/~joe/cgi-bin/douglas.cgi/dev/another_entry.html 
+   http://example.com/~joe/cgi-bin/douglas.cgi
+   http://example.com/~joe/cgi-bin/douglas.cgi/an_entry.html
+   http://example.com/~joe/cgi-bin/douglas.cgi/dev/another_entry.html 
 
 
 That gets pretty long and it's not very good looking.  For example,
@@ -253,15 +268,15 @@ Both methods are described here in more detail.
 
 
 Change the name of the douglas.cgi script
--------------------------------------------
+-----------------------------------------
 
 There's no reason that ``douglas.cgi`` has to be named
 ``douglas.cgi``.  Let's try changing it ``blog``.  Now our example
 URLs look like this::
 
-    http://example.com/~joe/cgi-bin/blog
-    http://example.com/~joe/cgi-bin/blog/an_entry.html
-    http://example.com/~joe/cgi-bin/blog/category1/another_entry.html 
+   http://example.com/~joe/cgi-bin/blog
+   http://example.com/~joe/cgi-bin/blog/an_entry.html
+   http://example.com/~joe/cgi-bin/blog/category1/another_entry.html 
 
 
 That's better looking in the example.  In your specific circumstances,
@@ -272,7 +287,7 @@ You might have to change the ``base_url`` property in your
 
 .. Note::
 
-    The ``base_url`` value should NOT have a trailing slash.
+   The ``base_url`` value should NOT have a trailing slash.
 
 
 If you're running on Apache, you might have to tell Apache that this
@@ -280,20 +295,20 @@ is a CGI script even if it doesn't have a ``.cgi`` at the end of it.
 If you can use ``.htaccess`` files to override Apache settings, you
 might be able to do something like this::
 
-    # this allows execution of CGI scripts in this directory
-    Options ExecCGI 
+   # this allows execution of CGI scripts in this directory
+   Options ExecCGI 
 
-    # if the user doesn't specify a file, then instead of doing the
-    # regular directory listing, we look at "blog" (which is our
-    # douglas.cgi script renamed)
-    DirectoryIndex blog 
+   # if the user doesn't specify a file, then instead of doing the
+   # regular directory listing, we look at "blog" (which is our
+   # douglas.cgi script renamed)
+   DirectoryIndex blog 
 
-    # this tells Apache that even though "blog" doesn't end in .cgi,
-    # it is in fact a CGI script and should be treated as such
-    <Files blog> 
-    ForceType application/cgi-script  
-    SetHandler cgi-script  
-    </Files>
+   # this tells Apache that even though "blog" doesn't end in .cgi,
+   # it is in fact a CGI script and should be treated as such
+   <Files blog> 
+   ForceType application/cgi-script  
+   SetHandler cgi-script  
+   </Files>
 
 
 You may need to stop and restart Apache for your Apache changes to
@@ -312,17 +327,17 @@ In our case, we want all incoming URLs pointing to ``blog`` to get
 rewritten to ``cgi-bin/douglas.cgi`` so they can be handled by
 Douglas.  Then all our URLs will look like this::
 
-    http://example.com/~joe/blog
-    http://example.com/~joe/blog/an_entry.html
-    http://example.com/~joe/blog/category1/another_entry.html
+   http://example.com/~joe/blog
+   http://example.com/~joe/blog/an_entry.html
+   http://example.com/~joe/blog/category1/another_entry.html
 
 
 To do this, we create an .htaccess file (it has to be named exactly
 that) in our ``public_html`` directory (or wherever it is that
 ``/~joe/`` points to).  In that file we have the following code::
 
-    RewriteEngine on
-    RewriteRule   ^blog?(.*)$   /~joe/cgi-bin/douglas.cgi$1   [last]
+   RewriteEngine on
+   RewriteRule   ^blog?(.*)$   /~joe/cgi-bin/douglas.cgi$1   [last]
 
 
 The first line turns on the Apache mod_rewrite engine so that it will
@@ -341,4 +356,3 @@ trailing slash.
 
 For more information on URL re-writing, see the mode_rewrite chapter
 in the Apache documentation for the version that you're using.
-

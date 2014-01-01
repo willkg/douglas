@@ -368,7 +368,7 @@ def cmd_test(cfg, command, argv):
                     print "version: %s" % (str(getattr(mem, "__version__")))
 
                     try:
-                        if mem.verify_installation(cfg) == 1:
+                        if mem.verify_installation(cfg):
                             pwrap("PASS")
                         else:
                             pwrap_error("FAIL")
