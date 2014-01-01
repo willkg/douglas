@@ -1,11 +1,66 @@
-.. Douglas documentation master file, created by sphinx-quickstart on
-   Mon Feb 16 00:26:34 2009.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+===================================
+Welcome to Douglas's documentation!
+===================================
 
-=======================================
- Welcome to Douglas's documentation!
-=======================================
+Summary
+=======
+
+Douglas is a file-based blog system written in Python with the
+following features:
+
+* compiler
+* WSGI application
+* runs as a CGI script (woo-hoo!)
+* plugin system for easy adjustment of transforms
+* Jinja renderer
+* basic set of built-in plugins
+
+Douglas is a rewrite of `Pyblosxom <http://pyblosxom.github.io>`_.
+
+
+Quick start
+===========
+
+1. Install:
+
+   .. code-block:: bash
+
+      $ pip install https://github.com/willkg/douglas/archive/master.zip#egg=douglas``
+
+2. Create a new blog:
+
+   .. code-block:: bash
+
+      $ douglas-cmd create blog
+      $ cd blog
+
+3. Edit the configuration
+4. Write a blog entry
+
+   .. code-block:: bash
+
+      $ vi entries/firstpost.txt
+
+5. Compile the blog
+
+   .. code-block:: bash
+
+      $ douglas-cmd compile
+
+6. Copy the static assets (JS, CSS, images, ...)
+
+   .. code-block:: bash
+
+      $ douglas-cmd collectstatic
+
+7. Preview it locally
+
+   .. code-block:: bash
+
+      $ douglas-cmd serve
+
+8. Copy it to your server
+
 
 .. _part-one:
 
