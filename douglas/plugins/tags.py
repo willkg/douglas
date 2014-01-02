@@ -477,7 +477,7 @@ class TagManager(object):
         """Returns list of (tag, tag_url) tuples for this entry"""
         cfg = self.request.get_configuration()
 
-        sep = cfg.get('tags_seperator', ',')
+        sep = cfg.get('tags_separator', ',')
         tags = sorted([t.strip() for t in entry.get('tags', '').split(sep)])
         theme = self.request.get_theme()
         baseurl = cfg['base_url']
@@ -491,14 +491,14 @@ class TagManager(object):
     def entry_tags_span(self, entry):
         """Returns span version of entry tags"""
         start_t = '<span class="entryTags">'
-        item_t = ' <a class="tag" href="{0}">{1}</a> '
+        item_t = ' <a class="tag" href="{0}">{1}</a>'
         finish_t = '</span>'
 
-        output = [start_t]
+        output = []
         for tag, tag_url in self.entry_tags(entry):
             output.append(item_t.format(tag_url, tag))
-        output.append(finish_t)
-        return '\n'.join(output)
+
+        return start_t + ', '.join(output) + finish_t
 
 
 def cb_context_processor(args):
