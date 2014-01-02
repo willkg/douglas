@@ -78,18 +78,21 @@ class YearArchivesManager(object):
     def as_list(self):
         config = self.request.get_configuration()
 
-        item_t = '<li><a href="{baseurl}/{year}/index.{theme}">{year}</a></li>'
+        item_t = '<li><a href="{baseurl}/{year}/index.{theme}">{year}</a> ({num_entries})</li>'
         theme = self.request.get_theme()
 
-        years = set([mem[0] for mem in self.entries])
+        years = {}
+        for year, month, day, entry in self.entries:
+            years[year] = years.get(year, 0) + 1
 
         output = []
         output.append('<ul class="yearArchives">')
 
-        for year in sorted(years, reverse=True):
+        for year, num_entries in sorted(years.items(), reverse=True):
             output.append(item_t.format(
                 baseurl=config['base_url'],
                 year=year,
+                num_entries=num_entries,
                 theme=theme))
         output.append('</ul>')
 
