@@ -12,6 +12,7 @@ import datetime
 import os
 import os.path
 import random
+import shutil
 import sys
 import time
 
@@ -20,8 +21,15 @@ from douglas import plugin_utils
 from douglas.app import Douglas, initialize
 from douglas.settings import import_config
 from douglas.tools import (
-    abort, run_callback, pwrap, pwrap_error, setup_logging,
-    render_url_statically, url_rewrite)
+    abort,
+    get_static_files,
+    pwrap,
+    pwrap_error,
+    render_url_statically,
+    run_callback,
+    setup_logging,
+    url_rewrite
+)
 
 
 USAGE = "%prog [options] [command] [command-options]"
@@ -135,20 +143,30 @@ def generate_handler(doug, cfg, host_port):
                 self.end_headers()
                 return
 
+            url = self.path[len(base_path):]
+            if not url:
+                url = '/'
+            if url.endswith('/'):
+                url = url + 'index.' + default_theme
+
             # If they did a hard-refresh, then there will be a Cache-Control
             # header. If that's there, then we re-render the page so it's
             # up to date.
             if self.headers.get('Cache-Control', '') == 'no-cache':
-                url = self.path[len(base_path):]
-                if not url:
-                    url = '/'
-                if url.endswith('/'):
-                    url = url + 'index.' + default_theme
-
-                # If this isn't a static asset, we should re-render it.
                 if not static_url or not url.startswith(static_url):
+                    # If this isn't a static asset, we should re-render it.
                     print 're-render {0}'.format(url)
                     render_url_statically(dict(cfg), url, '')
+                else:
+                    # Otherwise we should recopy it.
+                    asset_url = url[len(static_url):].lstrip('/')
+                    static_files = [pair for pair in get_static_files(dict(cfg))
+                                    if asset_url == pair[1]]
+                    if static_files:
+                        dst = os.path.join(cfg['compiledir'], 'static')
+                        pair = static_files[0]
+                        shutil.copy2(os.path.join(pair[0], pair[1]),
+                                     os.path.join(dst, pair[1]))
 
             # Need to know whether htis is an html file or not because
             # we need to translate the urls.

@@ -332,6 +332,9 @@ class Douglas(object):
 
     def run_collectstatic(self):
         """Collects static files and copies them to compiledir"""
+
+        # FIXME: rewrite using tools.get_static_files(cfg)
+
         cfg = self._request.get_configuration()
 
         self.initialize()

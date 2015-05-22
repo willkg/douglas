@@ -236,6 +236,38 @@ def get_entries(cfg, root, recurse=0):
     return argdict['entry_files']
 
 
+def get_static_files(cfg):
+    """
+    Return a list of ``(root, file_path)`` tuples for all static
+    files found.
+
+    :arg cfg: configuration
+
+    :returns: list of ``(root, file_path)`` tuples
+
+    """
+    static_files = []
+
+    # static_files_dirs
+    static_files_dirs = cfg['static_files_dirs']
+    static_files_dirs.append(os.path.join(cfg['datadir'], '..', 'static'))
+    for mem in static_files_dirs:
+        for root, dirs, files in os.walk(mem):
+            for name in files:
+                full_path = os.path.join(root, name)
+                static_files.append((mem, full_path[len(mem):].lstrip('/')))
+
+    # Themes static dirs
+    for mem in os.listdir(cfg['themedir']):
+        path = os.path.join(cfg['themedir'], mem, 'static')
+        if os.path.exists(path):
+            for root, dirs, files in os.walk(path):
+                for name in files:
+                    full_path = os.path.join(root, name)
+                    static_files.append((path, full_path[len(path):].lstrip('/')))
+    return static_files
+
+
 def walk(request, root='.', recurse=0, pattern='', return_folders=0):
     """
     This function walks a directory tree starting at a specified root
