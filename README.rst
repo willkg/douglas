@@ -17,6 +17,19 @@ Douglas is a file-based blog system written in Python with the following feature
 Douglas is a rewrite of `Pyblosxom <http://pyblosxom.github.io>`_.
 
 
+Status
+======
+
+There are other file-based blog systems out there that have a more
+complete feature set. I continued this one because at the time, it was
+easier to continue working on this than to switch.
+
+However, I've now switched to `nikola <https://getnikola.com/>`_. It's
+pretty swell. It was easy to switch my Pyblosxom/Douglas blog over.
+
+Ergo, this project is dead for now.
+
+
 Project
 =======
 
