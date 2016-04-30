@@ -134,7 +134,7 @@ test pass.
 
 Tests go in ``douglas/tests/``.
 
-We use `nose <https://nose.readthedocs.org/en/latest/>`_ because it's
+We use `nose <https://nose.readthedocs.io/>`_ because it's
 super.
 
 Run the tests by:

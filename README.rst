@@ -36,7 +36,7 @@ Project
 :Code:    https://github.com/willkg/douglas
 :License: MIT
 :Issues:  https://github.com/willkg/douglas/issues
-:Docs:    https://douglas.readthedocs.org/
+:Docs:    https://douglas.readthedocs.io/
 :Status:  **Extreme Alpha**
 
 
